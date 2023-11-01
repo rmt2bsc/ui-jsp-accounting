@@ -1,2 +1,2 @@
 # ui-jsp-accounting
-Accounting and Financial Application
+The new contacts JSP User Interface application 
