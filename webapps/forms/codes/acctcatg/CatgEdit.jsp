@@ -39,7 +39,7 @@
 				  <tr>
 					 <th class="clsTableFormHeader"><div align="right">Category Description:</div></th>
 					 <td>
-					     <beanlib:InputControl type="text" name="Description" value="#record.Acctcatgdescr" size="48%" maxLength="40"/>
+					     <beanlib:InputControl type="text" name="Acctcatgdescr" value="#record.Acctcatgdescr" size="48%" maxLength="40"/>
 					 </td>
 				  </tr>
 					 <input name="clientAction" type="hidden">
