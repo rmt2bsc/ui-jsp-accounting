@@ -18,6 +18,7 @@ import com.api.web.ICommand;
 import com.api.web.Request;
 import com.api.web.Response;
 import com.api.web.util.RMT2WebUtility;
+import com.entity.GeneralLedgerCriteria;
 import com.entity.VwCategory;
 import com.entity.VwCategoryFactory;
 
@@ -164,69 +165,45 @@ public class CatgEditAction extends AbstractActionHandler implements ICommand {
      */
     protected void doBack() throws ActionCommandException {
         this.receiveClientData();
-        this.getCategories();
+        this.acctCatgList = this.getAccountCategories();
         this.sendClientData();
         this.msg = null;
     }
 
-    // /**
-    // * Retrieves the current account category record in extended form after an
-    // * insert or an update operation.
-    // *
-    // * @throws ActionCommandException
-    // */
-    // private void refreshPage(DatabaseConnectionBean conBean) throws
-    // ActionCommandException {
-    // BasicGLApi api = GeneralLedgerFactory.createBasicGLApi(conBean,
-    // this.request);
-    // try {
-    // // Get Recently updated Account Category record.
-    // int acctCatgId = ((GlAccountCategory) this.catg).getAcctCatgId();
-    // this.catg = api.findAcctCatgByIdExt(acctCatgId);
-    // if (this.catg == null) {
-    // this.catg = GeneralLedgerFactory.createCatg();
-    // }
-    // } catch (GLException e) {
-    // throw new ActionCommandException(e);
-    // } finally {
-    // // Do not close api since its connection object is shared with the
-    // // caller.
-    // api = null;
-    // }
-    // }
-
     /**
-     * Obtains a list of {@link com.bean.GlAccountCategory GlAccountCategory}
-     * objects by account type id which will be presented on the Account
-     * Category list page when the <i>Back</i> button is clicked.
+     * Drives the process of fetching the list of GL Account Type Categories
      * 
+     * @return List<{@link VwCategory}
      * @throws ActionCommandException
      */
-    private void getCategories() throws ActionCommandException {
-        // DatabaseTransApi tx = DatabaseTransFactory.create();
-        // BasicGLApi api =
-        // GeneralLedgerFactory.createBasicGLApi((DatabaseConnectionBean)
-        // tx.getConnector(), this.request);
-        // try {
-        // // Get Acount TYpe object
-        // int acctTypeId = ((GlAccountCategory) this.catg).getAcctTypeId();
-        // this.acctType = api.findAcctTypeById(acctTypeId);
-        //
-        // // Get all GL Account Categories belonging to account type id.
-        // this.acctCatgList = api.findAcctCatgByAcctType(acctTypeId);
-        // if (this.acctCatgList == null) {
-        // this.acctCatgList = new ArrayList();
-        // }
-        // }
-        // catch (GLException e) {
-        // throw new ActionCommandException(e);
-        // }
-        // finally {
-        // api.close();
-        // tx.close();
-        // api = null;
-        // tx = null;
-        // }
+    private List<VwCategory> getAccountCategories() throws ActionCommandException {
+        int acctTypeId = ((VwCategory) this.catg).getAccttypeid();
+        GeneralLedgerCriteria criteria = new GeneralLedgerCriteria();
+        criteria.setAcctTypeId(acctTypeId);
+
+        // Call SOAP web service to get complete list of GL Account Categories
+        // based on a
+        // particular GL Account Type
+        try {
+            AccountingGeneralLedgerResponse response = VwCategorySoapRequests.callGet(criteria);
+            ReplyStatusType rst = response.getReplyStatus();
+            this.msg = rst.getMessage();
+            if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
+                this.msg = rst.getMessage();
+                return null;
+            }
+            List<VwCategory> results = null;
+            if (response.getProfile() != null) {
+                results = VwCategoryFactory.create(response.getProfile().getAccountCategory());
+            }
+            else {
+                results = new ArrayList<>();
+            }
+            return results;
+        } catch (Exception e) {
+            logger.log(Level.ERROR, e.getMessage());
+            throw new ActionCommandException(e.getMessage());
+        }
     }
 
     /**
