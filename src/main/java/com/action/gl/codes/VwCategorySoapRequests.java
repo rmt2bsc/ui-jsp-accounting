@@ -137,4 +137,49 @@ public class VwCategorySoapRequests {
             throw new AccountingUIException(VwCategorySoapRequests.MSG, e);
         }
     }
+
+    /**
+     * SOAP call to delete accounting general ledger account category record
+     * changes.
+     * 
+     * @param parms
+     *            {@link GeneralLedgerCriteria} Currently, should only provide
+     *            selection criteria values for account type id and account
+     *            category id.
+     * @return {@link AccountingGeneralLedgerResponse}
+     * @throws AccountingUIException
+     */
+    public static final AccountingGeneralLedgerResponse callDelete(VwCategory parms) throws AccountingUIException {
+        // Retrieve one or more accounting general ledger account types records
+        // from the database
+        ObjectFactory fact = new ObjectFactory();
+        AccountingGeneralLedgerRequest req = fact.createAccountingGeneralLedgerRequest();
+
+        HeaderType head = HeaderTypeBuilder.Builder.create()
+                .withApplication(ApiHeaderNames.APP_NAME_ACCOUNTING)
+                .withModule(ApiTransactionCodes.MODULE_ACCOUNTING_GL)
+                .withTransaction(ApiTransactionCodes.GL_ACCOUNT_CATG_DELETE)
+                .withMessageMode(ApiHeaderNames.MESSAGE_MODE_REQUEST)
+                .withDeliveryDate(new Date())
+                .withRouting(ApiTransactionCodes.ROUTE_ACCOUNTING)
+                .withDeliveryMode(ApiHeaderNames.DELIVERY_MODE_SYNC)
+                .build();
+
+        GlAccountcatgType gact = GlAccountCategoryTypeBuilder.Builder.create()
+                .withAcctCatgId(parms.getAcctcatid())
+                .build();
+
+        GlDetailGroup detailGroup = fact.createGlDetailGroup();
+        detailGroup.getAccountCategory().add(gact);
+        req.setProfile(detailGroup);
+        req.setHeader(head);
+
+        AccountingGeneralLedgerResponse response = null;
+        try {
+            response = SoapJaxbClientWrapper.callSoapRequest(req);
+            return response;
+        } catch (Exception e) {
+            throw new AccountingUIException(VwCategorySoapRequests.MSG, e);
+        }
+    }
 }

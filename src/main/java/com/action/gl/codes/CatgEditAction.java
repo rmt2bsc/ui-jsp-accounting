@@ -133,29 +133,21 @@ public class CatgEditAction extends AbstractActionHandler implements ICommand {
      * @throws ApplicationException
      */
     public void delete() throws ActionCommandException {
-        // DatabaseTransApi tx = DatabaseTransFactory.create();
-        // BasicGLApi api =
-        // GeneralLedgerFactory.createBasicGLApi((DatabaseConnectionBean)
-        // tx.getConnector(), this.request);
-        // this.refreshPage((DatabaseConnectionBean) tx.getConnector());
-        // try {
-        // api.deleteAcctCatg(((VwCategory) this.catg).getAcctcatid());
-        // tx.commitUOW();
-        // this.msg = "Account category was deleted successfully";
-        // return;
-        // }
-        // catch (GLException e) {
-        // tx.rollbackUOW();
-        // this.msg = "Error: " + e.getMessage();
-        // this.logger.log(Level.ERROR, this.msg);
-        // throw new ActionCommandException(e);
-        // }
-        // finally {
-        // api.close();
-        // tx.close();
-        // api = null;
-        // tx = null;
-        // }
+        // Call SOAP web service to delete GL Account Category data changes to
+        // the database
+        try {
+            AccountingGeneralLedgerResponse response = VwCategorySoapRequests.callDelete((VwCategory) this.catg);
+            ReplyStatusType rst = response.getReplyStatus();
+            this.msg = rst.getMessage();
+            if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
+                this.msg = rst.getMessage();
+                return;
+            }
+            return;
+        } catch (Exception e) {
+            logger.log(Level.ERROR, e.getMessage());
+            throw new ActionCommandException(e.getMessage());
+        }
     }
 
     /**
