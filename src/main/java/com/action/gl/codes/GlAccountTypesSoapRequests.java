@@ -31,10 +31,14 @@ public class GlAccountTypesSoapRequests {
      * 
      * @param parms
      *            {@link StateCriteria}
+     * @param loginId
+     *            the id of logged in user
+     * @param sessionId
+     *            the web session id of the logged in user.
      * @return {@link AccountingGeneralLedgerResponse}
      * @throws AccountingUIException
      */
-    public static final AccountingGeneralLedgerResponse callGet() throws AccountingUIException {
+    public static final AccountingGeneralLedgerResponse callGet(String loginId, String sessionId) throws AccountingUIException {
         // Retrieve one or more accounting general ledger account types records
         // from the database
         ObjectFactory fact = new ObjectFactory();
@@ -48,6 +52,9 @@ public class GlAccountTypesSoapRequests {
                 .withDeliveryDate(new Date())
                 .withRouting(ApiTransactionCodes.ROUTE_ACCOUNTING)
                 .withDeliveryMode(ApiHeaderNames.DELIVERY_MODE_SYNC)
+                // UI-37: Added login id and session id to the request
+                .withUserId(loginId)
+                .withSessionId(sessionId)
                 .build();
 
         GlCriteriaType criteria = fact.createGlCriteriaType();

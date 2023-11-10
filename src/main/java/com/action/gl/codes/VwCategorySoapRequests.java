@@ -40,10 +40,18 @@ public class VwCategorySoapRequests {
      *            {@link GeneralLedgerCriteria} Currently, should only provide
      *            selection criteria values for account type id and account
      *            category id.
+     * @param loginId
+     *            the id of logged in user
+     * @param sessionId
+     *            the web session id of the logged in user.
      * @return {@link AccountingGeneralLedgerResponse}
      * @throws AccountingUIException
+     * 
+     *             UI-37: Added loginId and sessionId parameters to method
+     *             signature.
      */
-    public static final AccountingGeneralLedgerResponse callGet(GeneralLedgerCriteria parms) throws AccountingUIException {
+    public static final AccountingGeneralLedgerResponse callGet(GeneralLedgerCriteria parms, String loginId, String sessionId)
+            throws AccountingUIException {
         // Retrieve one or more accounting general ledger account types records
         // from the database
         ObjectFactory fact = new ObjectFactory();
@@ -57,6 +65,9 @@ public class VwCategorySoapRequests {
                 .withDeliveryDate(new Date())
                 .withRouting(ApiTransactionCodes.ROUTE_ACCOUNTING)
                 .withDeliveryMode(ApiHeaderNames.DELIVERY_MODE_SYNC)
+                // UI-37: Added login id and session id to the request
+                .withUserId(loginId)
+                .withSessionId(sessionId)
                 .build();
 
         GlCriteriaType criteria = fact.createGlCriteriaType();
@@ -96,10 +107,18 @@ public class VwCategorySoapRequests {
      *            {@link GeneralLedgerCriteria} Currently, should only provide
      *            selection criteria values for account type id and account
      *            category id.
+     * @param loginId
+     *            the id of logged in user
+     * @param sessionId
+     *            the web session id of the logged in user.
      * @return {@link AccountingGeneralLedgerResponse}
      * @throws AccountingUIException
+     * 
+     *             UI-37: Added loginId and sessionId parameters to method
+     *             signature.
      */
-    public static final AccountingGeneralLedgerResponse callSave(VwCategory parms) throws AccountingUIException {
+    public static final AccountingGeneralLedgerResponse callSave(VwCategory parms, String loginId, String sessionId)
+            throws AccountingUIException {
         // Retrieve one or more accounting general ledger account types records
         // from the database
         ObjectFactory fact = new ObjectFactory();
@@ -113,6 +132,9 @@ public class VwCategorySoapRequests {
                 .withDeliveryDate(new Date())
                 .withRouting(ApiTransactionCodes.ROUTE_ACCOUNTING)
                 .withDeliveryMode(ApiHeaderNames.DELIVERY_MODE_SYNC)
+                // UI-37: Added login id and session id to the request
+                .withUserId(loginId)
+                .withSessionId(sessionId)
                 .build();
 
         GlAccounttypeType gatt = GlAccounttypeTypeBuilder.Builder.create()
@@ -146,10 +168,18 @@ public class VwCategorySoapRequests {
      *            {@link GeneralLedgerCriteria} Currently, should only provide
      *            selection criteria values for account type id and account
      *            category id.
+     * @param loginId
+     *            the id of logged in user
+     * @param sessionId
+     *            the web session id of the logged in user.
      * @return {@link AccountingGeneralLedgerResponse}
      * @throws AccountingUIException
+     * 
+     *             UI-37: Added loginId and sessionId parameters to method
+     *             signature.
      */
-    public static final AccountingGeneralLedgerResponse callDelete(VwCategory parms) throws AccountingUIException {
+    public static final AccountingGeneralLedgerResponse callDelete(VwCategory parms, String loginId, String sessionId)
+            throws AccountingUIException {
         // Retrieve one or more accounting general ledger account types records
         // from the database
         ObjectFactory fact = new ObjectFactory();
@@ -163,6 +193,9 @@ public class VwCategorySoapRequests {
                 .withDeliveryDate(new Date())
                 .withRouting(ApiTransactionCodes.ROUTE_ACCOUNTING)
                 .withDeliveryMode(ApiHeaderNames.DELIVERY_MODE_SYNC)
+                // UI-37: Added login id and session id to the request
+                .withUserId(loginId)
+                .withSessionId(sessionId)
                 .build();
 
         GlAccountcatgType gact = GlAccountCategoryTypeBuilder.Builder.create()

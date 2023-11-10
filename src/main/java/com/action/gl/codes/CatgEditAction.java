@@ -92,7 +92,7 @@ public class CatgEditAction extends AbstractActionHandler implements ICommand {
 
     /**
      * Creates a new or modifies an existing GL Account Category record by
-     * persiting changes to the database.
+     * persisting changes to the database.
      * 
      * @throws ActionCommandException
      */
@@ -100,7 +100,10 @@ public class CatgEditAction extends AbstractActionHandler implements ICommand {
         // Call SOAP web service to persist GL Account Category data changes to
         // the database
         try {
-            AccountingGeneralLedgerResponse response = VwCategorySoapRequests.callSave((VwCategory) this.catg);
+            // UI-37: added login id and session id parameters to the callSave
+            // method invocation
+            AccountingGeneralLedgerResponse response = VwCategorySoapRequests.callSave((VwCategory) this.catg, this.loginId,
+                    this.session.getId());
             ReplyStatusType rst = response.getReplyStatus();
             this.msg = rst.getMessage();
             if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
@@ -136,7 +139,10 @@ public class CatgEditAction extends AbstractActionHandler implements ICommand {
         // Call SOAP web service to delete GL Account Category data changes to
         // the database
         try {
-            AccountingGeneralLedgerResponse response = VwCategorySoapRequests.callDelete((VwCategory) this.catg);
+            // UI-37: added login id and session id parameters to the callSave
+            // method invocation
+            AccountingGeneralLedgerResponse response = VwCategorySoapRequests.callDelete((VwCategory) this.catg, this.loginId,
+                    this.session.getId());
             ReplyStatusType rst = response.getReplyStatus();
             this.msg = rst.getMessage();
             if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
@@ -177,7 +183,10 @@ public class CatgEditAction extends AbstractActionHandler implements ICommand {
         // based on a
         // particular GL Account Type
         try {
-            AccountingGeneralLedgerResponse response = VwCategorySoapRequests.callGet(criteria);
+            // UI-37: added login id and session id parameters to the callSave
+            // method invocation
+            AccountingGeneralLedgerResponse response = VwCategorySoapRequests.callGet(criteria, this.loginId,
+                    this.session.getId());
             ReplyStatusType rst = response.getReplyStatus();
             this.msg = rst.getMessage();
             if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {

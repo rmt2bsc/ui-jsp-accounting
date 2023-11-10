@@ -167,7 +167,10 @@ public class CatgConsoleAction extends AbstractActionHandler implements ICommand
         // based on a
         // particular GL Account Type
         try {
-            AccountingGeneralLedgerResponse response = VwCategorySoapRequests.callGet(criteria);
+            // UI-37: Added parameters, login id and session id to callGet
+            // method.
+            AccountingGeneralLedgerResponse response = VwCategorySoapRequests.callGet(criteria, this.loginId,
+                    this.session.getId());
             ReplyStatusType rst = response.getReplyStatus();
             this.msg = rst.getMessage();
             if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
@@ -196,7 +199,9 @@ public class CatgConsoleAction extends AbstractActionHandler implements ICommand
      */
     private List<GlAccountTypes> getAccountTypes() throws AccountingUIException {
         try {
-            AccountingGeneralLedgerResponse response = GlAccountTypesSoapRequests.callGet();
+            // UI-37: added login id and session id parameters to the callSave
+            // method invocation
+            AccountingGeneralLedgerResponse response = GlAccountTypesSoapRequests.callGet(this.loginId, this.session.getId());
 
             // Get message text from reply status
             ReplyStatusType rst = response.getReplyStatus();
