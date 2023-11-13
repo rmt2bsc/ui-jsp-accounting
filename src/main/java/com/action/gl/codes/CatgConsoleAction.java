@@ -321,7 +321,7 @@ public class CatgConsoleAction extends AbstractActionHandler implements ICommand
      * @throws ActionCommandException
      */
     protected void sendClientData() throws ActionCommandException {
-        this.session.setAttribute(AccountingConst.CLIENT_DATA_ACCTYPE_LIST, this.acctTypeList);
+        this.session.setAttribute(AccountingConst.CLIENT_DATA_ACCTTYPE_LIST, this.acctTypeList);
         this.session.setAttribute(AccountingConst.CLIENT_DATA_ACCTYPE_RECORD, this.acctType);
         this.request.setAttribute(GeneralConst.CLIENT_DATA_RECORD, this.catg);
         this.request.setAttribute(GeneralConst.CLIENT_DATA_LIST, this.acctCatgList);

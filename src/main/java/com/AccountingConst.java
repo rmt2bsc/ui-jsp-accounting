@@ -3,9 +3,11 @@ package com;
 public class AccountingConst {
 
     /** Account Type List constant to represent a list of account types */
-    public static final String CLIENT_DATA_ACCTYPE_LIST = "accountTypeList";
+    public static final String CLIENT_DATA_ACCTTYPE_LIST = "accountTypeList";
 
     public static final String CLIENT_DATA_ACCTYPE_RECORD = "accountType";
+
+    public static final String CLIENT_DATA_ACCTCATG_LIST = "accountCatgList";
 
     public static final int DEBIT_BAL_TYPE = 1;
 
