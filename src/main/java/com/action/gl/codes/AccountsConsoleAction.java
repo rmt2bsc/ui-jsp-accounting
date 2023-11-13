@@ -21,6 +21,7 @@ import com.api.web.Context;
 import com.api.web.ICommand;
 import com.api.web.Request;
 import com.api.web.Response;
+import com.api.web.util.RMT2WebUtility;
 import com.entity.GeneralLedgerCriteria;
 import com.entity.GlAccountTypes;
 import com.entity.GlAccountTypesFactory;
@@ -215,22 +216,7 @@ public class AccountsConsoleAction extends AbstractActionHandler implements ICom
      * @throws ActionCommandException
      */
     public void edit() throws ActionCommandException {
-        // DatabaseTransApi tx = DatabaseTransFactory.create();
-        // BasicGLApi api =
-        // GeneralLedgerFactory.createBasicGLApi((DatabaseConnectionBean)
-        // tx.getConnector(), this.request);
-        // try {
-        // // Get account view object.
-        // int id = ((GlAccounts) this.acct).getAcctId();
-        // this.acct = api.findByIdExt(id);
-        // } catch (GLException e) {
-        // throw new ActionCommandException(e);
-        // } finally {
-        // api.close();
-        // tx.close();
-        // api = null;
-        // tx = null;
-        // }
+        return;
     }
 
     /**
@@ -259,7 +245,7 @@ public class AccountsConsoleAction extends AbstractActionHandler implements ICom
      */
     protected void receiveClientData() throws ActionCommandException {
         String rowStr = this.request.getParameter("selCbx");
-        int rowNdx = 0;
+        this.selectedRow = 0;
 
         // Client must select a row to edit.
         if (rowStr == null) {
@@ -271,7 +257,7 @@ public class AccountsConsoleAction extends AbstractActionHandler implements ICom
         try {
             // Get index of the row that is to be processed from the
             // HttpServeltRequest object
-            rowNdx = RMT2Money.stringToNumber(rowStr).intValue();
+            this.selectedRow = RMT2Money.stringToNumber(rowStr).intValue();
 
             // Retrieve selected account type
             if (this.command.equalsIgnoreCase(AccountsConsoleAction.COMMAND_ACCT_CATGLIST)) {
@@ -285,20 +271,13 @@ public class AccountsConsoleAction extends AbstractActionHandler implements ICom
                 this.acctCatgId = RMT2Money.stringToNumber(temp).intValue();
                 temp = this.getInputValue("AcctTypeId", null);
                 this.acctTypeId = RMT2Money.stringToNumber(temp).intValue();
-
-                // this.catg = GeneralLedgerFactory.createCatg();
-                // GeneralLedgerFactory.packageBean(this.request, this.catg,
-                // rowNdx);
             }
 
-            // // Retrieve account record for edit.
-            // if
-            // (this.command.equalsIgnoreCase(AccountsConsoleAction.COMMAND_ACCT_EDIT))
-            // {
-            // this.acct = GeneralLedgerFactory.createGlAccount();
-            // GeneralLedgerFactory.packageBean(this.request, this.acct,
-            // rowNdx);
-            // }
+            // Retrieve account record from JSP for edit.
+            if (this.command.equalsIgnoreCase(AccountsConsoleAction.COMMAND_ACCT_EDIT)) {
+                this.acct = VwAccountFactory.create();
+                RMT2WebUtility.packageBean(this.request, this.acct, this.selectedRow);
+            }
         } catch (Exception e) {
             throw new ActionCommandException(e);
         }

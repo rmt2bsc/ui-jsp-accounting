@@ -68,41 +68,51 @@
 	
 								 <td align="center" class="clsTableListHeader">
 									<beanlib:InputControl type="radio" name="selCbx" value="rowid"/>
-									<beanlib:InputControl type="hidden" name="AcctId" value="#beanObj.Id" uniqueName="yes"/>                                  
 								 </td>   
 								 <td align="center" >
 								    <font size="2">
 								      <beanlib:InputControl value="#beanObj.Id"/>
+								      <beanlib:InputControl type="hidden" name="Id" value="#beanObj.Id" uniqueName="yes"/>
+								      <beanlib:InputControl type="hidden" name="AcctTypeId" value="#beanObj.AcctTypeId" uniqueName="yes"/>
+								      <beanlib:InputControl type="hidden" name="AcctCatId" value="#beanObj.AcctCatId" uniqueName="yes"/>
+								      <beanlib:InputControl type="hidden" name="Code" value="#beanObj.Code" uniqueName="yes"/>
+								      <beanlib:InputControl type="hidden" name="BalanceTypeId" value="#beanObj.BalanceTypeId" uniqueName="yes"/>
 									</font>
 								 </td>             
 	 							 <td>
 								    <font size="2">
 	   							      <beanlib:InputControl value="#beanObj.Accttypedescr"/>
+	   							      <beanlib:InputControl type="hidden" name="Accttypedescr" value="#beanObj.Accttypedescr" uniqueName="yes"/>
 									  </font>
 								 </td>
 								 <td>
 								     <font size="2">
 								    <beanlib:InputControl value="#beanObj.Acctcatgdescr"/>
+								    <beanlib:InputControl type="hidden" name="Acctcatgdescr" value="#beanObj.Acctcatgdescr" uniqueName="yes"/>
 									</font>
 								 </td>
 								 <td>
 								     <font size="2">
 								    <beanlib:InputControl value="#beanObj.Name"/>
+								    <beanlib:InputControl type="hidden" name="Name" value="#beanObj.Name" uniqueName="yes"/>
 									</font>
 								 </td>
 								 <td align="center">
 								    <font size="2">
 								    <beanlib:InputControl value="#beanObj.AcctSeq"/>
+								    <beanlib:InputControl type="hidden" name="AcctSeq" value="#beanObj.AcctSeq" uniqueName="yes"/>
 									</font>
 								 </td>
 								 <td>
 								     <font size="2">
 								    <beanlib:InputControl value="#beanObj.AcctNo"/>
+								    <beanlib:InputControl type="hidden" name="AcctNo" value="#beanObj.AcctNo" uniqueName="yes"/>
 									</font>
 								 </td>
 								 <td>
 								     <font size="2">
 								    <beanlib:InputControl value="#beanObj.Description"/>
+								    <beanlib:InputControl type="hidden" name="Description" value="#beanObj.Description" uniqueName="yes"/>
 									</font>
 								 </td>
 								 <td align="center" >
