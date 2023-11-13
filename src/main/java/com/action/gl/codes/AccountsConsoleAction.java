@@ -21,6 +21,7 @@ import com.api.web.Context;
 import com.api.web.ICommand;
 import com.api.web.Request;
 import com.api.web.Response;
+import com.entity.GeneralLedgerCriteria;
 import com.entity.GlAccountTypes;
 import com.entity.GlAccountTypesFactory;
 import com.entity.VwCategory;
@@ -61,6 +62,8 @@ public class AccountsConsoleAction extends AbstractActionHandler implements ICom
     private List catgList;
 
     private List acctList;
+
+    private int acctTypeId;
 
     /**
      * Default constructor responsible for initializing the logger.
@@ -143,33 +146,7 @@ public class AccountsConsoleAction extends AbstractActionHandler implements ICom
      */
     private void listCategories() throws ActionCommandException {
         this.receiveClientData();
-
-        // DatabaseTransApi tx = DatabaseTransFactory.create();
-        // BasicGLApi api =
-        // GeneralLedgerFactory.createBasicGLApi((DatabaseConnectionBean)
-        // tx.getConnector(), this.request);
-        //
-        // // Using account type id, get account type object and a list of
-        // account
-        // // type categories and send results to the client via the request
-        // object
-        // try {
-        // // Get all GL Account Categories belonging to account type id.
-        // this.catgList =
-        // api.findAcctCatgByAcctType(this.acctType.getAcctTypeId());
-        // if (this.catgList == null) {
-        // this.catgList = new ArrayList();
-        // }
-        // } catch (GLException e) {
-        // throw new ActionCommandException(e);
-        // } finally {
-        // api.close();
-        // tx.close();
-        // api = null;
-        // tx = null;
-        // }
-
-        // Send data to client
+        this.catgList = this.getAccountCategories(this.acctTypeId);
         this.sendClientData();
     }
 
@@ -308,15 +285,16 @@ public class AccountsConsoleAction extends AbstractActionHandler implements ICom
             // HttpServeltRequest object
             rowNdx = RMT2Money.stringToNumber(rowStr).intValue();
 
-            // // Retrieve selected account type
-            // if
-            // (this.command.equalsIgnoreCase(AccountsConsoleAction.COMMAND_ACCT_CATGLIST))
-            // {
-            // this.acctTypeList = GeneralLedgerFactory.createAcctType();
-            // GeneralLedgerFactory.packageBean(this.request, this.acctTypeList,
-            // rowNdx);
-            // }
-            //
+            // Retrieve selected account type
+            if (this.command.equalsIgnoreCase(AccountsConsoleAction.COMMAND_ACCT_CATGLIST)) {
+                String temp = this.getInputValue("AcctTypeId", null);
+                this.acctTypeId = RMT2Money.stringToNumber(temp).intValue();
+                // this.acctTypeList = GeneralLedgerFactory.createAcctType();
+                // GeneralLedgerFactory.packageBean(this.request,
+                // this.acctTypeList,
+                // rowNdx);
+            }
+
             // // Retrieve Selected Catgeory
             // if
             // (this.command.equalsIgnoreCase(AccountsConsoleAction.COMMAND_ACCT_LIST))
@@ -390,6 +368,43 @@ public class AccountsConsoleAction extends AbstractActionHandler implements ICom
             return results;
         } catch (AccountingUIException e) {
             throw e;
+        }
+    }
+
+    /**
+     * Drives the process of fetching the list of GL Account Type Categories
+     * 
+     * @param acctTypeId
+     *            the account type id belonging to the selected row.
+     * @return List<{@link VwCategory}
+     * @throws ActionCommandException
+     */
+    private List<VwCategory> getAccountCategories(int acctTypeId) throws ActionCommandException {
+        GeneralLedgerCriteria criteria = new GeneralLedgerCriteria();
+        criteria.setAcctTypeId(acctTypeId);
+
+        // Call SOAP web service to get complete list of GL Account Categories
+        // based on a particular GL Account Type
+        try {
+            AccountingGeneralLedgerResponse response = VwCategorySoapRequests.callGet(criteria, this.loginId,
+                    this.session.getId());
+            ReplyStatusType rst = response.getReplyStatus();
+            this.msg = rst.getMessage();
+            if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
+                this.msg = rst.getMessage();
+                return null;
+            }
+            List<VwCategory> results = null;
+            if (response.getProfile() != null) {
+                results = VwCategoryFactory.create(response.getProfile().getAccountCategory());
+            }
+            else {
+                results = new ArrayList<>();
+            }
+            return results;
+        } catch (Exception e) {
+            logger.log(Level.ERROR, e.getMessage());
+            throw new ActionCommandException(e.getMessage());
         }
     }
 

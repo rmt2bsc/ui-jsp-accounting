@@ -2,6 +2,8 @@
 <%@ taglib uri="/rmt2-generaltaglib" prefix="gen" %>
 <%@ page import="com.api.util.RMT2Utility" %>
 <%@ page import="com.api.constants.GeneralConst" %>
+<%@ page import="com.AccountingConst" %>
+
 
 <gen:InitAppRoot id="APP_ROOT"/>
 
@@ -43,15 +45,15 @@
 			}
 	 %>	
 	
-    <beanlib:LoopRows bean="beanObj" list="catgList">
+    <beanlib:LoopRows bean="item" list="<%=AccountingConst.CLIENT_DATA_ACCTCATG_LIST %>">
 		<tr> 
 			<td width="7%" align="center" bgcolor="FFCC00">
 			  <beanlib:InputControl type="radio" name="selCbx" value="rowid" onClick="handleAction(this)"/>
-			  <beanlib:InputControl type="hidden" name="AcctCatgId" value="#beanObj.AcctCatgId" uniqueName="yes"/>					  
-			  <beanlib:InputControl type="hidden" name="AcctTypeId" value="#beanObj.AcctTypeId" uniqueName="yes"/>					  
+			  <beanlib:InputControl type="hidden" name="AcctCatgId" value="#item.Acctcatid" uniqueName="yes"/>					  
+			  <beanlib:InputControl type="hidden" name="AcctTypeId" value="#item.Accttypeid" uniqueName="yes"/>					  
 			</td>
 			<td width="93%">
-			   <beanlib:InputControl value="#beanObj.Description"/>					
+			   <beanlib:InputControl value="#item.Acctcatgdescr"/>					
 			</td>
 		</tr>
     </beanlib:LoopRows>
