@@ -192,7 +192,7 @@ public class CatgConsoleAction extends AbstractActionHandler implements ICommand
     }
 
     /**
-     * Retrieves all Country records.
+     * Retrieves all Account Type records.
      * 
      * @return List<{@link Country}>
      * @throws AccountingUIException
