@@ -24,6 +24,8 @@ import com.api.web.Response;
 import com.entity.GeneralLedgerCriteria;
 import com.entity.GlAccountTypes;
 import com.entity.GlAccountTypesFactory;
+import com.entity.VwAccount;
+import com.entity.VwAccountFactory;
 import com.entity.VwCategory;
 import com.entity.VwCategoryFactory;
 
@@ -64,6 +66,8 @@ public class AccountsConsoleAction extends AbstractActionHandler implements ICom
     private List acctList;
 
     private int acctTypeId;
+
+    private int acctCatgId;
 
     /**
      * Default constructor responsible for initializing the logger.
@@ -159,27 +163,11 @@ public class AccountsConsoleAction extends AbstractActionHandler implements ICom
      */
     private void listAccounts() throws ActionCommandException {
         this.receiveClientData();
-        // DatabaseTransApi tx = DatabaseTransFactory.create();
-        // BasicGLApi api =
-        // GeneralLedgerFactory.createBasicGLApi((DatabaseConnectionBean)
-        // tx.getConnector(), this.request);
-        //
-        // // Using category id, get list of accounts and send results
-        // // to the client via the request object
-        // try {
-        // // Get all GL Accounts belonging to a given category.
-        // this.acctList = api.findByAcctCatgExt(this.catg.getAcctCatgId());
-        // if (this.acctList == null) {
-        // this.acctList = new ArrayList();
-        // }
-        // } catch (GLException e) {
-        // throw new ActionCommandException(e);
-        // } finally {
-        // api.close();
-        // tx.close();
-        // api = null;
-        // tx = null;
-        // }
+        this.acctList = this.getAccounts(this.acctCatgId);
+
+        this.catg = VwCategoryFactory.create();
+        this.catg.setAccttypeid(this.acctTypeId);
+        this.catg.setAcctcatid(this.acctCatgId);
 
         // Send data to client
         this.sendClientData();
@@ -289,21 +277,20 @@ public class AccountsConsoleAction extends AbstractActionHandler implements ICom
             if (this.command.equalsIgnoreCase(AccountsConsoleAction.COMMAND_ACCT_CATGLIST)) {
                 String temp = this.getInputValue("AcctTypeId", null);
                 this.acctTypeId = RMT2Money.stringToNumber(temp).intValue();
-                // this.acctTypeList = GeneralLedgerFactory.createAcctType();
-                // GeneralLedgerFactory.packageBean(this.request,
-                // this.acctTypeList,
+            }
+
+            // Retrieve Selected Catgeory
+            if (this.command.equalsIgnoreCase(AccountsConsoleAction.COMMAND_ACCT_LIST)) {
+                String temp = this.getInputValue("AcctCatgId", null);
+                this.acctCatgId = RMT2Money.stringToNumber(temp).intValue();
+                temp = this.getInputValue("AcctTypeId", null);
+                this.acctTypeId = RMT2Money.stringToNumber(temp).intValue();
+
+                // this.catg = GeneralLedgerFactory.createCatg();
+                // GeneralLedgerFactory.packageBean(this.request, this.catg,
                 // rowNdx);
             }
 
-            // // Retrieve Selected Catgeory
-            // if
-            // (this.command.equalsIgnoreCase(AccountsConsoleAction.COMMAND_ACCT_LIST))
-            // {
-            // this.catg = GeneralLedgerFactory.createCatg();
-            // GeneralLedgerFactory.packageBean(this.request, this.catg,
-            // rowNdx);
-            // }
-            //
             // // Retrieve account record for edit.
             // if
             // (this.command.equalsIgnoreCase(AccountsConsoleAction.COMMAND_ACCT_EDIT))
@@ -397,6 +384,43 @@ public class AccountsConsoleAction extends AbstractActionHandler implements ICom
             List<VwCategory> results = null;
             if (response.getProfile() != null) {
                 results = VwCategoryFactory.create(response.getProfile().getAccountCategory());
+            }
+            else {
+                results = new ArrayList<>();
+            }
+            return results;
+        } catch (Exception e) {
+            logger.log(Level.ERROR, e.getMessage());
+            throw new ActionCommandException(e.getMessage());
+        }
+    }
+
+    /**
+     * Drives the process of fetching the list of GL Accounts
+     * 
+     * @param acctCatgId
+     *            the account category id belonging to the selected row.
+     * @return List<{@link VwAccount}
+     * @throws ActionCommandException
+     */
+    private List<VwAccount> getAccounts(int acctCatgId) throws ActionCommandException {
+        VwAccount criteria = VwAccountFactory.create();
+        criteria.setAcctCatId(acctCatgId);
+
+        // Call SOAP web service to get a list of GL Accounts by account
+        // category
+        try {
+            AccountingGeneralLedgerResponse response = VwAccountSoapRequests.callGet(criteria, this.loginId,
+                    this.session.getId());
+            ReplyStatusType rst = response.getReplyStatus();
+            this.msg = rst.getMessage();
+            if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
+                this.msg = rst.getMessage();
+                return null;
+            }
+            List<VwAccount> results = null;
+            if (response.getProfile() != null) {
+                results = VwAccountFactory.create(response.getProfile().getAccount());
             }
             else {
                 results = new ArrayList<>();

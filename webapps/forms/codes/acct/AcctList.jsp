@@ -28,8 +28,8 @@
   <body bgcolor="#FFFFCC">
      <form name="DataForm" method="POST" action="<%=APP_ROOT%>/unsecureRequestProcessor/AccountsConsole.Accounts">
 	     <div style="border-style:groove; border-color:#999999; background-color:buttonface; width:90%; height:375px; overflow:auto">
-	       <beanlib:InputControl type="hidden" name="masterAcctTypeId" value="#acctCatg.AcctTypeId"/>
-	       <beanlib:InputControl type="hidden" name="masterAcctCatgId" value="#acctCatg.AcctCatgId"/>
+	       <beanlib:InputControl type="hidden" name="masterAcctTypeId" value="#acctCatg.Accttypeid"/>
+	       <beanlib:InputControl type="hidden" name="masterAcctCatgId" value="#acctCatg.Acctcatid"/>
 				 <table  width="100%" border="0" bgcolor="white" cellpadding="0" cellspacing="0"> 
 				     <caption align="left">
 				        <strong>General Ledger Accounts </strong> 
@@ -67,8 +67,8 @@
 						   <gen:ColorBarLines evenColor="#CCFFCC" oddColor="#FFFFFF"/>
 	
 								 <td align="center" class="clsTableListHeader">
-										 <beanlib:InputControl type="radio" name="selCbx" value="rowid"/>
-										 <beanlib:InputControl type="hidden" name="AcctId" value="#beanObj.Id" uniqueName="yes"/>                                  
+									<beanlib:InputControl type="radio" name="selCbx" value="rowid"/>
+									<beanlib:InputControl type="hidden" name="AcctId" value="#beanObj.Id" uniqueName="yes"/>                                  
 								 </td>   
 								 <td align="center" >
 								    <font size="2">
