@@ -168,4 +168,57 @@ public class VwAccountSoapRequests {
             throw new AccountingUIException(VwAccountSoapRequests.MSG, e);
         }
     }
+
+    /**
+     * SOAP call to delete accounting general ledger account profile.
+     * <p>
+     * Currently, this method only supports deleting a single Account at a time
+     * by GL Account ID.
+     * 
+     * @param parms
+     *            {@link VwAccount}
+     * @param loginId
+     *            the id of logged in user
+     * @param sessionId
+     *            the web session id of the logged in user.
+     * @return {@link AccountingGeneralLedgerResponse}
+     * @throws AccountingUIException
+     */
+    public static final AccountingGeneralLedgerResponse callDelete(VwAccount parms, String loginId, String sessionId)
+            throws AccountingUIException {
+
+        ObjectFactory fact = new ObjectFactory();
+        AccountingGeneralLedgerRequest req = fact.createAccountingGeneralLedgerRequest();
+
+        HeaderType head = HeaderTypeBuilder.Builder.create()
+                .withApplication(ApiHeaderNames.APP_NAME_ACCOUNTING)
+                .withModule(ApiTransactionCodes.MODULE_ACCOUNTING_GL)
+                .withTransaction(ApiTransactionCodes.GL_ACCOUNT_DELETE)
+                .withMessageMode(ApiHeaderNames.MESSAGE_MODE_REQUEST)
+                .withDeliveryDate(new Date())
+                .withRouting(ApiTransactionCodes.ROUTE_ACCOUNTING)
+                .withDeliveryMode(ApiHeaderNames.DELIVERY_MODE_SYNC)
+                .withUserId(loginId)
+                .withSessionId(sessionId)
+                .build();
+
+        GlAccountType rec = fact.createGlAccountType();
+        rec.setAcctId(BigInteger.valueOf(parms.getId()));
+
+        List<GlAccountType> acctList = new ArrayList<GlAccountType>();
+        acctList.add(rec);
+
+        GlDetailGroup details = fact.createGlDetailGroup();
+        details.getAccount().addAll(acctList);
+        req.setProfile(details);
+        req.setHeader(head);
+
+        AccountingGeneralLedgerResponse response = null;
+        try {
+            response = SoapJaxbClientWrapper.callSoapRequest(req);
+            return response;
+        } catch (Exception e) {
+            throw new AccountingUIException(VwAccountSoapRequests.MSG, e);
+        }
+    }
 }

@@ -98,7 +98,6 @@ public class AccountEditAction extends AbstractActionHandler implements ICommand
      * @throws ActionCommandException
      */
     public void save() throws ActionCommandException {
-
         // Call SOAP web service to persist GL Account Category data changes to
         // the database
         try {
@@ -136,27 +135,32 @@ public class AccountEditAction extends AbstractActionHandler implements ICommand
      * @throws ActionCommandException
      */
     public void delete() throws ActionCommandException {
-        // DatabaseTransApi tx = DatabaseTransFactory.create();
-        // BasicGLApi api =
-        // GeneralLedgerFactory.createBasicGLApi((DatabaseConnectionBean)
-        // tx.getConnector(), this.request);
-        // this.refreshPage((DatabaseConnectionBean) tx.getConnector());
-        // try {
-        // api.deleteAccount(((VwAccount) this.acct).getId());
-        // tx.commitUOW();
-        // this.msg = "GL Account was deleted successfully";
-        // return;
-        // } catch (GLException e) {
-        // tx.rollbackUOW();
-        // this.msg = "Error occurred deleting  GL Accoung";
-        // logger.error(this.msg);
-        // throw new ActionCommandException(this.msg, e);
-        // } finally {
-        // api.close();
-        // tx.close();
-        // api = null;
-        // tx = null;
-        // }
+        // Call SOAP web service to delete a GL Account from the database
+        try {
+            AccountingGeneralLedgerResponse response = VwAccountSoapRequests.callDelete(this.acct, this.loginId,
+                    this.session.getId());
+            ReplyStatusType rst = response.getReplyStatus();
+            this.msg = rst.getMessage();
+            if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
+                this.msg = rst.getMessage();
+                return;
+            }
+            // List<VwAccount> results = null;
+            // if (response.getProfile() != null) {
+            // results =
+            // VwAccountFactory.create(response.getProfile().getAccount());
+            // // For display purposes, update the account id value to capture
+            // // the primary key value for the current record that was updated
+            // this.acct.setId(results.get(0).getId());
+            // this.acct.setAcctNo(results.get(0).getAcctNo());
+            // }
+            // else {
+            // this.acct = VwAccountFactory.create();
+            // }
+        } catch (Exception e) {
+            logger.log(Level.ERROR, e.getMessage());
+            throw new ActionCommandException(e.getMessage());
+        }
     }
 
     /**
