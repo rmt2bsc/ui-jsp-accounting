@@ -60,8 +60,12 @@ public class VwAccountFactory {
             o.setBalanceTypeId(item.getBalanceType().getAccountBaltypeId().intValue());
 
             if (item.getTracking() != null) {
-                o.setDateCreated(item.getTracking().getDateCreated().toGregorianCalendar().getTime());
-                o.setDateUpdated(item.getTracking().getDateUpdated().toGregorianCalendar().getTime());
+                if (item.getTracking().getDateCreated() != null) {
+                    o.setDateCreated(item.getTracking().getDateCreated().toGregorianCalendar().getTime());
+                }
+                if (item.getTracking().getDateUpdated() != null) {
+                    o.setDateUpdated(item.getTracking().getDateUpdated().toGregorianCalendar().getTime());
+                }
                 o.setUserId(item.getTracking().getUserId());
             }
             return o;

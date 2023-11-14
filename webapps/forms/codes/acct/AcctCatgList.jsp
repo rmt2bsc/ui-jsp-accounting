@@ -32,7 +32,6 @@
         </div>
       </td>
     </tr>
-    
 	
 	 <%
 			if (request.getParameter("firsttime") != null) {
@@ -50,15 +49,18 @@
 			<td width="7%" align="center" bgcolor="FFCC00">
 			  <beanlib:InputControl type="radio" name="selCbx" value="rowid" onClick="handleAction(this)"/>
 			  <beanlib:InputControl type="hidden" name="AcctCatgId" value="#item.Acctcatid" uniqueName="yes"/>					  
-			  <beanlib:InputControl type="hidden" name="AcctTypeId" value="#item.Accttypeid" uniqueName="yes"/>					  
+			  <beanlib:InputControl type="hidden" name="AcctCatId" value="#item.Acctcatid" uniqueName="yes"/>
+			  <beanlib:InputControl type="hidden" name="AcctTypeId" value="#item.Accttypeid" uniqueName="yes"/>
 			</td>
 			<td width="93%">
-			   <beanlib:InputControl value="#item.Acctcatgdescr"/>					
+			   <beanlib:InputControl value="#item.Acctcatgdescr"/>
+			   <beanlib:InputControl type="hidden" name="Acctcatgdescr" value="#item.Acctcatgdescr" uniqueName="yes"/>					
 			</td>
 		</tr>
     </beanlib:LoopRows>
   </table>
   <input type="hidden" name="clientAction">
+  <beanlib:InputControl type="hidden" name="Accttypedescr" value="#AcctTypeDesc"/>
 </form>
 </body>
 </html>

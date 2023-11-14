@@ -28,8 +28,10 @@
   <body bgcolor="#FFFFCC">
      <form name="DataForm" method="POST" action="<%=APP_ROOT%>/unsecureRequestProcessor/AccountsConsole.Accounts">
 	     <div style="border-style:groove; border-color:#999999; background-color:buttonface; width:90%; height:375px; overflow:auto">
-	       <beanlib:InputControl type="hidden" name="masterAcctTypeId" value="#acctCatg.Accttypeid"/>
-	       <beanlib:InputControl type="hidden" name="masterAcctCatgId" value="#acctCatg.Acctcatid"/>
+	       <beanlib:InputControl type="hidden" name="AcctTypeId" value="#acctCatg.Accttypeid"/>
+	       <beanlib:InputControl type="hidden" name="AcctCatId" value="#acctCatg.Acctcatid"/>
+	       <beanlib:InputControl type="hidden" name="Accttypedescr" value="#AcctTypeDesc"/>
+	       <beanlib:InputControl type="hidden" name="Acctcatgdescr" value="#AcctCatgDesc"/>
 				 <table  width="100%" border="0" bgcolor="white" cellpadding="0" cellspacing="0"> 
 				     <caption align="left">
 				        <strong>General Ledger Accounts </strong> 

@@ -56,7 +56,7 @@ public class AccountsConsoleAction extends AbstractActionHandler implements ICom
 
     private Logger logger;
 
-    private Object acct;
+    private VwAccount acct;
 
     private List acctTypeList;
 
@@ -67,6 +67,10 @@ public class AccountsConsoleAction extends AbstractActionHandler implements ICom
     private List acctList;
 
     private int acctTypeId;
+
+    private String acctTypeDesc;
+
+    private String acctCatgDesc;
 
     private int acctCatgId;
 
@@ -184,29 +188,7 @@ public class AccountsConsoleAction extends AbstractActionHandler implements ICom
      * @throws ActionCommandException
      */
     public void add() throws ActionCommandException {
-        // DatabaseTransApi tx = DatabaseTransFactory.create();
-        // BasicGLApi api =
-        // GeneralLedgerFactory.createBasicGLApi((DatabaseConnectionBean)
-        // tx.getConnector(), this.request);
-        // int catgId =
-        // Integer.parseInt(this.request.getParameter("masterAcctCatgId"));
-        // try {
-        // VwCategory catg = (VwCategory) api.findAcctCatgByIdExt(catgId);
-        // VwAccount vwAcct = GeneralLedgerFactory.createVwAccount();
-        // vwAcct.setAcctTypeId(catg.getAccttypeid());
-        // vwAcct.setAcctCatId(catg.getAcctcatid());
-        // vwAcct.setAccttypedescr(catg.getAccttypedescr());
-        // vwAcct.setAcctcatgdescr(catg.getAcctcatgdescr());
-        // this.acct = vwAcct;
-        // return;
-        // } catch (GLException e) {
-        // throw new ActionCommandException(e);
-        // } finally {
-        // api.close();
-        // tx.close();
-        // api = null;
-        // tx = null;
-        // }
+        this.receiveClientData();
     }
 
     /**
@@ -248,35 +230,44 @@ public class AccountsConsoleAction extends AbstractActionHandler implements ICom
         this.selectedRow = 0;
 
         // Client must select a row to edit.
-        if (rowStr == null) {
+        if (rowStr == null && !this.command.equalsIgnoreCase(AccountsConsoleAction.COMMAND_ACCT_ADD)) {
             this.msg = "Client must select a row to edit";
             logger.error(this.msg);
             throw new ActionCommandException(this.msg);
         }
-
-        try {
+        else if (rowStr != null) {
             // Get index of the row that is to be processed from the
             // HttpServeltRequest object
             this.selectedRow = RMT2Money.stringToNumber(rowStr).intValue();
+        }
 
+        try {
             // Retrieve selected account type
             if (this.command.equalsIgnoreCase(AccountsConsoleAction.COMMAND_ACCT_CATGLIST)) {
                 String temp = this.getInputValue("AcctTypeId", null);
                 this.acctTypeId = RMT2Money.stringToNumber(temp).intValue();
+                this.acctTypeDesc = this.getInputValue("Description", null);
             }
 
-            // Retrieve Selected Catgeory
+            // Retrieve Selected Category
             if (this.command.equalsIgnoreCase(AccountsConsoleAction.COMMAND_ACCT_LIST)) {
                 String temp = this.getInputValue("AcctCatgId", null);
                 this.acctCatgId = RMT2Money.stringToNumber(temp).intValue();
                 temp = this.getInputValue("AcctTypeId", null);
                 this.acctTypeId = RMT2Money.stringToNumber(temp).intValue();
+                this.acctCatgDesc = this.getInputValue("Acctcatgdescr", null);
+                this.acctTypeDesc = this.getInputValue("Accttypedescr", null);
             }
 
             // Retrieve account record from JSP for edit.
             if (this.command.equalsIgnoreCase(AccountsConsoleAction.COMMAND_ACCT_EDIT)) {
                 this.acct = VwAccountFactory.create();
                 RMT2WebUtility.packageBean(this.request, this.acct, this.selectedRow);
+            }
+
+            if (this.command.equalsIgnoreCase(AccountsConsoleAction.COMMAND_ACCT_ADD)) {
+                this.acct = VwAccountFactory.create();
+                RMT2WebUtility.packageBean(this.request, this.acct);
             }
         } catch (Exception e) {
             throw new ActionCommandException(e);
@@ -302,6 +293,8 @@ public class AccountsConsoleAction extends AbstractActionHandler implements ICom
         this.request.setAttribute(GeneralConst.CLIENT_DATA_RECORD, this.acct);
         this.request.setAttribute(GeneralConst.CLIENT_DATA_LIST, this.acctList);
         this.request.setAttribute(AccountingConst.CLIENT_DATA_ACCTCATG_LIST, this.catgList);
+        this.request.setAttribute("AcctTypeDesc", this.acctTypeDesc);
+        this.request.setAttribute("AcctCatgDesc", this.acctCatgDesc);
         this.request.setAttribute(RMT2ServletConst.REQUEST_MSG_INFO, this.msg);
     }
 

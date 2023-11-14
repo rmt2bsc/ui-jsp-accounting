@@ -37,7 +37,8 @@
      <beanlib:LoopRows bean="item" list="<%=AccountingConst.CLIENT_DATA_ACCTTYPE_LIST %>">
 			<td width="7%" align="center" bgcolor="FFCC00">
 			  <beanlib:InputControl type="radio" name="selCbx" value="rowid" onClick="handleAction(this)"/>
-              <beanlib:InputControl type="hidden" name="AcctTypeId" value="#item.AcctTypeId" uniqueName="yes"/>					  
+              <beanlib:InputControl type="hidden" name="AcctTypeId" value="#item.AcctTypeId" uniqueName="yes"/>
+              <beanlib:InputControl type="hidden" name="Description" value="#item.Description" uniqueName="yes"/>										  
 			</td>
 			<td width="93%">
               <beanlib:InputControl value="#item.Description"/>					

@@ -31,11 +31,14 @@
   
   <body bgcolor="#FFFFCC">
      <form name="DataForm" method="POST" action="<%=APP_ROOT%>/unsecureRequestProcessor/Account.Edit">
-		     <beanlib:InputControl type="hidden" name="AcctId" value="#record.Id"/>
+		     <beanlib:InputControl type="hidden" name="Id" value="#record.Id"/>
 		     <beanlib:InputControl type="hidden" name="AcctTypeId" value="#record.AcctTypeId"/>
-		     <beanlib:InputControl type="hidden" name="AcctCatgId" value="#record.AcctCatId"/>
-				 
-				 <h1>General Ledger Account Maintenance</h1>
+		     <beanlib:InputControl type="hidden" name="AcctCatId" value="#record.AcctCatId"/>
+		     <beanlib:InputControl type="hidden" name="AcctNo" value="#record.AcctNo"/>
+		     <beanlib:InputControl type="hidden" name="AcctSeq" value="#record.AcctSeq"/>
+		      <beanlib:InputControl type="hidden" name="Accttypedescr" value="#record.Accttypedescr"/>
+		       <beanlib:InputControl type="hidden" name="Acctcatgdescr" value="#record.Acctcatgdescr"/>
+		     <h1>General Ledger Account Maintenance</h1>
 				 <table  width="100%" border="0"> 
 					 <tr>
 						 <td width="13%" class="clsTableFormHeader">Id:</td>
@@ -86,14 +89,14 @@
 						        <tr>
 						            <th>Debit</th>
 						            <td>
-						                <input type="radio" name="AcctBaltypeId" value="1"
+						                <input type="radio" name="BalanceTypeId" value="1"
 							                <gen:Evaluate  expression="#record.BalanceTypeId">
 												<gen:When expression="1">checked</gen:When>
 											</gen:Evaluate> >
 						            </td>
 									<th>Credit</th>
 						            <td>
-						                <input type="radio" name="AcctBaltypeId" value="2" 
+						                <input type="radio" name="BalanceTypeId" value="2" 
 	  						               <gen:Evaluate  expression="#record.BalanceTypeId">
 												<gen:When expression="2">checked</gen:When>
 										   </gen:Evaluate>  >
@@ -104,13 +107,13 @@
 					 </tr>
 					 <tr>
 						  <td colspan=2">
-							 <!-- Display any messgaes -->
+							 <!-- Display any messages -->
 							 <table>
 								 <tr>
 						  		  <td>
-									     <font color="red">
-										     <gen:ShowPageMessages dataSource="<%=RMT2ServletConst.REQUEST_MSG_MESSAGES%>"/>
-									     </font>
+								     <font color="red">
+									     <gen:ShowPageMessages dataSource="<%=RMT2ServletConst.REQUEST_MSG_MESSAGES%>"/>
+								     </font>
 						 	      </td>
 								 </tr>
 							 </table>				
