@@ -46,7 +46,7 @@ public abstract class CreditorAction extends AbstractActionHandler implements IC
     /** Creditor */
     protected Object cred;
 
-    /** Credotr Extension */
+    /** Creditor Extension */
     protected Object credExt;
 
     /** Creditor's Business profile */
@@ -109,38 +109,6 @@ public abstract class CreditorAction extends AbstractActionHandler implements IC
     }
 
 
-
-    /**
-     * Retrieves a single instance of creditor's detail data and its associated
-     * address from the database using the creditor's internal id.
-     * 
-     * @param creditorId
-     *            The creditor's internal id which is generally the primary key.
-     * @throws ActionCommandException
-     */
-    protected void fetchCreditor(int creditorId) throws ActionCommandException {
-        // DatabaseTransApi tx = DatabaseTransFactory.create();
-        // CreditorHelper helper =
-        // CreditorFactory.createCreditorHelper(this.request, this.response,
-        // (DatabaseConnectionBean) tx.getConnector());
-        // try {
-        // if (helper == null) {
-        // return;
-        // }
-        // helper.fetchCreditor(creditorId);
-        // this.cred = helper.getCred();
-        // this.credDetail = helper.getCredDetail();
-        // this.busTypes = helper.getBusTypes();
-        // this.busServTypes = helper.getBusServTypes();
-        // this.balance = helper.getBalance();
-        // } catch (Exception e) {
-        // throw new ActionCommandException(e);
-        // } finally {
-        // helper.close();
-        // helper = null;
-        // }
-    }
-
     /**
      * Retrieves a single instance of creditor's detail data and its associated
      * address from the database using the creditor's internal id.
@@ -185,7 +153,7 @@ public abstract class CreditorAction extends AbstractActionHandler implements IC
     public void add() throws ActionCommandException {
         // Create query to where creditor is not found
         int creditorId = -1;
-        this.fetchCreditor(creditorId);
+        // this.fetchCreditor(creditorId);
     }
 
     /**
@@ -199,7 +167,7 @@ public abstract class CreditorAction extends AbstractActionHandler implements IC
         if (this.cred != null) {
             creditorId = ((Creditor) this.cred).getCreditorId();
         }
-        this.fetchCreditor(creditorId);
+        // this.fetchCreditor(creditorId);
         return;
     }
 

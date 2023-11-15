@@ -104,9 +104,6 @@ public class CreditorSearchAction extends CreditorAction {
         if (command.equalsIgnoreCase(CreditorSearchAction.COMMAND_SEARCH)) {
             this.doSearch();
         }
-        // if (command.equalsIgnoreCase(CreditorSearchAction.COMMAND_LIST)) {
-        // this.listData();
-        // }
         if (command.equalsIgnoreCase(CreditorSearchAction.COMMAND_ADD)) {
             this.addData();
         }
@@ -148,17 +145,6 @@ public class CreditorSearchAction extends CreditorAction {
         this.credTypeList = this.getCreditorTypes();
         this.getCreditors(criteria);
     }
-
-    // /**
-    // * Returns selection criteria that is sure to return an empty result set
-    // * once applied to the sql that pertains to the data source of the
-    // creditor
-    // * search page.
-    // */
-    // protected String doInitialCriteria(RMT2TagQueryBean _query) throws
-    // ActionCommandException {
-    // return "creditor_id = -1";
-    // }
 
     /**
      * Creates an instance of CreditorCriteria, which is used to track the
@@ -281,19 +267,6 @@ public class CreditorSearchAction extends CreditorAction {
             this.criteriaType = CreditorSearchAction.CRITERIATYPE_ALL;
         }
     }
-
-    // /**
-    // * Retrieves a single instance of creditor's detail data and its
-    // associated
-    // * address from the database using the creditor's internal id.
-    // *
-    // * @param creditorId
-    // * The creditor's internal id which is generally the primary key.
-    // * @throws ActionCommandException
-    // */
-    // public void fetchCreditor(int creditorId) throws ActionCommandException {
-    // super.fetchCreditor(creditorId);
-    // }
 
     public void receiveClientData() throws ActionCommandException {
         int credId;

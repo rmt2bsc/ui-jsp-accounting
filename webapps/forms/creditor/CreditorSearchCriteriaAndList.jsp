@@ -82,8 +82,6 @@
 				 </td>					 
 				 <td>
 					 <font size="2">
-<!-- 						<beanlib:InputControl value="#beanObj.CreditorTypeDesc"/> -->
-						
 						 <gen:Evaluate expression="#beanObj.CreditorTypeId">
 							<gen:When expression="1">Vendor</gen:When>
 							<gen:When expression="2">Creditor</gen:When>
