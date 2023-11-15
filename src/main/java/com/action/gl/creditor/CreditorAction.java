@@ -1,5 +1,6 @@
 package com.action.gl.creditor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Level;
@@ -21,6 +22,7 @@ import com.api.web.Request;
 import com.api.web.Response;
 import com.api.web.util.RMT2WebUtility;
 import com.entity.Creditor;
+import com.entity.CreditorCriteria;
 import com.entity.CreditorFactory;
 import com.entity.CreditorType;
 import com.entity.CreditorTypeFactory;
@@ -236,6 +238,43 @@ public abstract class CreditorAction extends AbstractActionHandler implements IC
      */
     public Object getCred() {
         return cred;
+    }
+
+    /**
+     * Fetches the list creditors from the database using the where clause
+     * criteria previously stored on the session during the phase of the request
+     * to builds the query predicate.
+     * 
+     * @param criteria
+     *            {@link CreditorCriteria}
+     * @throws ActionCommandException
+     */
+    protected void getCreditors(CreditorCriteria criteria) throws ActionCommandException {
+        // Call SOAP web service to get a list of Creditors based on selection
+        // criteria
+        try {
+            AccountingTransactionResponse response = CreditorSoapRequests.callGet(criteria, this.loginId,
+                    this.session.getId());
+            ReplyStatusType rst = response.getReplyStatus();
+            this.msg = rst.getMessage();
+            if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
+                this.msg = rst.getMessage();
+                return;
+            }
+            List<Creditor> results = null;
+            if (response.getProfile() != null && response.getProfile().getCreditors() != null) {
+                results = CreditorFactory.create(response.getProfile().getCreditors().getCreditor());
+            }
+            else {
+                results = new ArrayList<>();
+            }
+            this.creditors = results;
+            this.sendClientData();
+            return;
+        } catch (Exception e) {
+            logger.log(Level.ERROR, e.getMessage());
+            throw new ActionCommandException(e.getMessage());
+        }
     }
 
     /**

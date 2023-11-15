@@ -23,6 +23,7 @@ public class Creditor extends OrmBean {
   public static final String PROP_ACCTID = "AcctId";
 /** The property name constant equivalent to property, CreditorTypeId, of respective DataSource view. */
   public static final String PROP_CREDITORTYPEID = "CreditorTypeId";
+    public static final String PROP_CREDITORTYPEDESC = "CreditorTypeDesc";
 /** The property name constant equivalent to property, BusinessId, of respective DataSource view. */
   public static final String PROP_BUSINESSID = "BusinessId";
 /** The property name constant equivalent to property, AccountNumber, of respective DataSource view. */
@@ -45,6 +46,7 @@ public class Creditor extends OrmBean {
   public static final String PROP_IPUPDATED = "IpUpdated";
 /** The property name constant equivalent to property, ExtAccountNumber, of respective DataSource view. */
   public static final String PROP_EXTACCOUNTNUMBER = "ExtAccountNumber";
+    public static final String PROP_BALANCE = "Balance";
 
     /**
      * The property name constant equivalent to property, EntityTypeId, of
@@ -193,12 +195,14 @@ public class Creditor extends OrmBean {
   private int acctId;
 /** The javabean property equivalent of database column creditor.creditor_type_id */
   private int creditorTypeId;
+
 /** The javabean property equivalent of database column creditor.business_id */
   private int businessId;
 /** The javabean property equivalent of database column creditor.account_number */
   private String accountNumber;
 /** The javabean property equivalent of database column creditor.credit_limit */
   private double creditLimit;
+    private double balance;
 /** The javabean property equivalent of database column creditor.apr */
   private double apr;
 /** The javabean property equivalent of database column creditor.active */
@@ -293,6 +297,7 @@ public class Creditor extends OrmBean {
     private String state;
     private String areaCode;
     private String county;
+    private String creditorTypeDesc;
 
 	// Getter/Setter Methods
 
@@ -800,6 +805,36 @@ public String toString() {
 
     public void setCounty(String county) {
         this.county = county;
+    }
+
+    /**
+     * @return the creditorTypeDesc
+     */
+    public String getCreditorTypeDesc() {
+        return creditorTypeDesc;
+    }
+
+    /**
+     * @param creditorTypeDesc
+     *            the creditorTypeDesc to set
+     */
+    public void setCreditorTypeDesc(String creditorTypeDesc) {
+        this.creditorTypeDesc = creditorTypeDesc;
+    }
+
+    /**
+     * @return the balance
+     */
+    public double getBalance() {
+        return balance;
+    }
+
+    /**
+     * @param balance
+     *            the balance to set
+     */
+    public void setBalance(double balance) {
+        this.balance = balance;
     }
 
 }

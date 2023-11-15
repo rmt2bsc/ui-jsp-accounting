@@ -29,7 +29,7 @@ public class CreditorSearchAction extends CreditorAction {
 
     private static final String COMMAND_SEARCH = "Creditor.Search.search";
 
-    public static final String COMMAND_LIST = "Creditor.Search.list";
+    // public static final String COMMAND_LIST = "Creditor.Search.list";
 
     private static final String COMMAND_EDIT = "Creditor.Search.edit";
 
@@ -104,9 +104,9 @@ public class CreditorSearchAction extends CreditorAction {
         if (command.equalsIgnoreCase(CreditorSearchAction.COMMAND_SEARCH)) {
             this.doSearch();
         }
-        if (command.equalsIgnoreCase(CreditorSearchAction.COMMAND_LIST)) {
-            this.listData();
-        }
+        // if (command.equalsIgnoreCase(CreditorSearchAction.COMMAND_LIST)) {
+        // this.listData();
+        // }
         if (command.equalsIgnoreCase(CreditorSearchAction.COMMAND_ADD)) {
             this.addData();
         }
@@ -131,6 +131,22 @@ public class CreditorSearchAction extends CreditorAction {
         this.credTypeList = this.getCreditorTypes();
         this.query = (RMT2TagQueryBean) this.getSession().getAttribute(RMT2ServletConst.QUERY_BEAN);
         this.sendClientData();
+    }
+
+    /**
+     * Handler method that responds to the client's request to perform a
+     * creditor search using the selection criteria entered by the user.
+     * 
+     * @throws ActionCommandException
+     */
+    protected void doSearch() throws ActionCommandException {
+        this.setFirstTime(false);
+        this.buildXMLSearchCriteria();
+        this.query.setQuerySource("CreditorView");
+        this.getSession().setAttribute(RMT2ServletConst.QUERY_BEAN, this.query);
+        CreditorCriteria criteria = (CreditorCriteria) this.query.getCustomObj();
+        this.credTypeList = this.getCreditorTypes();
+        this.getCreditors(criteria);
     }
 
     // /**
@@ -163,20 +179,6 @@ public class CreditorSearchAction extends CreditorAction {
         this.validateCriteria(criteriaObj);
 
         return criteriaObj;
-    }
-
-    /**
-     * Handler method that responds to the client's request to perform a
-     * creditor search using the selection criteria entered by the user.
-     * 
-     * @throws ActionCommandException
-     */
-    protected void doSearch() throws ActionCommandException {
-        this.setFirstTime(false);
-        this.buildXMLSearchCriteria();
-        this.query.setQuerySource("CreditorView");
-        this.getSession().setAttribute(RMT2ServletConst.QUERY_BEAN, this.query);
-        this.listData();
     }
 
     /**
@@ -243,35 +245,7 @@ public class CreditorSearchAction extends CreditorAction {
         // return;
     }
 
-    /**
-     * Fetches the list creditors from the database using the where clause
-     * criteria previously stored on the session during the phase of the request
-     * to builds the query predicate.
-     * 
-     * @throws ActionCommandException
-     */
-    protected void listData() throws ActionCommandException {
-        // DatabaseTransApi tx = DatabaseTransFactory.create();
-        // CreditorApi api = CreditorFactory.createApi((DatabaseConnectionBean)
-        // tx.getConnector(), this.request);
-        // try {
-        // CreditorCriteria criteria = (CreditorCriteria)
-        // this.query.getCustomObj();
-        // this.creditors = (List<CreditorExt>)
-        // api.findCreditorBusiness(criteria);
-        //
-        // if (this.creditors == null) {
-        // this.creditors = new ArrayList<CreditorExt>();
-        // }
-        // } catch (Exception e) {
-        // throw new ActionCommandException(e.getMessage());
-        // } finally {
-        // tx.close();
-        // api = null;
-        // tx = null;
-        // }
-        this.sendClientData();
-    }
+
 
     /**
      * Determines if search is to be performed using business contact criteria

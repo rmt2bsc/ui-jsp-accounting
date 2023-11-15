@@ -72,17 +72,22 @@
 				 </td>             
 				 <td>
 					 <font size="2">
-						<beanlib:InputControl value="#beanObj.Name"/>
+						<beanlib:InputControl value="#beanObj.Longname"/>
 					</font>
 				 </td>							 
 				 <td>
 					 <font size="2">
-						<beanlib:InputControl value="#beanObj.AccountNo"/>
+						<beanlib:InputControl value="#beanObj.AccountNumber"/>
 					 </font>
 				 </td>					 
 				 <td>
 					 <font size="2">
-						<beanlib:InputControl value="#beanObj.CreditorTypeDescription"/>
+<!-- 						<beanlib:InputControl value="#beanObj.CreditorTypeDesc"/> -->
+						
+						 <gen:Evaluate expression="#beanObj.CreditorTypeId">
+							<gen:When expression="1">Vendor</gen:When>
+							<gen:When expression="2">Creditor</gen:When>
+						 </gen:Evaluate>
 					 </font>
 				 </td>					 
 				 <td align="right">

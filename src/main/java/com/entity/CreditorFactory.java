@@ -40,8 +40,12 @@ public class CreditorFactory {
         try {
             Creditor o = CreditorFactory.create();
             o.setCreditorId(item.getCreditorId() == null ? 0 : item.getCreditorId().intValue());
-            o.setCreditorTypeId(item.getCreditorType() == null || item.getCreditorType().getCreditorTypeId() == null ? 0 : item
-                    .getCreditorType().getCreditorTypeId().intValue());
+            if (item.getCreditorType() != null) {
+                o.setCreditorTypeId(item.getCreditorType().getCreditorTypeId() == null ? 0 : item
+                        .getCreditorType().getCreditorTypeId().intValue());
+                o.setCreditorTypeDesc(item.getCreditorType().getDescription());
+            }
+
             o.setAcctId(item.getAcctId() == null ? 0 : item.getAcctId().intValue());
             o.setAccountNumber(item.getAccountNo());
             o.setCreditLimit(item.getCreditLimit() == null ? 0 : item.getCreditLimit().doubleValue());
