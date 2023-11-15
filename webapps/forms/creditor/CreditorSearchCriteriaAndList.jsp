@@ -17,51 +17,30 @@
 			</tr>    
 			<tr> 
 				<td width="10%" bgcolor="#FFCC00"> 
+					<div align="right"><b><font size="2">Creditor ID:</font></b></div>
+				</td>
+				<td width="21%"> 
+				  <beanlib:InputControl type="text" name="qry_CreditorId" value="#QUERY_BEAN.CustomObj.qry_CreditorId"/>
+				</td>
+			</tr>	
+			<tr> 
+				<td width="10%" bgcolor="#FFCC00"> 
 					<div align="right"><b><font size="2">Account Number :</font></b></div>
 				</td>
 				<td width="21%"> 
 				  <beanlib:InputControl type="text" name="qry_AccountNo" value="#QUERY_BEAN.CustomObj.qry_AccountNo"/>
 				</td>
-			</tr>				
-			<tr>
-			   <td colspan="2" align="left"><strong>-- OR --</strong></td>
-			</tr>
-		</table>
-		<br>
-	 
-		<table width="100%" border="0">
-		  <tr>
-			    <td colspan="6"><font color="blue">Business Contact Information</font></td>
 			</tr>
 			<tr> 
-				<td width="14%" bgcolor="#FFCC00"> 
+				<td width="10%" bgcolor="#FFCC00"> 
 					<div align="right"><b><font size="2">Name:</font></b></div>
 				</td>
-				<td width="19%"> 
-					<div align="left"> 
-					    <beanlib:InputControl type="text" name="qry_Name" value="#QUERY_BEAN.CustomObj.qry_Name" size="40"/>
-					</div>
+				<td width="21%"> 
+				  <beanlib:InputControl type="text" name="qry_Name" value="#QUERY_BEAN.CustomObj.qry_Name" size="40"/>
 				</td>
-				<td width="14%" bgcolor="#FFCC00"> 
-					<div align="right"><b><font size="2">Tax Id:</font></b></div>
-				</td>
-				<td width="19%"> 
-					<div align="left"> 
-					    <beanlib:InputControl type="text" name="qry_TaxId" value="#QUERY_BEAN.CustomObj.qry_TaxId"/>
-					</div>
-				</td>
-				<td width="14%" bgcolor="#FFCC00"> 
-					<div align="right">
-					   <b><font size="2">Phone:</font></b>
-					</div>
-				</td>
-  			<td width="19%"> 
-						<div align="left"> 
-						  <beanlib:InputControl type="text" name="qry_PhoneMain" value="#QUERY_BEAN.CustomObj.qry_PhoneMain"/>
-						</div>
-				</td>
-			</tr>
+			</tr>									
 		</table>
+		<br>
 	  </div>	  
 	 <br>         
 		 
