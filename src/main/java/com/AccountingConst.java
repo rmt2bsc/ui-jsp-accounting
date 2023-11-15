@@ -9,6 +9,25 @@ public class AccountingConst {
 
     public static final String CLIENT_DATA_ACCTCATG_LIST = "accountCatgList";
 
+    /** Represents Creditor data */
+    public static final String CLIENT_DATA_CREDITOR = "creditor";
+
+    /** Represents the creditor's balance */
+    public static final String CLIENT_DATA_CREDITOR_BAL = "creditorbalance";
+
+    public static final String CLIENT_CREDITORBAL = "creditorbalance";
+
+    public static final String CLIENT_CUSTOMERBAL = "customerbalance";
+
+    public static final String CLIENT_CREDITORTYPE_LIST = "creditorTypeList";
+
+    public static final String CLIENT_BUSSERVTYPES = "businessservicetypes";
+
+    public static final String CLIENT_BUSTYPES = "businesstypes";
+
+    /** Request attribute name mapping to a creditor extension object */
+    public static final String CLIENT_DATA_CREDEXTT = "creditorext";
+
     public static final int DEBIT_BAL_TYPE = 1;
 
     public static final int CREDIT_BAL_TYPE = 2;
@@ -34,11 +53,7 @@ public class AccountingConst {
     /** Creditor Type Code for creditor */
     public static final int CREDITOR_TYPE_CREDITOR = 2;
 
-    /** Represents Creditor data */
-    public static final String CLIENT_DATA_CREDITOR = "creditor";
 
-    /** Represents the creditor's balance */
-    public static final String CLIENT_DATA_CREDITOR_BAL = "creditorbalance";
 
     // Acccounting API Return Codes
     public static final int RC_ACCT_NAME_INVALID = -401;
