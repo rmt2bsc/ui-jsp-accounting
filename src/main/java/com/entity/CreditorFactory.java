@@ -52,6 +52,7 @@ public class CreditorFactory {
             o.setApr(item.getApr() == null ? 0 : item.getApr().doubleValue());
             o.setExtAccountNumber(item.getExtAccountNo());
             o.setActive(item.getActive() == null ? 0 : item.getActive().intValue());
+            o.setBalance(item.getBalance() == null ? 0 : item.getBalance().doubleValue());
 
             if (item.getTracking() != null) {
                 if (item.getTracking().getDateCreated() != null) {
