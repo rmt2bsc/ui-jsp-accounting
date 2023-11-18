@@ -26,12 +26,10 @@ import com.entity.CreditorCriteria;
  * @author Roy Terrell
  * 
  */
-public class CreditorSearchAction extends CreditorAction {
+public class CreditorSearchAction extends AbstractCreditorAction {
     private static final String COMMAND_NEWSEARCH = "Creditor.Search.newsearch";
 
     private static final String COMMAND_SEARCH = "Creditor.Search.search";
-
-    // public static final String COMMAND_LIST = "Creditor.Search.list";
 
     private static final String COMMAND_EDIT = "Creditor.Search.edit";
 

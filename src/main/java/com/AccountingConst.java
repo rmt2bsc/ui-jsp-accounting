@@ -12,10 +12,8 @@ public class AccountingConst {
     /** Represents Creditor data */
     public static final String CLIENT_DATA_CREDITOR = "creditor";
 
-    /** Represents the creditor's balance */
-    public static final String CLIENT_DATA_CREDITOR_BAL = "creditorbalance";
-
-    public static final String CLIENT_CREDITORBAL = "creditorbalance";
+    /** Represents the subsidiary's balance */
+    public static final String CLIENT_SUBSIDIARYBALANCE = "balance";
 
     public static final String CLIENT_CUSTOMERBAL = "customerbalance";
 

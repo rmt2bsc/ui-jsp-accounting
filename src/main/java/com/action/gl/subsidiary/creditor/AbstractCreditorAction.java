@@ -10,13 +10,11 @@ import org.rmt2.jaxb.ReplyStatusType;
 
 import com.AccountingConst;
 import com.SystemException;
+import com.action.gl.subsidiary.AbstractSubsidiaryAction;
 import com.api.constants.GeneralConst;
 import com.api.constants.RMT2ServletConst;
-import com.api.jsp.action.AbstractActionHandler;
 import com.api.persistence.DatabaseException;
-import com.api.persistence.db.DatabaseConnectionBean;
 import com.api.util.RMT2Money;
-import com.api.util.RMT2String2;
 import com.api.web.ActionCommandException;
 import com.api.web.Context;
 import com.api.web.ICommand;
@@ -36,11 +34,11 @@ import com.entity.CreditorTypeFactory;
  * @author Roy Terrell
  * 
  */
-public abstract class CreditorAction extends AbstractActionHandler implements ICommand {
+public abstract class AbstractCreditorAction extends AbstractSubsidiaryAction implements ICommand {
     private Logger logger;
 
-    /** Creditor's balance */
-    private Double balance;
+    // /** Creditor's balance */
+    // private Double balance;
 
     /** An ArrayList of Creditors */
     protected List<Creditor> creditors;
@@ -54,10 +52,6 @@ public abstract class CreditorAction extends AbstractActionHandler implements IC
     /** Creditor's Business profile */
     private Object credDetail;
 
-    private Object busTypes;
-
-    private Object busServTypes;
-
     protected List credTypeList;
 
     protected int creditorId;
@@ -67,9 +61,9 @@ public abstract class CreditorAction extends AbstractActionHandler implements IC
      * Default constructor
      * 
      */
-    public CreditorAction() {
+    public AbstractCreditorAction() {
         super();
-        logger = Logger.getLogger("CreditorAction");
+        logger = Logger.getLogger(AbstractCreditorAction.class);
     }
 
     /**
@@ -82,7 +76,7 @@ public abstract class CreditorAction extends AbstractActionHandler implements IC
      *            this action handler
      * @throws SystemException
      */
-    public CreditorAction(Context _context, Request _request) throws SystemException, DatabaseException {
+    public AbstractCreditorAction(Context _context, Request _request) throws SystemException, DatabaseException {
         super(_context, _request);
         this.init(this.context, this.request);
     }
@@ -125,31 +119,6 @@ public abstract class CreditorAction extends AbstractActionHandler implements IC
 
     }
 
-    /**
-     * Obtains the creditor balance.
-     * 
-     * @param id
-     *            The creditor Id
-     * @param conBean
-     *            The database connection
-     * @return Double Creditor's balance
-     */
-    protected Double getBalance(int id, DatabaseConnectionBean conBean) {
-        Double balance = null;
-        // CreditorApi api = CreditorFactory.createApi(conBean, this.request);
-        //
-        // // Get Customer Balance
-        // try {
-        // balance = new Double(api.findCreditorBalance(id));
-        // } catch (CreditorException e) {
-        // logger.log(Level.INFO,
-        // "Customer balance could not be obtained...defaulting to zero.");
-        // balance = new Double(0);
-        // } finally {
-        // api = null;
-        // }
-        return balance;
-    }
 
     /**
      * Create the data entities needed to represent a new creditor.
@@ -279,14 +248,7 @@ public abstract class CreditorAction extends AbstractActionHandler implements IC
      * Obtains common key creditor related data items from the client JSP.
      */
     public void receiveClientData() throws ActionCommandException {
-        // Attempt to locate and obtain current selected row on JSP.
-        String rowStr = this.request.getParameter("selCbx");
-        this.selectedRow = 0;
-        if (RMT2String2.isNotEmpty(rowStr)) {
-            // Get index of the row that is to be processed from the
-            // HttpServeltRequest object
-            this.selectedRow = RMT2Money.stringToNumber(rowStr).intValue();
-        }
+        super.receiveClientData();
 
         // Attempt to locate and obtain creditor ID from the JSP.
         String temp = this.getInputValue("CreditorId", null);
@@ -333,24 +295,6 @@ public abstract class CreditorAction extends AbstractActionHandler implements IC
      * <td>business</td>
      * </tr>
      * <tr>
-     * <td>BUSINESS TYPES</td>
-     * <td>XML from contact application</td>
-     * <td>Business Type data</td>
-     * <td>businesstypes</td>
-     * </tr>
-     * <tr>
-     * <td>BUSINESS SERVTYPES</td>
-     * <td>XML from contact application</td>
-     * <td>Business Service Type data</td>
-     * <td>businessservicetypes</td>
-     * </tr>
-     * <tr>
-     * <td>CREDITOR BALANCE</td>
-     * <td>Double</td>
-     * <td>Creditor's Balance</td>
-     * <td>creditorbalance</td>
-     * </tr>
-     * <tr>
      * <td>MESSAGE</td>
      * <td>String</td>
      * <td>Server message</td>
@@ -361,14 +305,12 @@ public abstract class CreditorAction extends AbstractActionHandler implements IC
      * @throws ActionCommandException
      */
     public void sendClientData() throws ActionCommandException {
+        super.sendClientData();
         this.request.setAttribute(AccountingConst.CLIENT_CREDITORTYPE_LIST, this.credTypeList);
         this.request.setAttribute(AccountingConst.CLIENT_DATA_CREDITOR, this.cred);
         this.request.setAttribute(AccountingConst.CLIENT_DATA_CREDEXTT, this.credExt);
         this.request.setAttribute(GeneralConst.CLIENT_DATA_LIST, this.creditors);
         this.request.setAttribute(GeneralConst.CLIENT_DATA_BUSINESS, this.credDetail);
-        this.request.setAttribute(AccountingConst.CLIENT_BUSTYPES, this.busTypes);
-        this.request.setAttribute(AccountingConst.CLIENT_BUSSERVTYPES, this.busServTypes);
-        this.request.setAttribute(AccountingConst.CLIENT_CREDITORBAL, this.balance);
         this.request.setAttribute(RMT2ServletConst.REQUEST_MSG_INFO, this.msg);
     }
 }
