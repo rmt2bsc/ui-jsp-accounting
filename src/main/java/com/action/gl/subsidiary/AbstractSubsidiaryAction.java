@@ -1,9 +1,15 @@
 package com.action.gl.subsidiary;
 
+import java.util.List;
+
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.rmt2.jaxb.LookupCodesResponse;
+import org.rmt2.jaxb.ReplyStatusType;
 
 import com.AccountingConst;
 import com.SystemException;
+import com.api.constants.GeneralConst;
 import com.api.jsp.action.AbstractActionHandler;
 import com.api.persistence.DatabaseException;
 import com.api.util.RMT2Money;
@@ -13,24 +19,21 @@ import com.api.web.Context;
 import com.api.web.ICommand;
 import com.api.web.Request;
 import com.api.web.Response;
+import com.entity.GeneralCodes;
+import com.entity.GeneralCodesFactory;
 
 /**
- * This abstract class provides common functionality needed to serve various
- * user interfaces pertaining to Creditor maintenance.
+ * This abstract class provides common GL Subsidiary functionality needed to
+ * serve various descendant user interfaces.
  * 
  * @author Roy Terrell
  * 
  */
 public abstract class AbstractSubsidiaryAction extends AbstractActionHandler implements ICommand {
     private Logger logger;
-
     protected Double balance;
-
-    private Object busEntityTypes;
-
-    private Object busServTypes;
-
-
+    private Object lookupBusType;
+    private Object lookupBusServ;
 
     /**
      * Default constructor
@@ -81,7 +84,88 @@ public abstract class AbstractSubsidiaryAction extends AbstractActionHandler imp
         super.processRequest(request, response, command);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.api.jsp.action.ICommonAction#add()
+     */
+    @Override
+    public void add() throws ActionCommandException {
+        this.setupLookupData();
+    }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.api.jsp.action.ICommonAction#edit()
+     */
+    @Override
+    public void edit() throws ActionCommandException {
+        this.setupLookupData();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.api.jsp.action.ICommonAction#save()
+     */
+    @Override
+    public void save() throws ActionCommandException, DatabaseException {
+        this.setupLookupData();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.api.jsp.action.ICommonAction#delete()
+     */
+    @Override
+    public void delete() throws ActionCommandException, DatabaseException {
+        this.setupLookupData();
+    }
+
+    /**
+     * Retrieves a lists of General Code records based on general code groups
+     * Business Entity Type and Business Services Type.
+     * 
+     * @throws ActionCommandException
+     */
+    private void setupLookupData() throws ActionCommandException {
+        this.lookupBusServ = this.getLookupData(AccountingConst.CODEGROUP_KEY_BUS_SERV);
+        this.lookupBusType = this.getLookupData(AccountingConst.CODEGROUP_KEY_BUS_TYPE);
+    }
+    
+    /**
+     * Retrieves a list of General Code records based on general code group.
+     * 
+     * @param codeGroupId
+     *            the id of the group to gather general codes.
+     * @return List<{@link GeneralCodes}>
+     * @throws ActionCommandException
+     */
+    private List<GeneralCodes> getLookupData(int codeGroupId) throws ActionCommandException {
+        GeneralCodes code = GeneralCodesFactory.create();
+        code.setCodeGrpId(codeGroupId);
+
+        // Call SOAP web service to get complete list of codes based on a
+        // particular group
+        try {
+            // UI-37: added login id and session id parameters to the callSave
+            // method invocation
+            LookupCodesResponse response = CodeSoapRequests.callGet(code, this.loginId, this.session.getId());
+            ReplyStatusType rst = response.getReplyStatus();
+            if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
+                this.msg = rst.getMessage();
+                return null;
+            }
+            List<GeneralCodes> results = GeneralCodesFactory.create(response.getDetailCodes());
+            return results;
+        } catch (Exception e) {
+            logger.log(Level.ERROR, e.getMessage());
+            throw new ActionCommandException(e.getMessage());
+        }
+    }
+    
     /**
      * Obtains common key creditor related data items from the client JSP.
      */
@@ -126,8 +210,9 @@ public abstract class AbstractSubsidiaryAction extends AbstractActionHandler imp
      * @throws ActionCommandException
      */
     public void sendClientData() throws ActionCommandException {
-        this.request.setAttribute(AccountingConst.CLIENT_BUSTYPES, this.busEntityTypes);
-        this.request.setAttribute(AccountingConst.CLIENT_BUSSERVTYPES, this.busServTypes);
+        this.request.setAttribute(AccountingConst.CLIENT_BUSTYPES, this.lookupBusType);
+        this.request.setAttribute(AccountingConst.CLIENT_BUSSERVTYPES, this.lookupBusServ);
         this.request.setAttribute(AccountingConst.CLIENT_SUBSIDIARYBALANCE, this.balance);
     }
+
 }

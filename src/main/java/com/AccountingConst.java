@@ -1,6 +1,14 @@
 package com;
 
 public class AccountingConst {
+    /**
+     * Primary key value for General Code Group Business Entity Type
+     */
+    public static final int CODEGROUP_KEY_BUS_TYPE = 7;
+    /**
+     * Primary key value for General Code Group Business Services Type
+     */
+    public static final int CODEGROUP_KEY_BUS_SERV = 8;
 
     /** Account Type List constant to represent a list of account types */
     public static final String CLIENT_DATA_ACCTTYPE_LIST = "accountTypeList";

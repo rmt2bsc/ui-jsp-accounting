@@ -235,6 +235,16 @@ public class CreditorSearchAction extends AbstractCreditorAction {
     /*
      * (non-Javadoc)
      * 
+     * @see com.action.gl.subsidiary.AbstractSubsidiaryAction#add()
+     */
+    @Override
+    public void add() throws ActionCommandException {
+        super.add();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.action.gl.creditor.CreditorAction#edit()
      */
     @Override
@@ -251,6 +261,8 @@ public class CreditorSearchAction extends AbstractCreditorAction {
         if (list != null && list.size() > 0) {
             this.cred = list.get(0);
         }
+
+        super.edit();
         return;
     }
 
@@ -298,6 +310,4 @@ public class CreditorSearchAction extends AbstractCreditorAction {
         this.session.setAttribute(GeneralConst.CLIENT_DATA_CRITERIA, this.query.getCustomObj());
 
     }
-
-
 }
