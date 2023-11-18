@@ -1,4 +1,4 @@
-package com.action.gl.creditor;
+package com.action.gl.subsidiary.creditor;
 
 import java.math.BigInteger;
 import java.util.Date;
@@ -8,44 +8,43 @@ import org.rmt2.constants.ApiHeaderNames;
 import org.rmt2.constants.ApiTransactionCodes;
 import org.rmt2.jaxb.AccountingTransactionRequest;
 import org.rmt2.jaxb.AccountingTransactionResponse;
-import org.rmt2.jaxb.CreditortypeCriteriaType;
+import org.rmt2.jaxb.CreditorCriteriaType;
 import org.rmt2.jaxb.HeaderType;
 import org.rmt2.jaxb.ObjectFactory;
 import org.rmt2.jaxb.TransactionCriteriaGroup;
+import org.rmt2.jaxb.XactCustomCriteriaTargetType;
 import org.rmt2.util.HeaderTypeBuilder;
 
 import com.AccountingUIException;
 import com.api.messaging.webservice.soap.client.SoapJaxbClientWrapper;
 import com.api.security.authentication.web.AuthenticationException;
-import com.entity.CreditorType;
+import com.api.util.RMT2String2;
+import com.entity.CreditorCriteria;
 
 /**
  * Help class for constructing and invoking SOAP calls pertaining to the
- * Accounting general codes.
+ * Accounting Creditors.
  * 
  * @author Roy Terrell
  *
  */
-public class CreditorTypeSoapRequests {
-    private static final Logger logger = Logger.getLogger(CreditorTypeSoapRequests.class);
+public class CreditorSoapRequests {
+    private static final Logger logger = Logger.getLogger(CreditorSoapRequests.class);
     private static final String MSG = "SOAP invocation error occurred regarding server-side messaging";
 
     /**
      * SOAP call to fetch general code(s).
      * 
      * @param parms
-     *            {@link GeneralCodes}
+     *            {@link CreditorCriteria}
      * @param loginId
      *            the id of logged in user
      * @param sessionId
      *            the web session id of the logged in user.
      * @return {@link AccountingTransactionResponse}
      * @throws AccountingUIException
-     * 
-     *             UI-37: Added loginId and sessionId parameters to method
-     *             signature.
      */
-    public static final AccountingTransactionResponse callGet(CreditorType parms, String loginId, String sessionId)
+    public static final AccountingTransactionResponse callGet(CreditorCriteria parms, String loginId, String sessionId)
             throws AccountingUIException {
         // Retrieve all code group records from the database
         ObjectFactory fact = new ObjectFactory();
@@ -54,7 +53,7 @@ public class CreditorTypeSoapRequests {
         HeaderType head = HeaderTypeBuilder.Builder.create()
                 .withApplication(ApiHeaderNames.APP_NAME_ACCOUNTING)
                 .withModule(ApiTransactionCodes.MODULE_ACCOUNTING_SUBSIDIARY)
-                .withTransaction(ApiTransactionCodes.SUBSIDIARY_CREDITOR_TYPE_GET)
+                .withTransaction(ApiTransactionCodes.SUBSIDIARY_CREDITOR_GET)
                 .withMessageMode(ApiHeaderNames.MESSAGE_MODE_REQUEST)
                 .withDeliveryDate(new Date())
                 .withRouting(ApiTransactionCodes.ROUTE_ACCOUNTING)
@@ -63,18 +62,25 @@ public class CreditorTypeSoapRequests {
                 .withSessionId(sessionId)
                 .build();
 
-        CreditortypeCriteriaType criteria = fact.createCreditortypeCriteriaType();
+        CreditorCriteriaType criteria = fact.createCreditorCriteriaType();
+        criteria.setTargetLevel(XactCustomCriteriaTargetType.FULL);
         if (parms != null) {
-            if (parms.getCreditorTypeId() > 0) {
-                criteria.setCreditorTypeId(BigInteger.valueOf(parms.getCreditorTypeId()));
+            if (RMT2String2.isNotEmpty(parms.getQry_CreditorTypeId())) {
+                criteria.setCreditorTypeId(BigInteger.valueOf(Integer.valueOf(parms.getQry_CreditorTypeId())));
             }
-            if (parms.getDescription() != null) {
-                criteria.setDecription(parms.getDescription());
+            if (RMT2String2.isNotEmpty(parms.getQry_CreditorId())) {
+                criteria.setCreditorId(BigInteger.valueOf(Integer.valueOf(parms.getQry_CreditorId())));
+            }
+            if (RMT2String2.isNotEmpty(parms.getQry_AccountNo())) {
+                criteria.setAccountNo(parms.getQry_AccountNo());
+            }
+            if (RMT2String2.isNotEmpty(parms.getQry_Name())) {
+                criteria.setBusinessName(parms.getQry_Name());
             }
         }
 
         TransactionCriteriaGroup criteriaGroup = fact.createTransactionCriteriaGroup();
-        criteriaGroup.setCreditortypeCriteria(criteria);
+        criteriaGroup.setCreditorCriteria(criteria);
         req.setCriteria(criteriaGroup);
         req.setHeader(head);
 
@@ -83,7 +89,7 @@ public class CreditorTypeSoapRequests {
             response = SoapJaxbClientWrapper.callSoapRequest(req);
             return response;
         } catch (Exception e) {
-            throw new AuthenticationException(CreditorTypeSoapRequests.MSG, e);
+            throw new AuthenticationException(CreditorSoapRequests.MSG, e);
         }
     }
 

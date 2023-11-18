@@ -1,4 +1,4 @@
-package com.action.gl.creditor;
+package com.action.gl.subsidiary.creditor;
 
 /**
  * Creditor constants.

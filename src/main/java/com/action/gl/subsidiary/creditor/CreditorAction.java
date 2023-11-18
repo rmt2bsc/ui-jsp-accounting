@@ -1,4 +1,4 @@
-package com.action.gl.creditor;
+package com.action.gl.subsidiary.creditor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +15,8 @@ import com.api.constants.RMT2ServletConst;
 import com.api.jsp.action.AbstractActionHandler;
 import com.api.persistence.DatabaseException;
 import com.api.persistence.db.DatabaseConnectionBean;
+import com.api.util.RMT2Money;
+import com.api.util.RMT2String2;
 import com.api.web.ActionCommandException;
 import com.api.web.Context;
 import com.api.web.ICommand;
@@ -41,10 +43,10 @@ public abstract class CreditorAction extends AbstractActionHandler implements IC
     private Double balance;
 
     /** An ArrayList of Creditors */
-    protected List creditors;
+    protected List<Creditor> creditors;
 
     /** Creditor */
-    protected Object cred;
+    protected Creditor cred;
 
     /** Creditor Extension */
     protected Object credExt;
@@ -57,6 +59,8 @@ public abstract class CreditorAction extends AbstractActionHandler implements IC
     private Object busServTypes;
 
     protected List credTypeList;
+
+    protected int creditorId;
 
 
     /**
@@ -161,14 +165,14 @@ public abstract class CreditorAction extends AbstractActionHandler implements IC
      * contact profile consists of business and address information.
      */
     public void edit() throws ActionCommandException {
-        // Create query to where creditor is not found in the event creditor
-        // object is null
-        int creditorId = -1;
-        if (this.cred != null) {
-            creditorId = ((Creditor) this.cred).getCreditorId();
-        }
-        // this.fetchCreditor(creditorId);
-        return;
+        // // Create query to where creditor is not found in the event creditor
+        // // object is null
+        // int creditorId = -1;
+        // if (this.cred != null) {
+        // creditorId = ((Creditor) this.cred).getCreditorId();
+        // }
+        // // this.fetchCreditor(creditorId);
+        // return;
     }
 
     /**
@@ -215,9 +219,10 @@ public abstract class CreditorAction extends AbstractActionHandler implements IC
      * 
      * @param criteria
      *            {@link CreditorCriteria}
+     * @return List<{@link Creditor}>
      * @throws ActionCommandException
      */
-    protected void getCreditors(CreditorCriteria criteria) throws ActionCommandException {
+    protected List<Creditor> getCreditors(CreditorCriteria criteria) throws ActionCommandException {
         // Call SOAP web service to get a list of Creditors based on selection
         // criteria
         try {
@@ -227,7 +232,7 @@ public abstract class CreditorAction extends AbstractActionHandler implements IC
             this.msg = rst.getMessage();
             if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
                 this.msg = rst.getMessage();
-                return;
+                return null;
             }
             List<Creditor> results = null;
             if (response.getProfile() != null && response.getProfile().getCreditors() != null) {
@@ -236,9 +241,7 @@ public abstract class CreditorAction extends AbstractActionHandler implements IC
             else {
                 results = new ArrayList<>();
             }
-            this.creditors = results;
-            this.sendClientData();
-            return;
+            return results;
         } catch (Exception e) {
             logger.log(Level.ERROR, e.getMessage());
             throw new ActionCommandException(e.getMessage());
@@ -273,9 +276,23 @@ public abstract class CreditorAction extends AbstractActionHandler implements IC
     }
 
     /**
-     * Obtains key creditor data entered by the user from the request object
+     * Obtains common key creditor related data items from the client JSP.
      */
     public void receiveClientData() throws ActionCommandException {
+        // Attempt to locate and obtain current selected row on JSP.
+        String rowStr = this.request.getParameter("selCbx");
+        this.selectedRow = 0;
+        if (RMT2String2.isNotEmpty(rowStr)) {
+            // Get index of the row that is to be processed from the
+            // HttpServeltRequest object
+            this.selectedRow = RMT2Money.stringToNumber(rowStr).intValue();
+        }
+
+        // Attempt to locate and obtain creditor ID from the JSP.
+        String temp = this.getInputValue("CreditorId", null);
+        this.creditorId = RMT2Money.stringToNumber(temp).intValue();
+
+        // Attempt to locate and obtain creditor profile data from the JSP.
         try {
             this.cred = CreditorFactory.create();
             RMT2WebUtility.packageBean(this.request, this.cred);

@@ -1,6 +1,7 @@
-package com.action.gl.creditor;
+package com.action.gl.subsidiary.creditor;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -15,6 +16,7 @@ import com.api.web.Context;
 import com.api.web.Request;
 import com.api.web.Response;
 import com.api.web.util.RMT2WebUtility;
+import com.entity.Creditor;
 import com.entity.CreditorCriteria;
 
 /**
@@ -143,7 +145,8 @@ public class CreditorSearchAction extends CreditorAction {
         this.getSession().setAttribute(RMT2ServletConst.QUERY_BEAN, this.query);
         CreditorCriteria criteria = (CreditorCriteria) this.query.getCustomObj();
         this.credTypeList = this.getCreditorTypes();
-        this.getCreditors(criteria);
+        this.creditors = this.getCreditors(criteria);
+        this.sendClientData();
     }
 
     /**
@@ -231,7 +234,27 @@ public class CreditorSearchAction extends CreditorAction {
         // return;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.action.gl.creditor.CreditorAction#edit()
+     */
+    @Override
+    public void edit() throws ActionCommandException {
+        super.edit();
+        if (this.selectedRow <= 0) {
+            throw new ActionCommandException("Client must select a row to edit");
+        }
 
+        // Make SOAP call to get selected creditor's profile
+        CreditorCriteria c = new CreditorCriteria();
+        c.setQry_CreditorId(String.valueOf(this.creditorId));
+        List<Creditor> list = this.getCreditors(c);
+        if (list != null && list.size() > 0) {
+            this.cred = list.get(0);
+        }
+        return;
+    }
 
     /**
      * Determines if search is to be performed using business contact criteria
@@ -242,7 +265,7 @@ public class CreditorSearchAction extends CreditorAction {
      * @param criteria
      *            Business contact or creditor selection criteria data.
      * @throws ActionCommandException
-     *             When bothe the creditor and contact criteria is present.
+     *             When both the creditor and contact criteria is present.
      */
     private void validateCriteria(CreditorCriteria criteria) throws ActionCommandException {
         boolean useCredParms = false;
@@ -269,20 +292,7 @@ public class CreditorSearchAction extends CreditorAction {
     }
 
     public void receiveClientData() throws ActionCommandException {
-        int credId;
-        String temp;
-
-        // try {
-        // temp = this.getInputValue("CreditorId", null);
-        // credId = Integer.parseInt(temp);
-        // this.cred = CreditorFactory.createCreditor();
-        // ((Creditor) this.cred).setCreditorId(credId);
-        // } catch (NumberFormatException e) {
-        // this.msg =
-        // "Problem Identifying Creditor Id from a list of creditors";
-        // CreditorSearchAction.logger.log(Level.ERROR, this.msg);
-        // throw new ActionCommandException(this.msg);
-        // }
+        super.receiveClientData();
     }
 
     public void sendClientData() throws ActionCommandException {
@@ -290,4 +300,6 @@ public class CreditorSearchAction extends CreditorAction {
         this.session.setAttribute(GeneralConst.CLIENT_DATA_CRITERIA, this.query.getCustomObj());
 
     }
+
+
 }
