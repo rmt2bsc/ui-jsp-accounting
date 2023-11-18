@@ -2,6 +2,8 @@
 <%@ taglib uri="/rmt2-generaltaglib" prefix="gen" %>
 <%@ page import="com.api.util.RMT2Utility" %>
 <%@ page import="com.api.constants.GeneralConst" %>
+<%@ page import="com.api.constants.RMT2ServletConst" %>
+
 
 <gen:InitAppRoot id="APP_ROOT"/>
 
@@ -84,6 +86,18 @@
 				 %>
 			 </table>
 			 </div>
+			 <br>
+			 
+			 <!-- Display any messages -->
+			 <table>
+				 <tr>
+		  		   <td>
+				     <font color="red">
+					     <gen:ShowPageMessages dataSource="<%=RMT2ServletConst.REQUEST_MSG_MESSAGES%>"/>
+				     </font>
+			 	   </td>
+				 </tr>
+			 </table>
 			 <br>
 		     <input type="button" name="<%=GeneralConst.REQ_EDIT%>" value="Edit" style=width:90 onClick="handleAction2(this.name)">
 <%-- 			 <input type="button" name="<%=GeneralConst.REQ_ADD%>" value="Add" style=width:90 onClick="handleAction2(this.name)"> --%>

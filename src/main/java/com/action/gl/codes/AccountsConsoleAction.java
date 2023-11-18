@@ -397,6 +397,7 @@ public class AccountsConsoleAction extends AbstractActionHandler implements ICom
             else {
                 results = new ArrayList<>();
             }
+            this.msg += ": " + results.size();
             return results;
         } catch (Exception e) {
             logger.log(Level.ERROR, e.getMessage());

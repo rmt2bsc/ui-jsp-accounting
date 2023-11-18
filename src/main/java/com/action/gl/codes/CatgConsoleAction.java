@@ -184,6 +184,7 @@ public class CatgConsoleAction extends AbstractActionHandler implements ICommand
             else {
                 results = new ArrayList<>();
             }
+            this.msg += ": " + results.size();
             return results;
         } catch (Exception e) {
             logger.log(Level.ERROR, e.getMessage());
@@ -322,7 +323,7 @@ public class CatgConsoleAction extends AbstractActionHandler implements ICommand
      */
     protected void sendClientData() throws ActionCommandException {
         this.session.setAttribute(AccountingConst.CLIENT_DATA_ACCTTYPE_LIST, this.acctTypeList);
-        this.session.setAttribute(AccountingConst.CLIENT_DATA_ACCTYPE_RECORD, this.acctType);
+        this.session.setAttribute(AccountingConst.CLIENT_DATA_ACCTTYPE_RECORD, this.acctType);
         this.request.setAttribute(GeneralConst.CLIENT_DATA_RECORD, this.catg);
         this.request.setAttribute(GeneralConst.CLIENT_DATA_LIST, this.acctCatgList);
         this.request.setAttribute(RMT2ServletConst.REQUEST_MSG_INFO, this.msg);

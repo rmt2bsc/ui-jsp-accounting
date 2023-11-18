@@ -10,6 +10,7 @@ import org.rmt2.jaxb.ReplyStatusType;
 import com.AccountingConst;
 import com.SystemException;
 import com.api.constants.GeneralConst;
+import com.api.constants.RMT2ServletConst;
 import com.api.jsp.action.AbstractActionHandler;
 import com.api.persistence.DatabaseException;
 import com.api.util.RMT2Money;
@@ -205,6 +206,12 @@ public abstract class AbstractSubsidiaryAction extends AbstractActionHandler imp
      * <td>Subsidiary's Balance</td>
      * <td>balance</td>
      * </tr>
+     * <tr>
+     * <td>MESSAGE</td>
+     * <td>String</td>
+     * <td>Server message</td>
+     * <td>info</td>
+     * </tr>
      * </table>
      * 
      * @throws ActionCommandException
@@ -213,6 +220,7 @@ public abstract class AbstractSubsidiaryAction extends AbstractActionHandler imp
         this.request.setAttribute(AccountingConst.CLIENT_BUSTYPES, this.lookupBusType);
         this.request.setAttribute(AccountingConst.CLIENT_BUSSERVTYPES, this.lookupBusServ);
         this.request.setAttribute(AccountingConst.CLIENT_SUBSIDIARYBALANCE, this.balance);
+        this.request.setAttribute(RMT2ServletConst.REQUEST_MSG_INFO, this.msg);
     }
 
 }

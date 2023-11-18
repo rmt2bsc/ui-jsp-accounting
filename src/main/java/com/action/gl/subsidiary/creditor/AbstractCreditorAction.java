@@ -12,7 +12,6 @@ import com.AccountingConst;
 import com.SystemException;
 import com.action.gl.subsidiary.AbstractSubsidiaryAction;
 import com.api.constants.GeneralConst;
-import com.api.constants.RMT2ServletConst;
 import com.api.persistence.DatabaseException;
 import com.api.util.RMT2Money;
 import com.api.web.ActionCommandException;
@@ -142,6 +141,7 @@ public abstract class AbstractCreditorAction extends AbstractSubsidiaryAction im
             else {
                 results = new ArrayList<>();
             }
+            this.msg += ": " + results.size();
             return results;
         } catch (Exception e) {
             logger.log(Level.ERROR, e.getMessage());
@@ -226,12 +226,6 @@ public abstract class AbstractCreditorAction extends AbstractSubsidiaryAction im
      * <td>Business and Address data</td>
      * <td>business</td>
      * </tr>
-     * <tr>
-     * <td>MESSAGE</td>
-     * <td>String</td>
-     * <td>Server message</td>
-     * <td>info</td>
-     * </tr>
      * </table>
      * 
      * @throws ActionCommandException
@@ -243,6 +237,5 @@ public abstract class AbstractCreditorAction extends AbstractSubsidiaryAction im
         this.request.setAttribute(AccountingConst.CLIENT_DATA_CREDEXTT, this.credExt);
         this.request.setAttribute(GeneralConst.CLIENT_DATA_LIST, this.creditors);
         this.request.setAttribute(GeneralConst.CLIENT_DATA_BUSINESS, this.credDetail);
-        this.request.setAttribute(RMT2ServletConst.REQUEST_MSG_INFO, this.msg);
     }
 }

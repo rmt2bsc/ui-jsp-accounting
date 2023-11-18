@@ -4,6 +4,7 @@
 <%@ page import="com.api.constants.GeneralConst" %>
 <%@ page import="com.AccountingConst" %>
 <%@ page import="com.api.util.RMT2Utility" %>
+<%@ page import="com.api.constants.RMT2ServletConst" %>
 
 <gen:InitAppRoot id="APP_ROOT"/>
 
@@ -27,6 +28,17 @@
  	 <form name="SearchForm" method="POST" action="<%=APP_ROOT%>/unsecureRequestProcessor/Creditor.Search">
 	 <%@include file="CreditorSearchCriteriaAndList.jsp"%>
 
+     <!-- Display any messages -->
+	 <table>
+		 <tr>
+  		   <td>
+		     <font color="red">
+			     <gen:ShowPageMessages dataSource="<%=RMT2ServletConst.REQUEST_MSG_MESSAGES%>"/>
+		     </font>
+	 	   </td>
+		 </tr>
+	 </table>
+			 
 	 <!-- Display command buttons -->     
 	 <br>      
 	 <table width="100%" cellpadding="0" cellspacing="0">
