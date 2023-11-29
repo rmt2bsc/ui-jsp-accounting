@@ -7,9 +7,8 @@
    1.  A entity bean of type, Creditor, which is identified as "this.cred".
    2.  A Double data type identified as "Balance".
  -->
- 						  
-	<table width="80%" border="0">			
-		 <caption align="left"><h3><%=pageTitle%></h3></caption>
+  	<table width="80%" border="0">			
+		<caption align="left"><h3><%=pageTitle%></h3></caption>
 		<tr>
 			<td width="12%" class="clsTableFormHeader">Account Number:</td>
 			<td width="21%">

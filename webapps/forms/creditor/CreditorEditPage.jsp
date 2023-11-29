@@ -6,7 +6,6 @@
 <%@ page import="com.api.util.RMT2Utility" %>
 <%@ page import="com.api.constants.GeneralConst" %>
 
-
 <gen:InitAppRoot id="APP_ROOT"/>
 
 <jsp:useBean id="QUERY_BEAN" scope="session" class="com.bean.RMT2TagQueryBean"/>
