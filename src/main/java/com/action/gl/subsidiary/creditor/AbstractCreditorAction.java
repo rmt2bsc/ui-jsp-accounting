@@ -34,10 +34,8 @@ import com.entity.CreditorTypeFactory;
  * 
  */
 public abstract class AbstractCreditorAction extends AbstractSubsidiaryAction implements ICommand {
+    
     private Logger logger;
-
-    // /** Creditor's balance */
-    // private Double balance;
 
     /** An ArrayList of Creditors */
     protected List<Creditor> creditors;
@@ -103,6 +101,46 @@ public abstract class AbstractCreditorAction extends AbstractSubsidiaryAction im
      */
     public void processRequest(Request request, Response response, String command) throws ActionCommandException {
         super.processRequest(request, response, command);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.api.jsp.action.ICommonAction#add()
+     */
+    @Override
+    public void add() throws ActionCommandException {
+        this.setupLookupData();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.api.jsp.action.ICommonAction#edit()
+     */
+    @Override
+    public void edit() throws ActionCommandException {
+        this.setupLookupData();
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.api.jsp.action.ICommonAction#delete()
+     */
+    @Override
+    public void delete() throws ActionCommandException, DatabaseException {
+        this.setupLookupData();
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.api.jsp.action.ICommonAction#save()
+     */
+    @Override
+    public void save() throws ActionCommandException, DatabaseException {
+        this.setupLookupData();        
     }
 
     /**
@@ -177,6 +215,17 @@ public abstract class AbstractCreditorAction extends AbstractSubsidiaryAction im
     }
 
     /**
+     * Retrieves a lists of creditor types and other useful lookup data sets.
+     * 
+     * @throws ActionCommandException
+     */
+    @Override
+    protected void setupLookupData() throws ActionCommandException {
+        super.setupLookupData();
+        this.credTypeList = this.getCreditorTypes(); 
+    }
+
+    /**
      * Obtains common key creditor related data items from the client JSP.
      */
     public void receiveClientData() throws ActionCommandException {
@@ -233,7 +282,7 @@ public abstract class AbstractCreditorAction extends AbstractSubsidiaryAction im
     public void sendClientData() throws ActionCommandException {
         super.sendClientData();
         this.request.setAttribute(AccountingConst.CLIENT_CREDITORTYPE_LIST, this.credTypeList);
-        this.request.setAttribute(AccountingConst.CLIENT_DATA_CREDITOR, this.cred);
+        this.request.setAttribute(AccountingConst.CLIENT_DATA_SUBSIDIARY, this.cred);
         this.request.setAttribute(AccountingConst.CLIENT_DATA_CREDEXTT, this.credExt);
         this.request.setAttribute(GeneralConst.CLIENT_DATA_LIST, this.creditors);
         this.request.setAttribute(GeneralConst.CLIENT_DATA_BUSINESS, this.credDetail);

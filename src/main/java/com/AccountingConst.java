@@ -17,8 +17,8 @@ public class AccountingConst {
 
     public static final String CLIENT_DATA_ACCTCATG_LIST = "accountCatgList";
 
-    /** Represents Creditor data */
-    public static final String CLIENT_DATA_CREDITOR = "creditor";
+    /** Represents Creditor/Customer data */
+    public static final String CLIENT_DATA_SUBSIDIARY = "subsidiary";
 
     /** Represents the subsidiary's balance */
     public static final String CLIENT_SUBSIDIARYBALANCE = "balance";

@@ -85,53 +85,14 @@ public abstract class AbstractSubsidiaryAction extends AbstractActionHandler imp
         super.processRequest(request, response, command);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.api.jsp.action.ICommonAction#add()
-     */
-    @Override
-    public void add() throws ActionCommandException {
-        this.setupLookupData();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.api.jsp.action.ICommonAction#edit()
-     */
-    @Override
-    public void edit() throws ActionCommandException {
-        this.setupLookupData();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.api.jsp.action.ICommonAction#save()
-     */
-    @Override
-    public void save() throws ActionCommandException, DatabaseException {
-        this.setupLookupData();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.api.jsp.action.ICommonAction#delete()
-     */
-    @Override
-    public void delete() throws ActionCommandException, DatabaseException {
-        this.setupLookupData();
-    }
-
+    
     /**
      * Retrieves a lists of General Code records based on general code groups
      * Business Entity Type and Business Services Type.
      * 
      * @throws ActionCommandException
      */
-    private void setupLookupData() throws ActionCommandException {
+    protected void setupLookupData() throws ActionCommandException {
         this.lookupBusServ = this.getLookupData(AccountingConst.CODEGROUP_KEY_BUS_SERV);
         this.lookupBusType = this.getLookupData(AccountingConst.CODEGROUP_KEY_BUS_TYPE);
     }

@@ -261,8 +261,6 @@ public class CreditorSearchAction extends AbstractCreditorAction {
         if (list != null && list.size() > 0) {
             this.cred = list.get(0);
         }
-
-        super.edit();
         return;
     }
 
