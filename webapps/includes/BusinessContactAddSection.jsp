@@ -23,7 +23,7 @@
 				<beanlib:InputControl dataSource="<%=AccountingConst.CLIENT_BUSTYPES %>"
 									   type="select"
 									   name="EntityTypeId"
-									   codeProperty="code_id"
+									   codeProperty="CodeId"
 									   displayProperty="longdesc"
                                        tabIndex="11"
 									   selectedValue="#item.busType"/>									
@@ -39,7 +39,7 @@
 				  <beanlib:InputControl dataSource="<%=AccountingConst.CLIENT_BUSSERVTYPES %>"
 									   type="select"
 									   name="ServTypeId"
-									   codeProperty="code_id"
+									   codeProperty="CodeId"
 									   displayProperty="longdesc"
                                        tabIndex="12"
 		  							   selectedValue="#item.servType"/>

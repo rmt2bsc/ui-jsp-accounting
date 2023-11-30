@@ -134,7 +134,7 @@ public abstract class AbstractSubsidiaryAction extends AbstractActionHandler imp
     public void receiveClientData() throws ActionCommandException {
         // Attempt to locate and obtain current selected row on JSP.
         String rowStr = this.request.getParameter("selCbx");
-        this.selectedRow = 0;
+        this.selectedRow = -1;
         if (RMT2String2.isNotEmpty(rowStr)) {
             // Get index of the row that is to be processed from the
             // HttpServeltRequest object

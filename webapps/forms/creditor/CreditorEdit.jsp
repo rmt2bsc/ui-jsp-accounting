@@ -27,9 +27,9 @@
 		</tr>				
 		
 		<tr>
-			<td width="12%" class="clsTableFormHeader">APR:</td>
-			<td width="21%">
-				<beanlib:InputControl type="text" name="Apr" value="#subsidiary.Apr" tabIndex="1"/>
+			<td width="12%" class="clsTableFormHeader">Creditor Id:</td>
+			<td width="21%"> 
+			   <beanlib:InputControl value="#subsidiary.CreditorId"/>
 			</td>
 			<td width="12%" class="clsTableFormHeader">Creditor Type:</td>
 			<td width="24%"> 
@@ -41,7 +41,9 @@
 	                                   tabIndex="2"
 									   selectedValue="#subsidiary.CreditorTypeId"/>
 			</td>
-			<td width="12%" class="clsTableFormHeader"></td>
-			<td width="21%"></td>
+			<td width="12%" class="clsTableFormHeader">APR:</td>
+			<td width="21%">
+				<beanlib:InputControl type="text" name="Apr" value="#subsidiary.Apr" tabIndex="1"/>
+			</td>
 		</tr>					
 	</table>

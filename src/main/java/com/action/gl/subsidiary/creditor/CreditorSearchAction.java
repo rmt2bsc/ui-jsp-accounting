@@ -250,7 +250,7 @@ public class CreditorSearchAction extends AbstractCreditorAction {
     @Override
     public void edit() throws ActionCommandException {
         super.edit();
-        if (this.selectedRow <= 0) {
+        if (this.selectedRow < 0) {
             throw new ActionCommandException("Client must select a row to edit");
         }
 

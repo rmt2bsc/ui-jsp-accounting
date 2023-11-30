@@ -1,14 +1,15 @@
 <%@ taglib uri="/rmt2-beantaglib" prefix="beanlib" %>
 <%@ taglib uri="/rmt2-generaltaglib" prefix="gen" %>
-<%@ taglib uri="/rmt2-xmltaglib" prefix="xml" %>
 <%@ page import="com.AccountingConst" %>
 <%@ page import="com.api.constants.RMT2ServletConst" %>
 <%@ page import="com.api.util.RMT2Utility" %>
 <%@ page import="com.api.constants.GeneralConst" %>
+<%@ page import="com.api.security.RMT2TagQueryBean" %>
+
 
 <gen:InitAppRoot id="APP_ROOT"/>
 
-<jsp:useBean id="QUERY_BEAN" scope="session" class="com.bean.RMT2TagQueryBean"/>
+<jsp:useBean id="QUERY_BEAN" scope="session" class="com.api.security.RMT2TagQueryBean"/>
 
 	
 <html>
@@ -36,7 +37,7 @@
 			   <br>
 			   
 			   <!--  Display Business contact data for creditor -->
-			   <%@include file="../includes/BusinessContactEditSection.jsp"%>
+			   <%@include file="../../includes/BusinessContactEditSection.jsp"%>
 			   <br>
 			
 			   <!--  Display any server messages -->		
@@ -48,12 +49,8 @@
 				 </tr>
 			   </table>
 			   
+			   <br>
 			   <table>
-				  <tr>
-					 <td><img src="/accounting/images/clr.gif" height="10"></td>
-					 <td><img src="/accounting/images/clr.gif" height="10"></td>
-					 <td><img src="/accounting/images/clr.gif" height="10"></td>
-				</tr>
 				<tr>
 					 <td><input type="button" name="<%=GeneralConst.REQ_SAVE %>" value="Save" style="width:90"  tabIndex="30"  onClick="handleAction('_self', DataForm, this.name)"></td>
 					 <td><input type="button" name="<%=GeneralConst.REQ_BACK %>" value="Back" style="width:90" tabIndex="31" onClick="handleAction('_self', DataForm, this.name)"></td>
