@@ -1,30 +1,24 @@
 package com.action.gl.subsidiary.creditor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.rmt2.jaxb.AccountingGeneralLedgerResponse;
 import org.rmt2.jaxb.AccountingTransactionResponse;
+import org.rmt2.jaxb.AddressBookResponse;
 import org.rmt2.jaxb.ReplyStatusType;
 
 import com.SystemException;
-import com.action.gl.codes.VwAccountSoapRequests;
+import com.action.gl.subsidiary.BusinessContactSoapRequests;
 import com.api.constants.GeneralConst;
-import com.api.constants.RMT2ServletConst;
 import com.api.persistence.DatabaseException;
-import com.api.security.RMT2TagQueryBean;
 import com.api.web.ActionCommandException;
 import com.api.web.Context;
 import com.api.web.Request;
 import com.api.web.Response;
-import com.api.web.util.RMT2WebUtility;
 import com.entity.Creditor;
 import com.entity.CreditorCriteria;
 import com.entity.CreditorFactory;
-import com.entity.VwAccount;
-import com.entity.VwAccountFactory;
 
 /**
  * This class provides functionality needed to serve the requests for the
@@ -68,7 +62,7 @@ public class CreditorEditAction extends AbstractCreditorAction {
 
     /**
      * Initializes this object using _conext and _request. This is needed in the
-     * event this object is inistantiated using the default constructor.
+     * event this object is instantiated using the default constructor.
      * 
      * @throws SystemException
      */
@@ -117,13 +111,35 @@ public class CreditorEditAction extends AbstractCreditorAction {
      */
     @Override
     public void save() throws ActionCommandException {
-        // Call SOAP web service to persist Creditor data changes to
-        // the database
+        int contactId = 0;
+
+        // Call SOAP web service to update creditor's business contact
+        // information since creditor depends on business id.
+        try {
+            AddressBookResponse response = BusinessContactSoapRequests.callSave(this.cred, this.loginId,
+                    this.session.getId());
+            ReplyStatusType rst2 = response.getReplyStatus();
+            if (rst2.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
+                this.msg = rst2.getMessage();
+                return;
+            }
+            // Capture the business id property of the business contact
+            // regardless if new or existing.
+            if (response.getProfile() != null && response.getProfile().getCommonContacts() != null) {
+                contactId = response.getProfile().getCommonContacts().get(0).getContactId().intValue();
+                this.cred.setBusinessId(contactId);
+            }
+        } catch (Exception e) {
+            logger.log(Level.ERROR, e.getMessage());
+            throw new ActionCommandException(e.getMessage());
+        }
+
+        // Call SOAP web service to persist Creditor data changes to the
+        // database.
         try {
             AccountingTransactionResponse response = CreditorSoapRequests.callSave(this.cred, this.loginId,
                     this.session.getId());
             ReplyStatusType rst = response.getReplyStatus();
-            this.msg = rst.getMessage();
             if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
                 this.msg = rst.getMessage();
                 return;
@@ -131,20 +147,24 @@ public class CreditorEditAction extends AbstractCreditorAction {
             List<Creditor> results = null;
             if (response.getProfile() != null) {
                 results = CreditorFactory.create(response.getProfile().getCreditors().getCreditor());
-                // For display purposes, update the account id value to capture
-                // the primary key value for the current record that was updated
-                this.cred.setCreditorId(results.get(0).getCreditorId());
-                this.cred.setAccountNumber(results.get(0).getAccountNumber());
 
-                // Make sure that city and state are auto populated after zip
-                // code has been looked up on the server side.
-                this.cred.setCity(results.get(0).getCity());
-                this.cred.setState(results.get(0).getState());
+                // Retrieve newly updated creditor profile from database
+                CreditorCriteria criteria = new CreditorCriteria();
+                criteria.setQry_CreditorId(String.valueOf(results.get(0).getCreditorId()));
+                List<Creditor> list = this.getCreditors(criteria);
+                if (list != null && list.size() > 0) {
+                    this.cred = list.get(0);
+                }
             }
             else {
                 this.cred = CreditorFactory.create();
             }
             super.save();
+
+            // Delayed the assignment of the "creditor saved successfully"
+            // confirmation message due to other web service calls are message
+            // property as well.
+            this.msg = rst.getMessage();
         } catch (Exception e) {
             logger.log(Level.ERROR, e.getMessage());
             throw new ActionCommandException(e.getMessage());

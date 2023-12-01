@@ -18,7 +18,7 @@
 			<td width="10%" class="clsTableFormHeader">Business Id:</td>
 			<td width="21%"> 
 			   <beanlib:InputControl value="#subsidiary.BusinessId"/>	
-			   <beanlib:InputControl type="hidden" name="BusinessId2" value="#subsidiary.BusinessId"/>	
+			   <beanlib:InputControl type="hidden" name="BusinessId" value="#subsidiary.BusinessId"/>	
 			</td>
 			<td width="12%" class="clsTableFormHeader">Contact First Name:</td>
 			<td width="24%"> 
