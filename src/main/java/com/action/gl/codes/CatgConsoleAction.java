@@ -174,8 +174,7 @@ public class CatgConsoleAction extends AbstractActionHandler implements ICommand
             ReplyStatusType rst = response.getReplyStatus();
             this.msg = rst.getMessage();
             if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
-                this.msg = rst.getMessage();
-                return null;
+                this.throwActionError(rst.getMessage(), rst.getExtMessage());
             }
             List<VwCategory> results = null;
             if (response.getProfile() != null) {
@@ -207,8 +206,7 @@ public class CatgConsoleAction extends AbstractActionHandler implements ICommand
             // Get message text from reply status
             ReplyStatusType rst = response.getReplyStatus();
             if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
-                this.msg = rst.getMessage();
-                return null;
+                this.throwActionError(rst.getMessage(), rst.getExtMessage());
             }
 
             List<GlAccountTypes> results = null;
@@ -219,8 +217,8 @@ public class CatgConsoleAction extends AbstractActionHandler implements ICommand
                 results = new ArrayList<>();
             }
             return results;
-        } catch (AccountingUIException e) {
-            throw e;
+        } catch (Exception e) {
+            throw new AccountingUIException(e);
         }
     }
 

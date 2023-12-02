@@ -107,8 +107,7 @@ public class CatgEditAction extends AbstractActionHandler implements ICommand {
             ReplyStatusType rst = response.getReplyStatus();
             this.msg = rst.getMessage();
             if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
-                this.msg = rst.getMessage();
-                return;
+                this.throwActionError(rst.getMessage(), rst.getExtMessage());
             }
             List<VwCategory> results = null;
             if (response.getProfile() != null) {
@@ -146,8 +145,7 @@ public class CatgEditAction extends AbstractActionHandler implements ICommand {
             ReplyStatusType rst = response.getReplyStatus();
             this.msg = rst.getMessage();
             if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
-                this.msg = rst.getMessage();
-                return;
+                this.throwActionError(rst.getMessage(), rst.getExtMessage());
             }
             return;
         } catch (Exception e) {
@@ -190,8 +188,7 @@ public class CatgEditAction extends AbstractActionHandler implements ICommand {
             ReplyStatusType rst = response.getReplyStatus();
             this.msg = rst.getMessage();
             if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
-                this.msg = rst.getMessage();
-                return null;
+                this.throwActionError(rst.getMessage(), rst.getExtMessage());
             }
             List<VwCategory> results = null;
             if (response.getProfile() != null) {

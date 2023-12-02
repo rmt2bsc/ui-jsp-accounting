@@ -12,7 +12,6 @@ import com.SystemException;
 import com.api.constants.GeneralConst;
 import com.api.constants.RMT2ServletConst;
 import com.api.jsp.action.AbstractActionHandler;
-import com.api.persistence.db.DatabaseConnectionBean;
 import com.api.web.ActionCommandException;
 import com.api.web.Context;
 import com.api.web.ICommand;
@@ -106,8 +105,7 @@ public class AccountEditAction extends AbstractActionHandler implements ICommand
             ReplyStatusType rst = response.getReplyStatus();
             this.msg = rst.getMessage();
             if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
-                this.msg = rst.getMessage();
-                return;
+                this.throwActionError(rst.getMessage(), rst.getExtMessage());
             }
             List<VwAccount> results = null;
             if (response.getProfile() != null) {
@@ -142,21 +140,8 @@ public class AccountEditAction extends AbstractActionHandler implements ICommand
             ReplyStatusType rst = response.getReplyStatus();
             this.msg = rst.getMessage();
             if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
-                this.msg = rst.getMessage();
-                return;
+                this.throwActionError(rst.getMessage(), rst.getExtMessage());
             }
-            // List<VwAccount> results = null;
-            // if (response.getProfile() != null) {
-            // results =
-            // VwAccountFactory.create(response.getProfile().getAccount());
-            // // For display purposes, update the account id value to capture
-            // // the primary key value for the current record that was updated
-            // this.acct.setId(results.get(0).getId());
-            // this.acct.setAcctNo(results.get(0).getAcctNo());
-            // }
-            // else {
-            // this.acct = VwAccountFactory.create();
-            // }
         } catch (Exception e) {
             logger.log(Level.ERROR, e.getMessage());
             throw new ActionCommandException(e.getMessage());
@@ -173,34 +158,6 @@ public class AccountEditAction extends AbstractActionHandler implements ICommand
         this.acctList = this.getAccounts(this.acct.getAcctCatId());
         this.sendClientData();
         this.msg = null;
-    }
-
-    /**
-     * Retrieves the current account record in extended form after an insert or
-     * an update operation.
-     * 
-     * @param conBean
-     *            The database connection
-     * @throws ActionCommandException
-     */
-    private void refreshPage(DatabaseConnectionBean conBean) throws ActionCommandException {
-        // BasicGLApi api = GeneralLedgerFactory.createBasicGLApi(conBean,
-        // this.request);
-        // int id = 0;
-        // try {
-        // // Get account view object.
-        // id = ((GlAccounts) this.acct).getAcctId();
-        // this.acct = api.findByIdExt(id);
-        // } catch (GLException e) {
-        // this.msg = "Error occurred retrieving data to refresh GL account, " +
-        // id;
-        // logger.error(this.msg);
-        // throw new ActionCommandException(this.msg, e);
-        // } finally {
-        // // Do not close api since its connection object is shared with the
-        // // caller
-        // api = null;
-        // }
     }
 
     /**
@@ -222,8 +179,7 @@ public class AccountEditAction extends AbstractActionHandler implements ICommand
             ReplyStatusType rst = response.getReplyStatus();
             this.msg = rst.getMessage();
             if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
-                this.msg = rst.getMessage();
-                return null;
+                this.throwActionError(rst.getMessage(), rst.getExtMessage());
             }
             List<VwAccount> results = null;
             if (response.getProfile() != null) {

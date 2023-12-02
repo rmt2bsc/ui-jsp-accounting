@@ -117,8 +117,7 @@ public abstract class AbstractSubsidiaryAction extends AbstractActionHandler imp
             LookupCodesResponse response = CodeSoapRequests.callGet(code, this.loginId, this.session.getId());
             ReplyStatusType rst = response.getReplyStatus();
             if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
-                this.msg = rst.getMessage();
-                return null;
+                this.throwActionError(rst.getMessage(), rst.getExtMessage());
             }
             List<GeneralCodes> results = GeneralCodesFactory.create(response.getDetailCodes());
             return results;

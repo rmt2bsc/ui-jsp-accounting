@@ -141,8 +141,7 @@ public class CreditorEditAction extends AbstractCreditorAction {
                     this.session.getId());
             ReplyStatusType rst = response.getReplyStatus();
             if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
-                this.msg = rst.getMessage();
-                return;
+                this.throwActionError(rst.getMessage(), rst.getExtMessage());
             }
             List<Creditor> results = null;
             if (response.getProfile() != null) {
