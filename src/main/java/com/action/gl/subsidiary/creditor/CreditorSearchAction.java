@@ -187,49 +187,7 @@ public class CreditorSearchAction extends AbstractCreditorAction {
      *             discovered for the same search transaction.
      */
     protected void doPostCustomInitialization(RMT2TagQueryBean query, int searchMode) throws ActionCommandException {
-        // CreditorCriteria cc = (CreditorCriteria) query.getCustomObj();
-        // StringBuffer sql = new StringBuffer();
-        // if (this.criteriaType == CRITERIATYPE_CONTACT) {
-        // if (!cc.getQry_Name().equals("")) {
-        // sql.append(CreditorConst.CRITERIATAGS_CONTACT[0]);
-        // sql.append(" = ");
-        // sql.append(cc.getQry_Name().trim());
-        // }
-        // if (!cc.getQry_PhoneMain().equals("")) {
-        // if (sql.length() > 0) {
-        // sql.append(" and ");
-        // }
-        // sql.append(CreditorConst.CRITERIATAGS_CONTACT[1]);
-        // sql.append(" = ");
-        // sql.append(cc.getQry_PhoneMain().trim());
-        // }
-        // if (!cc.getQry_TaxId().equals("")) {
-        // if (sql.length() > 0) {
-        // sql.append(" and ");
-        // }
-        // sql.append(CreditorConst.CRITERIATAGS_CONTACT[2]);
-        // sql.append(" = ");
-        // sql.append(cc.getQry_TaxId().trim());
-        // }
-        // }
-        // if (this.criteriaType == CRITERIATYPE_CREDITOR) {
-        // if (!cc.getQry_AccountNo().equals("")) {
-        // sql.append(CreditorConst.CRITERIATAGS_CREDITOR[0]);
-        // sql.append(" like ");
-        // sql.append(cc.getQry_AccountNo().trim());
-        // }
-        // if (!cc.getQry_CreditorTypeId().equals("")) {
-        // if (sql.length() > 0) {
-        // sql.append(" and ");
-        // }
-        // sql.append(CreditorConst.CRITERIATAGS_CREDITOR[1]);
-        // sql.append(" = ");
-        // sql.append(cc.getQry_CreditorTypeId().trim());
-        // }
-        // }
-        // query.setWhereClause(null);
-        // query.setWhereClause(sql.toString());
-        // return;
+        return;
     }
 
     /*
