@@ -1,6 +1,5 @@
 <%@ taglib uri="/rmt2-beantaglib" prefix="beanlib" %>
 <%@ taglib uri="/rmt2-generaltaglib" prefix="gen" %>
-<%@ taglib uri="/rmt2-taglib" prefix="db" %>
 <%@ page import="com.api.constants.GeneralConst" %>
 <%@ page import="com.AccountingConst" %>
 <%@ page import="com.api.util.RMT2Utility" %>
@@ -45,7 +44,7 @@
 		 <tr>
 			<td colspan="2">
 			  <input name="<%=GeneralConst.REQ_SEARCH %>" type="button" value="Search" style="width:90" onClick="handleAction('_self', document.SearchForm, this.name)">
-			  <input name="<%=GeneralConst.REQ_RESET %>" type="reset" value="Clear" style="width:90" onClick="handleAction('_self', document.SearchForm, this.name)">
+			  <input name="<%=GeneralConst.REQ_NEWSEARCH %>" type="button" value="Clear" style="width:90" onClick="handleAction('_self', document.SearchForm, this.name)">
 			  <input type="button" name="<%=GeneralConst.REQ_EDIT %>" value="Edit" style="width:90" onClick="handleAction('_self', document.SearchForm, this.name)">
 	          <input type="button" name="<%=GeneralConst.REQ_ADD %>" value="Add" style="width:90" onClick="handleAction('_self', document.SearchForm, this.name)">
 	          <input type="button" name="<%=GeneralConst.REQ_BACK %>" value="Back" style="width:90" onClick="handleAction('_self', document.SearchForm, this.name)">

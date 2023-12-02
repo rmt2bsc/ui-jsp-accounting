@@ -131,6 +131,12 @@ public class AccountingConst {
 
     public static final String MSG_CRED2_INVALID = "Cannot create Creditor when base creditor data is not available";
 
+    public static final String MSG_SUBSIDIARY_CANNOT_DELETE_ADDRESS = "Error occurred deleting the creditor due to complications pertaining to its related business contact information";
+
+    public static final String MSG_SUBSIDIARY_HAS_HISTORY = "Subsidiary cannot be deleted due to the exisitence of transaction history";
+
+    public static final String MSG_SUBSIDIARY_NOTFOUND = "Subsidiary does not exists in the system";
+
     public static final String MSG_CRED3_INVALID = "Function Name must be provided to obtain a count of Account associations";
 
     public static final String MSG_IM_NOVENDOR = "Item Master must be associated with a vendor";
