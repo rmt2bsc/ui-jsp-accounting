@@ -18,7 +18,7 @@
 			</td>
 			<td width="12%" class="clsTableFormHeader">Credit Limit:</td>
 			<td width="21%"> 
-				<beanlib:InputControl value="#subsidiary.CreditLimit" format="$#,##0.00;($#,##0.00)"/>						   
+				<beanlib:InputControl name="CreditLimit" type="text" value="#subsidiary.CreditLimit" format="#,##0.00;(#,##0.00)" tabIndex="1"/>						   
 			</td>
 			<td width="12%" class="clsTableFormHeader">Balance:</td>
 			<td width="21%"> 
@@ -43,7 +43,7 @@
 			</td>
 			<td width="12%" class="clsTableFormHeader">APR:</td>
 			<td width="21%">
-				<beanlib:InputControl type="text" name="Apr" value="#subsidiary.Apr" tabIndex="1"/>
+				<beanlib:InputControl type="text" name="Apr" value="#subsidiary.Apr" tabIndex="3"/>
 			</td>
 		</tr>					
 	</table>
