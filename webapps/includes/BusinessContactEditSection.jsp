@@ -81,7 +81,7 @@
 			<td colspan="2"></td>
 			<td width="12%" class="clsTableFormHeader">Web Site:</td>
 			<td colspan="3" width="21%"> 
-			   <beanlib:InputControl type="text" name="Website" value="#subsidiary.Website"  maxLength="100" tabIndex="18"/>													
+			   <beanlib:InputControl type="text" name="Website" value="#subsidiary.Website"  maxLength="100" tabIndex="19"/>													
 			</td>			
 		</tr>
 	</table>
@@ -92,7 +92,7 @@
 			<td class="clsTableFormHeader" width="10%">Address 1:</td>
 			<td width="24%">
 			   <beanlib:InputControl type="hidden" name="AddrId" value="#subsidiary.AddrId"/>						
-			   <beanlib:InputControl type="text" name="Addr1" value="#subsidiary.Addr1" size="40" maxLength="50" tabIndex="19"/>						
+			   <beanlib:InputControl type="text" name="Addr1" value="#subsidiary.Addr1" size="40" maxLength="50" tabIndex="20"/>						
 			</td>
 			<td class="clsTableFormHeader" width="10%">City:</td>
 			<td width="24%">
@@ -102,7 +102,7 @@
 		<tr>
 			<td class="clsTableFormHeader" width="10%"> Address 2:</td>
 			<td width="24%">
-			   <beanlib:InputControl type="text" name="Addr2" value="#subsidiary.addr2" size="40" maxLength="50" tabIndex="20"/>												
+			   <beanlib:InputControl type="text" name="Addr2" value="#subsidiary.addr2" size="40" maxLength="50" tabIndex="21"/>												
 			</td>
 			<td class="clsTableFormHeader" width="10%">State:</td>
 			<td width="24%">
@@ -112,28 +112,28 @@
 		<tr>
 			<td class="clsTableFormHeader" width="10%">Address 3:</td>
 			<td width="24%">
-			   <beanlib:InputControl type="text" name="Addr3" value="#subsidiary.Addr3" size="40" maxLength="50" tabIndex="21"/>												
+			   <beanlib:InputControl type="text" name="Addr3" value="#subsidiary.Addr3" size="40" maxLength="50" tabIndex="22"/>												
 			</td>
 			<td class="clsTableFormHeader" width="10%">Main Phone:</td>
 			<td width="24%">
-			   <beanlib:InputControl type="text" name="PhoneMain" value="#subsidiary.PhoneMain" maxLength="20" tabIndex="25"/>						
+			   <beanlib:InputControl type="text" name="PhoneMain" value="#subsidiary.PhoneMain" maxLength="20" tabIndex="26"/>						
 			</td>
 		</tr>              
 		<tr> 
 			<td class="clsTableFormHeader" width="10%">Address 4:</td>
 			<td width="24%">
-			   <beanlib:InputControl type="text" name="Addr4" value="#subsidiary.Addr4" size="40" maxLength="50" tabIndex="22"/>												
+			   <beanlib:InputControl type="text" name="Addr4" value="#subsidiary.Addr4" size="40" maxLength="50" tabIndex="23"/>												
 			</td>
 			<td class="clsTableFormHeader" width="10%">Fax Phone:</td>
 			<td width="24%">
-			   <beanlib:InputControl type="text" name="PhoneFax" value="#subsidiary.PhoneFax" maxLength="20" tabIndex="26"/>												
+			   <beanlib:InputControl type="text" name="PhoneFax" value="#subsidiary.PhoneFax" maxLength="20" tabIndex="27"/>												
 			</td>
 		</tr>
 		<tr> 
 			<td class="clsTableFormHeader" width="10%">Zip:</td>
 			<td width="24%">
-			   <beanlib:InputControl type="text" name="Zip" value="#subsidiary.Zip" size="10" maxLength="5" tabIndex="23"/>&nbsp;-&nbsp;
-			   <beanlib:InputControl type="text" name="Zipext" value="#subsidiary.Zipext" size="10" maxLength="4" tabIndex="24"/>						                         
+			   <beanlib:InputControl type="text" name="Zip" value="#subsidiary.Zip" size="10" maxLength="5" tabIndex="24"/>&nbsp;-&nbsp;
+			   <beanlib:InputControl type="text" name="Zipext" value="#subsidiary.Zipext" size="10" maxLength="4" tabIndex="25"/>						                         
 			</td>
 			<td width="10%">&nbsp; </td>
 			<td width="24%">&nbsp;</td>
