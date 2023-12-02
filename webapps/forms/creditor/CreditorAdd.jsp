@@ -4,7 +4,7 @@
 		<tr>
 			<td width="10%" class="clsTableFormHeader">Account Number:</td>
 			<td width="15%">
-			    <input type="hidden" name="CreditorId">
+			    <input type="hidden" name="CreditorId" value="0">
 			    <input type="hidden" name="AccountNumber">
 			</td>
 			<td width="10%" class="clsTableFormHeader">Credit Limit:</td>
