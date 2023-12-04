@@ -28,7 +28,7 @@ import com.entity.CreditorTypeFactory;
 
 /**
  * This abstract class provides common functionality needed to serve various
- * user interfaces pertaining to Creditor maintenance.
+ * user interfaces pertaining to Creditor.
  * 
  * @author Roy Terrell
  * 
@@ -42,9 +42,6 @@ public abstract class AbstractCreditorAction extends AbstractSubsidiaryAction im
 
     /** Creditor */
     protected Creditor cred;
-
-    /** Creditor Extension */
-    protected Object credExt;
 
     /** Creditor's Business profile */
     private Object credDetail;
@@ -281,7 +278,6 @@ public abstract class AbstractCreditorAction extends AbstractSubsidiaryAction im
         super.sendClientData();
         this.request.setAttribute(AccountingConst.CLIENT_CREDITORTYPE_LIST, this.credTypeList);
         this.request.setAttribute(AccountingConst.CLIENT_DATA_SUBSIDIARY, this.cred);
-        this.request.setAttribute(AccountingConst.CLIENT_DATA_CREDEXTT, this.credExt);
         this.request.setAttribute(GeneralConst.CLIENT_DATA_LIST, this.creditors);
         this.request.setAttribute(GeneralConst.CLIENT_DATA_BUSINESS, this.credDetail);
     }
