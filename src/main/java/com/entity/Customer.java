@@ -216,6 +216,8 @@ public class Customer extends OrmBean {
      */
     public static final String PROP_PHONEPAGER = "PhonePager";
 
+    public static final String PROP_BALANCE = "Balance";
+
     /** The javabean property equivalent of database column customer.customer_id */
     private int customerId;
     /** The javabean property equivalent of database column customer.acct_id */
@@ -228,6 +230,7 @@ public class Customer extends OrmBean {
      * The javabean property equivalent of database column customer.credit_limit
      */
     private double creditLimit;
+    private double balance;
     /** The javabean property equivalent of database column customer.description */
     private String description;
     /** The javabean property equivalent of database column customer.active */
@@ -1050,4 +1053,18 @@ public class Customer extends OrmBean {
         this.county = county;
     }
 
+    /**
+     * @return the balance
+     */
+    public double getBalance() {
+        return balance;
+    }
+
+    /**
+     * @param balance
+     *            the balance to set
+     */
+    public void setBalance(double balance) {
+        this.balance = balance;
+    }
 }
