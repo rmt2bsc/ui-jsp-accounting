@@ -1,6 +1,7 @@
 package com.action.gl.subsidiary.customer;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -17,6 +18,7 @@ import com.api.web.Context;
 import com.api.web.Request;
 import com.api.web.Response;
 import com.api.web.util.RMT2WebUtility;
+import com.entity.Customer;
 import com.entity.CustomerCriteria;
 
 /**
@@ -172,6 +174,29 @@ public class CustomerSearchAction extends AbstractCustomerAction {
         CustomerCriteria criteria = (CustomerCriteria) this.query.getCustomObj();
         this.customers = this.getCustomers(criteria);
         this.sendClientData();
+    }
+
+
+    @Override
+    public void add() throws ActionCommandException {
+        super.add();
+    }
+
+    @Override
+    public void edit() throws ActionCommandException {
+        super.edit();
+        if (this.selectedRow < 0) {
+            throw new ActionCommandException("Client must select a row to edit");
+        }
+
+        // Make SOAP call to get selected creditor's profile
+        CustomerCriteria c = CustomerCriteria.getInstance();
+        c.setQry_CustomerId(String.valueOf(this.customerId));
+        List<Customer> list = this.getCustomers(c);
+        if (list != null && list.size() > 0) {
+            this.cust = list.get(0);
+        }
+        return;
     }
 
     /**
