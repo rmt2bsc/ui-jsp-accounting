@@ -78,7 +78,7 @@ public class CustomerSearchAction extends AbstractCustomerAction {
 
     /**
      * Initializes this object using _conext and _request. This is needed in the
-     * event this object is inistantiated using the default constructor.
+     * event this object is instantiated using the default constructor.
      * 
      * @param context
      *            The application context to be associated with this action
