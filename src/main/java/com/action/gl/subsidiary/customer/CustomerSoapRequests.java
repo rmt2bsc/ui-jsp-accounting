@@ -14,6 +14,8 @@ import org.rmt2.jaxb.CodeDetailType;
 import org.rmt2.jaxb.CreditorCriteriaType;
 import org.rmt2.jaxb.CreditorType;
 import org.rmt2.jaxb.CreditortypeType;
+import org.rmt2.jaxb.CustomerCriteriaType;
+import org.rmt2.jaxb.CustomerType;
 import org.rmt2.jaxb.HeaderType;
 import org.rmt2.jaxb.ObjectFactory;
 import org.rmt2.jaxb.TransactionCriteriaGroup;
@@ -23,6 +25,7 @@ import org.rmt2.jaxb.ZipcodeType;
 import org.rmt2.util.HeaderTypeBuilder;
 import org.rmt2.util.accounting.subsidiary.CreditorTypeBuilder;
 import org.rmt2.util.accounting.subsidiary.CreditortypeTypeBuilder;
+import org.rmt2.util.accounting.subsidiary.CustomerTypeBuilder;
 import org.rmt2.util.addressbook.AddressTypeBuilder;
 import org.rmt2.util.addressbook.BusinessTypeBuilder;
 import org.rmt2.util.addressbook.CodeDetailTypeBuilder;
@@ -35,10 +38,12 @@ import com.api.security.authentication.web.AuthenticationException;
 import com.api.util.RMT2String2;
 import com.entity.Creditor;
 import com.entity.CreditorCriteria;
+import com.entity.CustomerCriteria;
 
 /**
  * Help class for constructing and invoking SOAP calls pertaining to the
  * Accounting Customers.
+ * 
  * 
  * @author Roy Terrell
  *
@@ -48,10 +53,61 @@ public class CustomerSoapRequests extends SubsidiarySoapRequests {
     private static final String MSG = "SOAP invocation error occurred regarding server-side messaging";
 
     /**
-     * SOAP call to fetch one or more creditors.
+     * SOAP call to fetch one or more customers.
      * 
      * @param parms
-     *            {@link CreditorCriteria}
+     *            {@link CustomerCriteria}
+     *            <p>
+     *            Currently, the following fields are recognized as selection
+     *            criteria:
+     *            <p>
+     *            <table width="100%" border="1" cellspacing="0" cellpadding="0">
+     *            <tr>
+     *            <td><strong>Field</strong></td>
+     *            <td><strong>Type</strong></td>
+     *            <td><strong>Description</strong></td>
+     *            <td><strong>Attribute Name</strong></td>
+     *            </tr>
+     *            <tr>
+     *            <td>Customer id</td>
+     *            <td>Numeric</td>
+     *            <td>Creditor's unique identifier</td>
+     *            <td>qry_CustomerId</td>
+     *            </tr>
+     *            <tr>
+     *            <td>Account Number</td>
+     *            <td>String</td>
+     *            <td>Creditor's account number. Conducts incremental searches</td>
+     *            <td>qry_AccountNo</td>
+     *            </tr>
+     *            <tr>
+     *            <td>Business Id</td>
+     *            <td>Numeric</td>
+     *            <td>Business contact Id</td>
+     *            <td>qry_BusinessId</td>
+     *            </tr>
+     *            <tr>
+     *            <td>Tax Id</td>
+     *            <td>String</td>
+     *            <td>Creditor's Tax Id or EIN Number. Conducts incremental
+     *            searches</td>
+     *            <td>qry_TaxId</td>
+     *            </tr>
+     *            <tr>
+     *            <td>Business Name</td>
+     *            <td>String</td>
+     *            <td>Name of creditor. Conducts incremental searches</td>
+     *            <td>qry_Name</td>
+     *            </tr>
+     *            <tr>
+     *            <td>Company Phone Number</td>
+     *            <td>String</td>
+     *            <td>The main phone number for creditor. Conducts exact match
+     *            searches</td>
+     *            <td>qry_PhoneMain</td>
+     *            </tr>
+     *            </table>
+     * 
      * @param loginId
      *            the id of logged in user
      * @param sessionId
@@ -59,7 +115,7 @@ public class CustomerSoapRequests extends SubsidiarySoapRequests {
      * @return {@link AccountingTransactionResponse}
      * @throws AccountingUIException
      */
-    public static final AccountingTransactionResponse callGet(CreditorCriteria parms, String loginId, String sessionId)
+    public static final AccountingTransactionResponse callGet(CustomerCriteria parms, String loginId, String sessionId)
             throws AccountingUIException {
         // Retrieve all code group records from the database
         ObjectFactory fact = new ObjectFactory();
@@ -77,25 +133,56 @@ public class CustomerSoapRequests extends SubsidiarySoapRequests {
                 .withSessionId(sessionId)
                 .build();
 
-        CreditorCriteriaType criteria = fact.createCreditorCriteriaType();
+        CustomerCriteriaType criteria = fact.createCustomerCriteriaType();
         criteria.setTargetLevel(XactCustomCriteriaTargetType.FULL);
+
+        AddressType addrType = AddressTypeBuilder.Builder.create().build();
+        BusinessType busType = BusinessTypeBuilder.Builder.create().build();
+        CustomerType custType = CustomerTypeBuilder.Builder.create().build();
+        boolean useCustomerType = false;
+        boolean useBusinessType = false;
+        boolean useAddressType = false;
+
         if (parms != null) {
-            if (RMT2String2.isNotEmpty(parms.getQry_CreditorTypeId())) {
-                criteria.setCreditorTypeId(BigInteger.valueOf(Integer.valueOf(parms.getQry_CreditorTypeId())));
-            }
-            if (RMT2String2.isNotEmpty(parms.getQry_CreditorId())) {
-                criteria.setCreditorId(BigInteger.valueOf(Integer.valueOf(parms.getQry_CreditorId())));
+            if (RMT2String2.isNotEmpty(parms.getQry_CustomerId())) {
+                custType.setCustomerId(BigInteger.valueOf(Integer.valueOf(parms.getQry_CustomerId())));
+                useCustomerType = true;
             }
             if (RMT2String2.isNotEmpty(parms.getQry_AccountNo())) {
-                criteria.setAccountNo(parms.getQry_AccountNo());
+                custType.setAccountNo(parms.getQry_AccountNo());
+                useCustomerType = true;
+            }
+            if (RMT2String2.isNotEmpty(parms.getQry_BusinessId())) {
+                busType.setBusinessId(BigInteger.valueOf(Integer.valueOf(parms.getQry_BusinessId())));
+                useBusinessType = true;
+            }
+            if (RMT2String2.isNotEmpty(parms.getQry_TaxId())) {
+                busType.setTaxId(parms.getQry_TaxId());
+                useBusinessType = true;
             }
             if (RMT2String2.isNotEmpty(parms.getQry_Name())) {
-                criteria.setBusinessName(parms.getQry_Name());
+                busType.setLongName(parms.getQry_Name());
+                useBusinessType = true;
+            }
+            if (RMT2String2.isNotEmpty(parms.getQry_PhoneMain())) {
+                addrType.setPhoneMain(parms.getQry_PhoneMain());
+                useAddressType = true;
+                useBusinessType = true;
             }
         }
 
+        // Determine which objects to use as selection criteria
+        if (useCustomerType) {
+            criteria.setCustomer(custType);
+        }
+        if (useAddressType) {
+            busType.setAddress(addrType);
+        }
+        if (useBusinessType) {
+            criteria.setContactDetails(busType);
+        }
         TransactionCriteriaGroup criteriaGroup = fact.createTransactionCriteriaGroup();
-        criteriaGroup.setCreditorCriteria(criteria);
+        criteriaGroup.setCustomerCriteria(criteria);
         req.setCriteria(criteriaGroup);
         req.setHeader(head);
 

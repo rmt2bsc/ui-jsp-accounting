@@ -1,7 +1,6 @@
 package com.action.gl.subsidiary.customer;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -10,15 +9,15 @@ import com.SystemException;
 import com.api.constants.GeneralConst;
 import com.api.constants.RMT2ServletConst;
 import com.api.persistence.DatabaseException;
-import com.api.persistence.db.DatabaseConnectionBean;
 import com.api.security.RMT2TagQueryBean;
+import com.api.util.RMT2Money;
+import com.api.util.RMT2String2;
 import com.api.web.ActionCommandException;
 import com.api.web.Context;
 import com.api.web.Request;
 import com.api.web.Response;
-import com.entity.Customer;
+import com.api.web.util.RMT2WebUtility;
 import com.entity.CustomerCriteria;
-import com.entity.CustomerFactory;
 
 /**
  * An relational database implementation of {@link com.gl.customer.CustomerApi
@@ -49,7 +48,7 @@ public class CustomerSearchAction extends AbstractCustomerAction {
 
     private static final int CRITERIATYPE_ALL = 300;
 
-    private Logger logger;
+    static private Logger logger;
 
     private int criteriaType;
 
@@ -113,9 +112,6 @@ public class CustomerSearchAction extends AbstractCustomerAction {
         if (command.equalsIgnoreCase(CustomerSearchAction.COMMAND_SEARCH)) {
             this.doSearch();
         }
-        if (command.equalsIgnoreCase(CustomerSearchAction.COMMAND_LIST)) {
-            this.listData();
-        }
         if (command.equalsIgnoreCase(CustomerSearchAction.COMMAND_EDIT)) {
             this.editData();
         }
@@ -128,33 +124,24 @@ public class CustomerSearchAction extends AbstractCustomerAction {
     }
 
     /**
-     * Returns selection criteria that is sure to retrun an empty result set
-     * once applied to the sql that pertains to the data source of the customer
-     * search page.
-     */
-    protected String doInitialCriteria(RMT2TagQueryBean _query) throws ActionCommandException {
-        return "customer_id = -1";
-    }
-
-    /**
      * Creates an instance of {@link com.bean.criteria.CustomerCriteria
      * CustomerCriteria}, which is used to track the user's selection criteria
      * input. This method uses introspection to gather user's input into the
-     * cretieria object.
+     * criteria object.
      */
     protected Object doCustomInitialization() throws ActionCommandException {
         CustomerCriteria criteriaObj = CustomerCriteria.getInstance();
         if (!this.isFirstTime()) {
             try {
-                DataSourceAdapter.packageBean(this.request, criteriaObj);
-                this.setBaseView("CustomerView");
+                RMT2WebUtility.packageBean(this.request, criteriaObj);
             } catch (SystemException e) {
-                this.msg = "Problem gathering Customer Search request parameters:  " + e.getMessage();
-                logger.log(Level.ERROR, this.msg);
+                this.msg = "Problem gathering Creditor Search request parameters:  " + e.getMessage();
+                CustomerSearchAction.logger.log(Level.ERROR, this.msg);
                 throw new ActionCommandException(this.msg);
             }
         }
         this.validateCriteria(criteriaObj);
+
         return criteriaObj;
     }
 
@@ -167,106 +154,23 @@ public class CustomerSearchAction extends AbstractCustomerAction {
     protected void doNewSearch() throws ActionCommandException {
         this.setFirstTime(true);
         this.startSearchConsole();
-        this.customers = new ArrayList();
+        this.customers = new ArrayList<>();
         this.query = (RMT2TagQueryBean) this.getSession().getAttribute(RMT2ServletConst.QUERY_BEAN);
         this.sendClientData();
     }
 
     /**
      * Handler method that responds to the client's request to perform a
-     * customer search using the selection criterai entered by the user.
+     * customer search using the selection criteria entered by the user.
      * 
      * @throws ActionCommandException
      */
     protected void doSearch() throws ActionCommandException {
         this.setFirstTime(false);
-        this.buildSearchCriteria();
+        this.buildXMLSearchCriteria();
         this.getSession().setAttribute(RMT2ServletConst.QUERY_BEAN, this.query);
-    }
-
-    /**
-     * Builds selection criteria using either direct customer or business
-     * contact data values. Customer criteria is represented by <i>account
-     * number</i>. <i>Name</i>, <i>tax id</i>, and <i>main phone number</i> are
-     * the only properties recognized as business contact data. Customer and
-     * business contact data are mutual exclusive when determining which
-     * criteria group is active.
-     * 
-     * @param query
-     *            {@link RMT2TagQueryBean} object containing the key/value pair
-     *            data items used to build the service parameters.
-     * @param searchMode
-     *            Set to either {@link RMT2ServletConst.SEARCH_MODE_NEW} or
-     *            {@link RMT2ServletConst.SEARCH_MODE_OLD}
-     * @throws ActionCommandException
-     *             When customer values and business contact values are
-     *             discovered for the same search transaction.
-     */
-    protected void doPostCustomInitialization(RMT2TagQueryBean query, int searchMode) throws ActionCommandException {
-        CustomerCriteria cc = (CustomerCriteria) query.getCustomObj();
-        StringBuffer sql = new StringBuffer();
-
-        if (this.criteriaType == CRITERIATYPE_CONTACT) {
-            if (!cc.getQry_Name().equals("")) {
-                sql.append(CustomerConst.CRITERIATAGS_CONTACT[0]);
-                sql.append(" = ");
-                sql.append(cc.getQry_Name().trim());
-            }
-            if (!cc.getQry_PhoneMain().equals("")) {
-                if (sql.length() > 0) {
-                    sql.append(" and ");
-                }
-                sql.append(CustomerConst.CRITERIATAGS_CONTACT[1]);
-                sql.append(" = ");
-                sql.append(cc.getQry_PhoneMain().trim());
-            }
-            if (!cc.getQry_TaxId().equals("")) {
-                if (sql.length() > 0) {
-                    sql.append(" and ");
-                }
-                sql.append(CustomerConst.CRITERIATAGS_CONTACT[2]);
-                sql.append(" = ");
-                sql.append(cc.getQry_TaxId().trim());
-            }
-        }
-        if (this.criteriaType == CRITERIATYPE_CUSTOMER) {
-            if (!cc.getQry_AccountNo().equals("")) {
-                sql.append(CustomerConst.CRITERIATAGS_CUSTOMER[0]);
-                sql.append(" like ");
-                sql.append(cc.getQry_AccountNo().trim());
-            }
-        }
-        query.setWhereClause(null);
-        query.setWhereClause(sql.toString());
-        return;
-    }
-
-    /**
-     * Fetches the list customers from the database using the where clause
-     * criteria previously stored on the session during the phase of the request
-     * to builds the query predicate.
-     * 
-     * @throws ActionCommandException
-     */
-    protected void listData() throws ActionCommandException {
-        DatabaseTransApi tx = DatabaseTransFactory.create();
-        CustomerApi api = CustomerFactory.createApi((DatabaseConnectionBean) tx.getConnector(), this.request);
-        try {
-            // String criteria = this.query.getWhereClause();
-            CustomerCriteria criteria = (CustomerCriteria) this.query.getCustomObj();
-            this.customers = (List) api.findCustomerBusiness(criteria);
-
-            if (this.customers == null) {
-                this.customers = new ArrayList();
-            }
-        } catch (Exception e) {
-            throw new ActionCommandException(e);
-        } finally {
-            api.close();
-            tx.close();
-            api = null;
-            tx = null;
-        }
+        CustomerCriteria criteria = (CustomerCriteria) this.query.getCustomObj();
+        this.customers = this.getCustomers(criteria);
         this.sendClientData();
     }
 
@@ -279,12 +183,22 @@ public class CustomerSearchAction extends AbstractCustomerAction {
      * @param criteria
      *            Business contact or customer selection criteria data.
      * @throws ActionCommandException
-     *             When bothe the customer and contact criteria is present.
+     *             When both the customer and contact criteria is present.
      */
     private void validateCriteria(CustomerCriteria criteria) throws ActionCommandException {
         boolean useCredParms = false;
         boolean useContactParms = false;
 
+        if (RMT2String2.isNotEmpty(criteria.getQry_CustomerId()) && !RMT2Money.isNumeric(criteria.getQry_CustomerId())) {
+            this.msg = "Customer Id field must be numeric when used as selection criteria";
+            this.logger.log(Level.ERROR, this.msg);
+            throw new ActionCommandException(this.msg);
+        }
+        if (RMT2String2.isNotEmpty(criteria.getQry_BusinessId()) && !RMT2Money.isNumeric(criteria.getQry_BusinessId())) {
+            this.msg = "Business Contact Id field must be numer when used as selection criteria";
+            this.logger.log(Level.ERROR, this.msg);
+            throw new ActionCommandException(this.msg);
+        }
         useCredParms = (!criteria.getQry_AccountNo().equals(""));
         useContactParms = (!criteria.getQry_TaxId().equals("") || !criteria.getQry_Name().equals("") || !criteria
                 .getQry_PhoneMain().equals(""));
@@ -312,23 +226,7 @@ public class CustomerSearchAction extends AbstractCustomerAction {
      *             Problem Identifying Customer Id from a list of customers
      */
     public void receiveClientData() throws ActionCommandException {
-        int custId;
-        String temp = null;
-
-        try {
-            if (this.command.equalsIgnoreCase(CustomerSearchAction.COMMAND_ADD)) {
-                return;
-            }
-            temp = this.getInputValue("CustomerId", null);
-            custId = Integer.parseInt(temp);
-            this.cust = CustomerFactory.createCustomer();
-            ((Customer) this.cust).setCustomerId(custId);
-        } catch (NumberFormatException e) {
-            this.msg = "Problem Identifying Customer Id from a list of customers.  The customer id was found to be [" + temp
-                    + "]";
-            this.logger.log(Level.ERROR, this.msg);
-            throw new ActionCommandException(this.msg);
-        }
+        super.receiveClientData();
     }
 
     /**

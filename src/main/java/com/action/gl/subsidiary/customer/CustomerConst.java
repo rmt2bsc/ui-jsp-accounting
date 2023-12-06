@@ -1,4 +1,4 @@
-package com.gl.customer;
+package com.action.gl.subsidiary.customer;
 
 /**
  * Customer constants.
@@ -7,14 +7,17 @@ package com.gl.customer;
  *
  */
 public class CustomerConst {
-    /** 
-     * Property names for search criteria deriving from the customer entity.
-     */
-    public static String CRITERIATAGS_CUSTOMER[] = { "Arg_AccountNo", "Arg_CustomerId", "Arg_CustomerIdList" };
-
-    /**
-     * Property names for search criteria deriving from the business contact entity.
-     */
-    public static String CRITERIATAGS_CONTACT[] = { "Arg_Name", "Arg_PhoneMain", "Arg_TaxId" };
+    // /**
+    // * Property names for search criteria deriving from the customer entity.
+    // */
+    // public static String CRITERIATAGS_CUSTOMER[] = { "Arg_AccountNo",
+    // "Arg_CustomerId", "Arg_CustomerIdList" };
+    //
+    // /**
+    // * Property names for search criteria deriving from the business contact
+    // entity.
+    // */
+    // public static String CRITERIATAGS_CONTACT[] = { "Arg_Name",
+    // "Arg_PhoneMain", "Arg_TaxId" };
 
 }

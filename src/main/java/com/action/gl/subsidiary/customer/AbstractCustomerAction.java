@@ -11,8 +11,6 @@ import org.rmt2.jaxb.ReplyStatusType;
 import com.AccountingConst;
 import com.SystemException;
 import com.action.gl.subsidiary.AbstractSubsidiaryAction;
-import com.action.gl.subsidiary.creditor.CreditorSoapRequests;
-import com.action.gl.subsidiary.creditor.CreditorTypeSoapRequests;
 import com.api.constants.GeneralConst;
 import com.api.persistence.DatabaseException;
 import com.api.util.RMT2Money;
@@ -22,15 +20,13 @@ import com.api.web.ICommand;
 import com.api.web.Request;
 import com.api.web.Response;
 import com.api.web.util.RMT2WebUtility;
-import com.entity.Creditor;
-import com.entity.CreditorCriteria;
-import com.entity.CreditorFactory;
-import com.entity.CreditorType;
-import com.entity.CreditorTypeFactory;
+import com.entity.Customer;
+import com.entity.CustomerCriteria;
+import com.entity.CustomerFactory;
 
 /**
  * This abstract class provides common functionality needed to serve various
- * user interfaces pertaining to Creditor maintenance.
+ * user interfaces pertaining to Customer maintenance.
  * 
  * @author Roy Terrell
  * 
@@ -39,18 +35,15 @@ public abstract class AbstractCustomerAction extends AbstractSubsidiaryAction im
     
     private Logger logger;
 
-    /** An ArrayList of Creditors */
-    protected List<Creditor> creditors;
+    /** An ArrayList of Customers */
+    protected List<Customer> customers;
 
-    /** Creditor */
-    protected Creditor cred;
+    /** Customer */
+    protected Customer cust;
 
-    /** Creditor's Business profile */
-    private Object credDetail;
-
-    protected List credTypeList;
-
-    protected int creditorId;
+    /** Customer's Business profile */
+    private Object custDetail;
+    protected int customerId;
 
 
     /**
@@ -145,34 +138,34 @@ public abstract class AbstractCustomerAction extends AbstractSubsidiaryAction im
     /**
      * @return the cred
      */
-    public Object getCred() {
-        return cred;
+    public Object getCust() {
+        return cust;
     }
 
     /**
-     * Fetches the list creditors from the database using the where clause
+     * Fetches the list customers from the database using the where clause
      * criteria previously stored on the session during the phase of the request
      * to builds the query predicate.
      * 
      * @param criteria
-     *            {@link CreditorCriteria}
-     * @return List<{@link Creditor}>
+     *            {@link CustomerCriteria}
+     * @return List<{@link Customer}>
      * @throws ActionCommandException
      */
-    protected List<Creditor> getCreditors(CreditorCriteria criteria) throws ActionCommandException {
-        // Call SOAP web service to get a list of Creditors based on selection
+    protected List<Customer> getCustomers(CustomerCriteria criteria) throws ActionCommandException {
+        // Call SOAP web service to get a list of Customers based on selection
         // criteria
         try {
-            AccountingTransactionResponse response = CreditorSoapRequests.callGet(criteria, this.loginId,
+            AccountingTransactionResponse response = CustomerSoapRequests.callGet(criteria, this.loginId,
                     this.session.getId());
             ReplyStatusType rst = response.getReplyStatus();
             this.msg = rst.getMessage();
             if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
                 this.throwActionError(rst.getMessage(), rst.getExtMessage());
             }
-            List<Creditor> results = null;
-            if (response.getProfile() != null && response.getProfile().getCreditors() != null) {
-                results = CreditorFactory.create(response.getProfile().getCreditors().getCreditor());
+            List<Customer> results = null;
+            if (response.getProfile() != null && response.getProfile().getCustomers() != null) {
+                results = CustomerFactory.create(response.getProfile().getCustomers().getCustomer());
             }
             else {
                 results = new ArrayList<>();
@@ -185,42 +178,6 @@ public abstract class AbstractCustomerAction extends AbstractSubsidiaryAction im
         }
     }
 
-    /**
-     * Retrieves a list of Creditor type records.
-     * 
-     * @return List<{@link CreditorType}>
-     * @throws ActionCommandException
-     */
-    protected List<CreditorType> getCreditorTypes() throws ActionCommandException {
-        // Call SOAP web service to get complete list of codes based on a
-        // particular group
-        try {
-            AccountingTransactionResponse response = CreditorTypeSoapRequests.callGet(null, this.loginId, this.session.getId());
-            ReplyStatusType rst = response.getReplyStatus();
-            if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
-                this.throwActionError(rst.getMessage(), rst.getExtMessage());
-            }
-            List<CreditorType> results = null;
-            if (response.getProfile() != null) {
-                results = CreditorTypeFactory.create(response.getProfile().getCreditorTypes());
-            }
-            return results;
-        } catch (Exception e) {
-            logger.log(Level.ERROR, e.getMessage());
-            throw new ActionCommandException(e.getMessage());
-        }
-    }
-
-    /**
-     * Retrieves a lists of creditor types and other useful lookup data sets.
-     * 
-     * @throws ActionCommandException
-     */
-    @Override
-    protected void setupLookupData() throws ActionCommandException {
-        super.setupLookupData();
-        this.credTypeList = this.getCreditorTypes(); 
-    }
 
     /**
      * Obtains common key creditor related data items from the client JSP.
@@ -229,13 +186,13 @@ public abstract class AbstractCustomerAction extends AbstractSubsidiaryAction im
         super.receiveClientData();
 
         // Attempt to locate and obtain creditor ID from the JSP.
-        String temp = this.getInputValue("CreditorId", null);
-        this.creditorId = RMT2Money.stringToNumber(temp).intValue();
+        String temp = this.getInputValue("CustomerId", null);
+        this.customerId = RMT2Money.stringToNumber(temp).intValue();
 
         // Attempt to locate and obtain creditor profile data from the JSP.
         try {
-            this.cred = CreditorFactory.create();
-            RMT2WebUtility.packageBean(this.request, this.cred);
+            this.cust = CustomerFactory.create();
+            RMT2WebUtility.packageBean(this.request, this.cust);
         } catch (Exception e) {
             throw new ActionCommandException(e.getMessage());
         }
@@ -278,9 +235,8 @@ public abstract class AbstractCustomerAction extends AbstractSubsidiaryAction im
      */
     public void sendClientData() throws ActionCommandException {
         super.sendClientData();
-        this.request.setAttribute(AccountingConst.CLIENT_CREDITORTYPE_LIST, this.credTypeList);
-        this.request.setAttribute(AccountingConst.CLIENT_DATA_SUBSIDIARY, this.cred);
-        this.request.setAttribute(GeneralConst.CLIENT_DATA_LIST, this.creditors);
-        this.request.setAttribute(GeneralConst.CLIENT_DATA_BUSINESS, this.credDetail);
+        this.request.setAttribute(AccountingConst.CLIENT_DATA_SUBSIDIARY, this.cust);
+        this.request.setAttribute(GeneralConst.CLIENT_DATA_LIST, this.customers);
+        this.request.setAttribute(GeneralConst.CLIENT_DATA_BUSINESS, this.custDetail);
     }
 }

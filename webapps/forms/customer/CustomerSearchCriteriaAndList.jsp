@@ -1,56 +1,75 @@
-<%@ page import="com.bean.criteria.CustomerCriteria" %>
+<%@ page import="com.entity.CustomerCriteria" %>
 
  <font size="4" style="color:blue">Selection Criteria</font>
- <div style="border-style:groove;border-color:#999999; background-color:buttonface; width:60%; height:55px">
+ <div style="border-style:groove;border-color:#999999; background-color:buttonface; width:60%; height:175px">
 		  
-			<table width="40%" border="0">
-				<tr> 
-					<td width="10%" bgcolor="#FFCC00"> 
-						<div align="right"><b><font size="2">Account Number :</font></b></div>
-					</td>
-					<td width="21%"> 
-					  <beanlib:InputControl type="text" name="qry_AccountNo" value="#QUERY_BEAN.CustomObj.qry_AccountNo"/>
-					</td>
-				</tr>
-				<tr><td colspan="2">&nbsp;</td></tr>
-				<tr>
-				   <td colspan="2" align="left"><strong>-- OR --</strong></td>
-				</tr>
-			</table>
-			<br>
-		  
-			<table width="90%" border="0">
-			  <tr>
-				    <td colspan="6"><font color="blue">Business Contact Information</font></td>
-				</tr>
-				<tr> 
-					<td width="10%" bgcolor="#FFCC00"> 
-						<div align="right"><b><font size="2">Name:</font></b></div>
-					</td>
-					<td width="21%"> 
-						<div align="left"> 
-						  <beanlib:InputControl type="text" name="qry_Name" value="#QUERY_BEAN.CustomObj.qry_Name" size="30"/>
-						</div>
-					</td>
-					<td width="12%" bgcolor="#FFCC00"> 
-						<div align="right"><b><font size="2">Tax Id:</font></b></div>
-					</td>
-					<td width="24%"> 
-						<div align="left"> 
-						   <beanlib:InputControl type="text" name="qry_TaxId" value="#QUERY_BEAN.CustomObj.qry_TaxId"/>
-						</div>
-					</td>
-					<td width="12%" bgcolor="#FFCC00"> 
-						<div align="right"><b><font size="2">Phone:</font></b></div>
-					</td>
-					<td width="21%"> 
-						<div align="left"> 
-						  <beanlib:InputControl type="text" name="qry_PhoneMain" value="#QUERY_BEAN.CustomObj.qry_PhoneMain"/>
-						</div>
-					</td>
-				</tr>
-			</table>
-			<br>
+	<table width="90%" border="0">
+	    <tr>
+		    <td colspan="6"><font color="blue">Creditor Information</font></td>
+		</tr>
+		<tr> 
+			<td width="10%" bgcolor="#FFCC00"> 
+			  <div align="right"><b><font size="2">Customer Id:</font></b></div>
+			</td>
+			<td width="21%"> 
+			  <beanlib:InputControl type="text" name="qry_CustomerId" value="#QUERY_BEAN.CustomObj.qry_CustomerId"/>
+			</td>
+			<td width="12%" bgcolor="#FFCC00"> 
+				<div align="right"><b><font size="2">Business Id:</font></b></div>
+			</td>
+			<td width="24%"> 
+				<div align="left"> 
+				   <beanlib:InputControl type="text" name="qry_BusinessId" value="#QUERY_BEAN.CustomObj.qry_BusinessId"/>
+				</div>
+			</td>
+			<td width="12%" bgcolor="#FFCC00"> 
+				<div align="right"><b><font size="2">Account Number:</font></b></div>
+			</td>
+			<td width="21%"> 
+				<div align="left"> 
+				  <beanlib:InputControl type="text" name="qry_AccountNo" value="#QUERY_BEAN.CustomObj.qry_AccountNo"/>
+				</div>
+			</td>
+		</tr>
+		<tr><td colspan="2">&nbsp;</td></tr>
+		<tr>
+		   <td colspan="2" align="left"><strong>-- OR --</strong></td>
+		</tr>
+	</table>
+	<br>
+  
+	<table width="90%" border="0">
+	    <tr>
+		    <td colspan="6"><font color="blue">Business Contact Information</font></td>
+		</tr>
+		<tr> 
+			<td width="10%" bgcolor="#FFCC00"> 
+				<div align="right"><b><font size="2">Name:</font></b></div>
+			</td>
+			<td width="21%"> 
+				<div align="left"> 
+				  <beanlib:InputControl type="text" name="qry_Name" value="#QUERY_BEAN.CustomObj.qry_Name" size="30"/>
+				</div>
+			</td>
+			<td width="12%" bgcolor="#FFCC00"> 
+				<div align="right"><b><font size="2">Tax Id:</font></b></div>
+			</td>
+			<td width="24%"> 
+				<div align="left"> 
+				   <beanlib:InputControl type="text" name="qry_TaxId" value="#QUERY_BEAN.CustomObj.qry_TaxId"/>
+				</div>
+			</td>
+			<td width="12%" bgcolor="#FFCC00"> 
+				<div align="right"><b><font size="2">Phone:</font></b></div>
+			</td>
+			<td width="21%"> 
+				<div align="left"> 
+				  <beanlib:InputControl type="text" name="qry_PhoneMain" value="#QUERY_BEAN.CustomObj.qry_PhoneMain"/>
+				</div>
+			</td>
+		</tr>
+	</table>
+	<br>
 </div>	
 <br>  
 <!-- Display Search Criteria command buttons -->         
@@ -58,7 +77,7 @@
   <tr>
 		<td colspan="2">
 		  <input name="<%=GeneralConst.REQ_SEARCH%>" type="button" value="Search" style="width:90" onClick="handleAction('_self', document.SearchForm, this.name)">
-		  <input name="<%=GeneralConst.REQ_RESET%>" type="reset" value="Clear" style="width:90">
+		  <input name="<%=GeneralConst.REQ_NEWSEARCH %>" type="button" value="Clear" style="width:90" onClick="handleAction('_self', document.SearchForm, this.name)">
 		</td>
   </tr>		
 </table>
@@ -66,17 +85,18 @@
  <br>         
 <font size="4" style="color:blue">Search Results</font>
 <div style="border-style:groove; border-color:#999999; background-color:buttonface; width:70%; height:420px; overflow:auto">
-<table  width="100%" border="0" bgcolor="white" cellpadding="0" cellspacing="0"> 
+    <table  width="100%" border="0" bgcolor="white" cellpadding="0" cellspacing="0"> 
 		 <tr>
 			 <th width="2%" class="clsTableListHeader">&nbsp;</th>
-			 <th width="8%" class="clsTableListHeader"><div align="center">Id</div></th>
+			 <th width="8%" class="clsTableListHeader"><div align="center">Creditor Id</div></th>
+			 <th width="8%" class="clsTableListHeader"><div align="center">Business Id</div></th>
 			 <th width="10%" class="clsTableListHeader"><div align="left">Account No.</div></th>
 			 <th width="30%" class="clsTableListHeader"><div align="left">Customer Name </div></th>
 			 <th width="10%" class="clsTableListHeader"><div align="left">Balance </div></th>
-			 <th width="10%" class="clsTableListHeader"><div align="left">Credit Limit</div></th>
-			 <th width="10%" class="clsTableListHeader">Create Date</th>
-			 <th width="10%" class="clsTableListHeader">Update Date</th>
-			 <th width="10%" class="clsTableListHeader">Update User</th>
+			 <th width="8%" class="clsTableListHeader"><div align="left">Credit Limit</div></th>
+			 <th width="8%" class="clsTableListHeader">Create Date</th>
+			 <th width="8%" class="clsTableListHeader">Update Date</th>
+			 <th width="8%" class="clsTableListHeader">Update User</th>
 		 </tr>
 
 		 <beanlib:LoopRows bean="item" list="<%=GeneralConst.CLIENT_DATA_LIST %>">
@@ -90,7 +110,13 @@
 				  <beanlib:InputControl value="#item.CustomerId"/>
 				  <beanlib:InputControl type="hidden" name="CustomerId" value="#item.CustomerId" uniqueName="yes"/>         
 				</font>
-			 </td>             			 
+			 </td>
+			 <td align="center" >
+				<font size="2">
+				  <beanlib:InputControl value="#item.BusinessId"/>
+				  <beanlib:InputControl type="hidden" name="BusinessId" value="#item.BusinessId" uniqueName="yes"/>         
+				</font>
+			 </td>                     			 
 			 <td align="left" >
 				<font size="2">
 				  <beanlib:InputControl value="#item.AccountNo"/>
@@ -98,7 +124,7 @@
 			 </td>             
 			 <td>
 				<font size="2"> 
-				  <beanlib:InputControl value="#item.Name"/>
+				  <beanlib:InputControl value="#item.Longname"/>
 				  </font>
 			 </td>
 			 <td>
