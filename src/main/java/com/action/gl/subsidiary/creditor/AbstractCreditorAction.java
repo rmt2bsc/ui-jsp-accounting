@@ -217,7 +217,7 @@ public abstract class AbstractCreditorAction extends AbstractSubsidiaryAction im
     @Override
     protected void setupLookupData() throws ActionCommandException {
         super.setupLookupData();
-        this.credTypeList = this.getCreditorTypes(); 
+        this.credTypeList = this.getCreditorTypes();
     }
 
     /**
