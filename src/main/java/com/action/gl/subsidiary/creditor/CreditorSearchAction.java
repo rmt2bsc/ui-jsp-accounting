@@ -168,28 +168,6 @@ public class CreditorSearchAction extends AbstractCreditorAction {
         return criteriaObj;
     }
 
-    /**
-     * Builds selection criteria based on business contact data values, if
-     * available. Creditor criteria is represented by <i>creditor type id</i>
-     * and <i>account number</i>. <i>Name</i>, <i>tax id</i>, and <i>main phone
-     * number</i> are the only properties recognized as business contact data.
-     * Creditor and business contact data are mutual exclusive when determining
-     * which criteria group is active.
-     * 
-     * @param query
-     *            {@link RMT2TagQueryBean} object containing the key/value pair
-     *            data items used to build the service parameters.
-     * @param searchMode
-     *            Set to either {@link RMT2ServletConst.SEARCH_MODE_NEW} or
-     *            {@link RMT2ServletConst.SEARCH_MODE_OLD}
-     * @throws ActionCommandException
-     *             When creditor values and business contact values are
-     *             discovered for the same search transaction.
-     */
-    protected void doPostCustomInitialization(RMT2TagQueryBean query, int searchMode) throws ActionCommandException {
-        return;
-    }
-
     /*
      * (non-Javadoc)
      * 
