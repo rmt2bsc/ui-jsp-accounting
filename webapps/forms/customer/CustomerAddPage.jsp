@@ -21,12 +21,10 @@
   		    <script type="text/javascript" src="<%=APP_ROOT%>/js/RMT2General.js"></script>
 	  	    <script type="text/javascript" src="<%=APP_ROOT%>/js/RMT2Menu.js"></script>
 		</head>
-		
 
-
-    <%
+	    <%
 		  String pageTitle = "Customer Maintenance";
-    %>
+	    %>
        
 		<body bgcolor="#FFFFFF" text="#000000">
 			<form name="DataForm" method="post" action="<%=APP_ROOT%>/unsecureRequestProcessor/Customer.Edit">
@@ -46,10 +44,10 @@
 
                <br>					
 			   <table>
-				<tr>
-					 <td><input type="button" name="<%=GeneralConst.REQ_SAVE %>" value="Save" style="width:90" tabIndex="30" onClick="handleAction('_self', DataForm, this.name)"></td>
-					 <td><input type="button" name="<%=GeneralConst.REQ_BACK %>" value="Back" style="width:90" tabIndex="31" onClick="handleAction('_self', DataForm, this.name)"></td>
-				</tr>
+					<tr>
+						 <td><input type="button" name="<%=GeneralConst.REQ_SAVE %>" value="Save" style="width:90" tabIndex="30" onClick="handleAction('_self', DataForm, this.name)"></td>
+						 <td><input type="button" name="<%=GeneralConst.REQ_BACK %>" value="Back" style="width:90" tabIndex="31" onClick="handleAction('_self', DataForm, this.name)"></td>
+					</tr>
 			</table>
 			<input name="clientAction" type="hidden">
 		</form>
