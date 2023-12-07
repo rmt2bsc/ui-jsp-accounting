@@ -49,7 +49,8 @@
 			<tr>
     			 <td>
   			      <input type="button" name="<%=GeneralConst.REQ_SAVE%>" value="Save" style="width:90" tabIndex="30" onClick="handleAction('_self', document.DataForm, this.name)">
- 			        <input type="button" name="<%=GeneralConst.REQ_BACK%>" value="Back" style="width:90" tabIndex="31" onClick="handleAction('_self', document.DataForm, this.name)">
+  			      <input type="button" name="<%=GeneralConst.REQ_DELETE %>" value="Delete" style="width:90" tabIndex="31" onClick="handleAction('_self', DataForm, this.name)">
+ 			      <input type="button" name="<%=GeneralConst.REQ_BACK%>" value="Back" style="width:90" tabIndex="31" onClick="handleAction('_self', document.DataForm, this.name)">
 				 </td>
 			</tr>
 		</table>

@@ -8,10 +8,13 @@ import org.rmt2.jaxb.AccountingTransactionResponse;
 import org.rmt2.jaxb.AddressBookResponse;
 import org.rmt2.jaxb.ReplyStatusType;
 
+import com.AccountingConst;
+import com.AccountingUIException;
 import com.SystemException;
 import com.action.gl.subsidiary.BusinessContactSoapRequests;
 import com.api.constants.GeneralConst;
 import com.api.persistence.DatabaseException;
+import com.api.util.RMT2String2;
 import com.api.web.ActionCommandException;
 import com.api.web.Context;
 import com.api.web.Request;
@@ -29,6 +32,8 @@ import com.entity.CustomerFactory;
  */
 public class CustomerEditAction extends AbstractCustomerAction {
     private static final String COMMAND_SAVE = "Customer.Edit.save";
+
+    private static final String COMMAND_DELETE = "Customer.Edit.delete";
 
     private static final String COMMAND_BACK = "Customer.Edit.back";
 
@@ -93,6 +98,9 @@ public class CustomerEditAction extends AbstractCustomerAction {
 
         if (command.equalsIgnoreCase(CustomerEditAction.COMMAND_SAVE)) {
             this.saveData();
+        }
+        if (command.equalsIgnoreCase(CustomerEditAction.COMMAND_DELETE)) {
+            this.deleteData();
         }
         if (command.equalsIgnoreCase(CustomerEditAction.COMMAND_BACK)) {
             this.doBack();
@@ -162,6 +170,99 @@ public class CustomerEditAction extends AbstractCustomerAction {
             logger.log(Level.ERROR, e.getMessage());
             throw new ActionCommandException(e.getMessage());
         }
+    }
+
+    /**
+     * Deletes a single customer profile from the system.
+     * 
+     * @throws ActionCommandException
+     */
+    @Override
+    public void delete() throws ActionCommandException, DatabaseException {
+        // Call SOAP web service to verify whether or not the customer has
+        // transaction history.
+        try {
+            CustomerCriteria criteria = CustomerCriteria.getInstance();
+            criteria.setQry_CustomerId(String.valueOf(this.cust.getCustomerId()));
+
+            AccountingTransactionResponse response = CustomerSoapRequests.callGetHistory(criteria, this.loginId,
+                    this.session.getId());
+            ReplyStatusType rst = response.getReplyStatus();
+            if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
+                this.throwActionError(rst.getMessage(), rst.getExtMessage());
+            }
+
+            // Abort if customer cannot not be found in the system
+            if (rst.getRecordCount().intValue() > 0) {
+                // Abort the process if customer has transaction history.
+                if (response.getProfile() != null
+                        && response.getProfile().getCustomers() != null
+                        && response.getProfile().getCustomers().getCustomer() != null
+                        && !response.getProfile().getCustomers().getCustomer().isEmpty()
+                        && response.getProfile().getCustomers().getCustomer().get(0).getTransactions() != null
+                        && !response.getProfile().getCustomers().getCustomer().get(0).getTransactions().getTransaction()
+                                .isEmpty()) {
+                    this.throwActionError(AccountingConst.MSG_SUBSIDIARY_HAS_HISTORY, null);
+                }
+            }
+            else {
+                this.throwActionError(AccountingConst.MSG_SUBSIDIARY_NOTFOUND, null);
+            }
+        } catch (AccountingUIException e) {
+            logger.log(Level.ERROR, e.getMessage());
+            throw new ActionCommandException(e.getMessage());
+        }
+
+        // Capture the business ID
+        int contactId = this.cust.getBusinessId();
+        String addressResults = null;
+
+        // Call SOAP web service to delete the Creditor profile.
+        try {
+            AccountingTransactionResponse response = CustomerSoapRequests.callDelete(this.cust, this.loginId,
+                    this.session.getId());
+            ReplyStatusType rst = response.getReplyStatus();
+            this.msg = rst.getMessage();
+            if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
+                this.throwActionError(rst.getMessage(), rst.getExtMessage());
+            }
+        } catch (Exception e) {
+            logger.log(Level.ERROR, e.getMessage());
+            throw new ActionCommandException(e.getMessage());
+        }
+
+        // Call SOAP web service to delete the customer's business contact
+        // profile from the Addressbook
+        try {
+            AddressBookResponse response = CustomerSoapRequests.callDeleteContactData(contactId, this.loginId,
+                    this.session.getId());
+            ReplyStatusType rst = response.getReplyStatus();
+            if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
+                this.throwActionError(rst.getMessage(), rst.getExtMessage());
+            }
+
+            // Verify contact info was deleted.
+            if (response.getProfile() != null) {
+                if (response.getProfile().getCommonContacts() != null) {
+                    // TODO: Don't quite know how to use this at the moment,
+                    // though...
+                    contactId = response.getProfile().getCommonContacts().get(0).getContactId().intValue();
+                    addressResults = "The creditor's business contact profile was removed from the Addressbook";
+                }
+            }
+            else {
+                addressResults = "NOTE:  Records indicate the creditor's business contact profile has already been removed from the Addressbook prior to this transaction";
+            }
+        } catch (Exception e) {
+            logger.log(Level.ERROR, e.getMessage());
+            throw new ActionCommandException(e.getMessage());
+        }
+
+        // Update the user's confirmation message
+        if (RMT2String2.isNotEmpty(addressResults)) {
+            this.msg += ":  " + addressResults;
+        }
+        super.delete();
     }
 
     /**

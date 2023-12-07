@@ -11,7 +11,6 @@ import org.rmt2.jaxb.AccountingTransactionResponse;
 import org.rmt2.jaxb.AddressType;
 import org.rmt2.jaxb.BusinessType;
 import org.rmt2.jaxb.CodeDetailType;
-import org.rmt2.jaxb.CreditorCriteriaType;
 import org.rmt2.jaxb.CustomerCriteriaType;
 import org.rmt2.jaxb.CustomerType;
 import org.rmt2.jaxb.HeaderType;
@@ -32,8 +31,6 @@ import com.action.gl.subsidiary.SubsidiarySoapRequests;
 import com.api.messaging.webservice.soap.client.SoapJaxbClientWrapper;
 import com.api.security.authentication.web.AuthenticationException;
 import com.api.util.RMT2String2;
-import com.entity.Creditor;
-import com.entity.CreditorCriteria;
 import com.entity.Customer;
 import com.entity.CustomerCriteria;
 
@@ -207,7 +204,7 @@ public class CustomerSoapRequests extends SubsidiarySoapRequests {
      * @return {@link AccountingTransactionResponse}
      * @throws AccountingUIException
      */
-    public static final AccountingTransactionResponse callGetHistory(CreditorCriteria parms, String loginId, String sessionId)
+    public static final AccountingTransactionResponse callGetHistory(CustomerCriteria parms, String loginId, String sessionId)
             throws AccountingUIException {
         ObjectFactory fact = new ObjectFactory();
         AccountingTransactionRequest req = fact.createAccountingTransactionRequest();
@@ -224,15 +221,16 @@ public class CustomerSoapRequests extends SubsidiarySoapRequests {
                 .withSessionId(sessionId)
                 .build();
 
-        CreditorCriteriaType criteria = fact.createCreditorCriteriaType();
+        CustomerCriteriaType criteria = fact.createCustomerCriteriaType();
+        criteria.setCustomer(fact.createCustomerType());
         if (parms != null) {
-            if (RMT2String2.isNotEmpty(parms.getQry_CreditorId())) {
-                criteria.setCreditorId(BigInteger.valueOf(Integer.valueOf(parms.getQry_CreditorId())));
+            if (RMT2String2.isNotEmpty(parms.getQry_CustomerId())) {
+                criteria.getCustomer().setCustomerId(BigInteger.valueOf(Integer.valueOf(parms.getQry_CustomerId())));
             }
         }
 
         TransactionCriteriaGroup criteriaGroup = fact.createTransactionCriteriaGroup();
-        criteriaGroup.setCreditorCriteria(criteria);
+        criteriaGroup.setCustomerCriteria(criteria);
         req.setCriteria(criteriaGroup);
         req.setHeader(head);
 
@@ -344,12 +342,12 @@ public class CustomerSoapRequests extends SubsidiarySoapRequests {
     
     
     /**
-     * SOAP call to delete one or more creditor's profile.
+     * SOAP call to delete one or more customer's profile.
      * <p>
-     * Currently, this implementation only deletes a single creditor profile.
+     * Currently, this implementation only deletes a single customer profile.
      * 
      * @param data
-     *            {@link Creditor}
+     *            {@link Customer}
      * @param loginId
      *            the id of logged in user
      * @param sessionId
@@ -357,7 +355,7 @@ public class CustomerSoapRequests extends SubsidiarySoapRequests {
      * @return {@link AccountingTransactionResponse}
      * @throws AccountingUIException
      */
-    public static final AccountingTransactionResponse callDelete(Creditor data, String loginId, String sessionId)
+    public static final AccountingTransactionResponse callDelete(Customer data, String loginId, String sessionId)
             throws AccountingUIException {
 
         ObjectFactory fact = new ObjectFactory();
@@ -375,11 +373,12 @@ public class CustomerSoapRequests extends SubsidiarySoapRequests {
                 .withSessionId(sessionId)
                 .build();
 
-        CreditorCriteriaType criteria = fact.createCreditorCriteriaType();
-        criteria.setCreditorId(BigInteger.valueOf(data.getCreditorId()));
+        CustomerCriteriaType criteria = fact.createCustomerCriteriaType();
+        criteria.setCustomer(fact.createCustomerType());
+        criteria.getCustomer().setCustomerId(BigInteger.valueOf(data.getCustomerId()));
         
         TransactionCriteriaGroup criteriaGroup = fact.createTransactionCriteriaGroup();
-        criteriaGroup.setCreditorCriteria(criteria);
+        criteriaGroup.setCustomerCriteria(criteria);
         req.setCriteria(criteriaGroup);
         req.setHeader(head);
 
