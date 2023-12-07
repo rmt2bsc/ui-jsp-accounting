@@ -1,14 +1,24 @@
 package com.action.gl.subsidiary.customer;
 
+import java.util.List;
+
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.rmt2.jaxb.AccountingTransactionResponse;
+import org.rmt2.jaxb.AddressBookResponse;
+import org.rmt2.jaxb.ReplyStatusType;
 
 import com.SystemException;
+import com.action.gl.subsidiary.BusinessContactSoapRequests;
+import com.api.constants.GeneralConst;
 import com.api.persistence.DatabaseException;
 import com.api.web.ActionCommandException;
 import com.api.web.Context;
 import com.api.web.Request;
 import com.api.web.Response;
+import com.entity.Customer;
 import com.entity.CustomerCriteria;
+import com.entity.CustomerFactory;
 
 /**
  * This class provides action handlers needed to serve Customer Maintenance Edit
@@ -95,60 +105,63 @@ public class CustomerEditAction extends AbstractCustomerAction {
      * @throws ActionCommandException
      */
     public void save() throws ActionCommandException {
-        // int busId = 0;
-        //
-        // // Update business contact data
-        // JaxbAccountingFactory jaxbUtil = new JaxbAccountingFactory();
-        // BusinessType bt = jaxbUtil.createtBusinessType(request);
-        // RMT2SessionBean userSession = (RMT2SessionBean)
-        // this.request.getSession().getAttribute(RMT2ServletConst.SESSION_BEAN);
-        // try {
-        // busId = jaxbUtil.updateBusinessContactData(bt,
-        // userSession.getLoginId());
-        // } catch (MessagingException e) {
-        // throw new ActionCommandException(e);
-        // }
-        //
-        // // Update Creditor data.
-        // DatabaseTransApi tx = DatabaseTransFactory.create();
-        // Customer customer = (Customer) this.cust;
-        // boolean error = false;
-        // boolean customerNew = customer.getCustomerId() == 0;
-        //
-        // try {
-        // this.msg = "Customer profile was updated successfully";
-        // try {
-        // customer.setBusinessId(busId);
-        // super.save();
-        // } catch (Exception e) {
-        // this.logger.log(Level.ERROR, e.getMessage());
-        // this.msg = e.getMessage();
-        // error = true;
-        // }
-        // if (error) {
-        // if (customerNew) {
-        // // Send request to the Contacts system to delete the contact
-        // // record just added above when update for new customer
-        // // fails.
-        // try {
-        // jaxbUtil.deleteBusinessContactData(busId, userSession.getLoginId());
-        // } catch (MessagingException e) {
-        // this.logger.log(Level.ERROR, e.getMessage());
-        // this.msg += ".  " + e.getMessage();
-        // throw new ActionCommandException(this.msg);
-        // }
-        // }
-        // }
-        // tx.commitUOW();
-        // return;
-        // } catch (ActionCommandException e) {
-        // tx.rollbackUOW();
-        // throw e;
-        // } finally {
-        // tx.close();
-        // tx = null;
-        // this.edit();
-        // }
+        int contactId = 0;
+
+        // Call SOAP web service to update creditor's business contact
+        // information since creditor depends on business id.
+        try {
+            AddressBookResponse response = BusinessContactSoapRequests.callSave(this.cust, this.loginId,
+                    this.session.getId());
+            ReplyStatusType rst2 = response.getReplyStatus();
+            if (rst2.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
+                this.msg = rst2.getMessage();
+                return;
+            }
+            // Capture the business id property of the business contact
+            // regardless if new or existing.
+            if (response.getProfile() != null && response.getProfile().getCommonContacts() != null) {
+                contactId = response.getProfile().getCommonContacts().get(0).getContactId().intValue();
+                this.cust.setBusinessId(contactId);
+            }
+        } catch (Exception e) {
+            logger.log(Level.ERROR, e.getMessage());
+            throw new ActionCommandException(e.getMessage());
+        }
+
+        // Call SOAP web service to persist Customer data changes to the
+        // database.
+        try {
+            AccountingTransactionResponse response = CustomerSoapRequests.callSave(this.cust, this.loginId,
+                    this.session.getId());
+            ReplyStatusType rst = response.getReplyStatus();
+            if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
+                this.throwActionError(rst.getMessage(), rst.getExtMessage());
+            }
+            List<Customer> results = null;
+            if (response.getProfile() != null) {
+                results = CustomerFactory.create(response.getProfile().getCustomers().getCustomer());
+
+                // Retrieve newly updated customer profile from database
+                CustomerCriteria criteria = CustomerCriteria.getInstance();
+                criteria.setQry_CustomerId(String.valueOf(results.get(0).getCustomerId()));
+                List<Customer> list = this.getCustomers(criteria);
+                if (list != null && list.size() > 0) {
+                    this.cust = list.get(0);
+                }
+            }
+            else {
+                this.cust = CustomerFactory.create();
+            }
+            super.save();
+
+            // Delayed the assignment of the "customer saved successfully"
+            // confirmation message due to other web service calls are message
+            // property as well.
+            this.msg = rst.getMessage();
+        } catch (Exception e) {
+            logger.log(Level.ERROR, e.getMessage());
+            throw new ActionCommandException(e.getMessage());
+        }
     }
 
     /**

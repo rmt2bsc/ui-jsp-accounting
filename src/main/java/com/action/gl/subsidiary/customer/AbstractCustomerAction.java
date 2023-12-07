@@ -136,7 +136,7 @@ public abstract class AbstractCustomerAction extends AbstractSubsidiaryAction im
     }
 
     /**
-     * @return the cred
+     * @return the cust
      */
     public Object getCust() {
         return cust;

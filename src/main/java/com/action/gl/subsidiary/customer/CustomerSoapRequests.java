@@ -12,8 +12,6 @@ import org.rmt2.jaxb.AddressType;
 import org.rmt2.jaxb.BusinessType;
 import org.rmt2.jaxb.CodeDetailType;
 import org.rmt2.jaxb.CreditorCriteriaType;
-import org.rmt2.jaxb.CreditorType;
-import org.rmt2.jaxb.CreditortypeType;
 import org.rmt2.jaxb.CustomerCriteriaType;
 import org.rmt2.jaxb.CustomerType;
 import org.rmt2.jaxb.HeaderType;
@@ -23,8 +21,6 @@ import org.rmt2.jaxb.TransactionDetailGroup;
 import org.rmt2.jaxb.XactCustomCriteriaTargetType;
 import org.rmt2.jaxb.ZipcodeType;
 import org.rmt2.util.HeaderTypeBuilder;
-import org.rmt2.util.accounting.subsidiary.CreditorTypeBuilder;
-import org.rmt2.util.accounting.subsidiary.CreditortypeTypeBuilder;
 import org.rmt2.util.accounting.subsidiary.CustomerTypeBuilder;
 import org.rmt2.util.addressbook.AddressTypeBuilder;
 import org.rmt2.util.addressbook.BusinessTypeBuilder;
@@ -38,6 +34,7 @@ import com.api.security.authentication.web.AuthenticationException;
 import com.api.util.RMT2String2;
 import com.entity.Creditor;
 import com.entity.CreditorCriteria;
+import com.entity.Customer;
 import com.entity.CustomerCriteria;
 
 /**
@@ -249,10 +246,10 @@ public class CustomerSoapRequests extends SubsidiarySoapRequests {
     }
 
     /**
-     * SOAP call to apply data changes to a creditor's profile.
+     * SOAP call to apply data changes to a customer's profile.
      * 
      * @param data
-     *            {@link Creditor}
+     *            {@link Customer}
      * @param loginId
      *            the id of logged in user
      * @param sessionId
@@ -260,7 +257,7 @@ public class CustomerSoapRequests extends SubsidiarySoapRequests {
      * @return {@link AccountingTransactionResponse}
      * @throws AccountingUIException
      */
-    public static final AccountingTransactionResponse callSave(Creditor data, String loginId, String sessionId)
+    public static final AccountingTransactionResponse callSave(Customer data, String loginId, String sessionId)
             throws AccountingUIException {
         // Retrieve all code group records from the database
         ObjectFactory fact = new ObjectFactory();
@@ -319,26 +316,20 @@ public class CustomerSoapRequests extends SubsidiarySoapRequests {
                 .withAddress(addr)
                 .build();
         
-        CreditortypeType creditorType = CreditortypeTypeBuilder.Builder.create()
-                .withCreditorTypeId(data.getCreditorTypeId())
-                .build();
-      
-        CreditorType creditor = CreditorTypeBuilder.Builder.create()
-                .withCreditorId(data.getCreditorId())
+        CustomerType custType = CustomerTypeBuilder.Builder.create()
+                .withCustomerId(data.getCustomerId())
                 .withAcctId(data.getAcctId())
                 .withBusinessType(busType)
-                .withCreditorytypeType(creditorType)
-                .withAccountNo(data.getAccountNumber())
-                .withExtAccountNo(data.getExtAccountNumber())
-                .withApr(data.getApr())
+                .withAccountNo(data.getAccountNo())
+                .withAcctDescription(data.getDescription())
                 .withCreditLimit(data.getCreditLimit())
                 .withBalance(data.getBalance())
                 .withActive(data.getActive())
                 .build();
                 
         TransactionDetailGroup profileGroup = fact.createTransactionDetailGroup();
-        profileGroup.setCreditors(fact.createCreditorListType());
-        profileGroup.getCreditors().getCreditor().add(creditor);
+        profileGroup.setCustomers(fact.createCustomerListType());
+        profileGroup.getCustomers().getCustomer().add(custType);
         req.setHeader(head);
         req.setProfile(profileGroup);
 
