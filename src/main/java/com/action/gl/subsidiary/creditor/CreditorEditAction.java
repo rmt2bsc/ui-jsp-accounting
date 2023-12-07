@@ -200,6 +200,7 @@ public class CreditorEditAction extends AbstractCreditorAction {
                         && response.getProfile().getCreditors() != null
                         && response.getProfile().getCreditors().getCreditor() != null
                         && !response.getProfile().getCreditors().getCreditor().isEmpty()
+                        && response.getProfile().getCreditors().getCreditor().get(0).getTransactions() != null
                         && !response.getProfile().getCreditors().getCreditor().get(0).getTransactions().getTransaction()
                                 .isEmpty()) {
                     this.throwActionError(AccountingConst.MSG_SUBSIDIARY_HAS_HISTORY, null);
