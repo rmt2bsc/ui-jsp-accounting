@@ -2,6 +2,7 @@ package com.action.inventory;
 
 import java.util.ArrayList;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import com.SystemException;
@@ -9,6 +10,8 @@ import com.api.constants.GeneralConst;
 import com.api.constants.RMT2ServletConst;
 import com.api.persistence.DatabaseException;
 import com.api.security.RMT2TagQueryBean;
+import com.api.util.RMT2Money;
+import com.api.util.RMT2String2;
 import com.api.web.ActionCommandException;
 import com.api.web.Context;
 import com.api.web.Request;
@@ -30,8 +33,6 @@ public class ItemMasterSearchAction extends AbstractInventoryAction {
     private static final String COMMAND_EDIT = "Inventory.Search.edit";
 
     private static final String COMMAND_ADD = "Inventory.Search.add";
-
-    public static final String COMMAND_LIST = "Inventory.Search.list";
 
     public static final String COMMAND_BACK = "Inventory.Search.back";
 
@@ -96,9 +97,6 @@ public class ItemMasterSearchAction extends AbstractInventoryAction {
         if (command.equalsIgnoreCase(ItemMasterSearchAction.COMMAND_SEARCH)) {
             this.doSearch();
         }
-        if (command.equalsIgnoreCase(ItemMasterSearchAction.COMMAND_LIST)) {
-            this.listData();
-        }
         if (command.equalsIgnoreCase(ItemMasterSearchAction.COMMAND_BACK)) {
             this.doBack();
         }
@@ -142,6 +140,8 @@ public class ItemMasterSearchAction extends AbstractInventoryAction {
      * @return Object which represents the custom object that is a member of
      *         {@link RMT2TagQueryBean}.
      * @throws ActionCommandException
+     *             when one or more selection criteria fields are found to be
+     *             invalid.
      */
     protected Object doCustomInitialization() throws ActionCommandException {
         ItemMasterCriteria criteria = ItemMasterCriteria.getInstance();
@@ -152,65 +152,69 @@ public class ItemMasterSearchAction extends AbstractInventoryAction {
                 throw new ActionCommandException(e.getMessage());
             }
         }
+
+        this.validateCriteria(criteria);
         return criteria;
     }
 
-    /**
-     * This method signals to the caller to ignore the selection criteria that
-     * was setup for _filedName in the ancestor script. Typically, this is true
-     * when _fieldName is pointing to the Active or Inactive fields.
-     * 
-     * @return String - Return "" which means to ignore the criteria of
-     *         _fieldName which was setup in the ancestor script. Returns null
-     *         to indicate that there is no custom criteria to be applied and to
-     *         apply that which was built in the ancestor.
-     */
-    protected String buildCustomClientCriteria(String _fieldName) {
-        if (_fieldName.equalsIgnoreCase("qry_Active") || _fieldName.equalsIgnoreCase("qry_Inactive")) {
-            return "";
-        }
-        return null;
-    }
+    // /**
+    // * This method signals to the caller to ignore the selection criteria that
+    // * was setup for _filedName in the ancestor script. Typically, this is
+    // true
+    // * when _fieldName is pointing to the Active or Inactive fields.
+    // *
+    // * @return String - Return "" which means to ignore the criteria of
+    // * _fieldName which was setup in the ancestor script. Returns null
+    // * to indicate that there is no custom criteria to be applied and to
+    // * apply that which was built in the ancestor.
+    // */
+    // protected String buildCustomClientCriteria(String _fieldName) {
+    // if (_fieldName.equalsIgnoreCase("qry_Active") ||
+    // _fieldName.equalsIgnoreCase("qry_Inactive")) {
+    // return "";
+    // }
+    // return null;
+    // }
 
-    /**
-     * Includes the item master values, "Active" and "Inactive", into the SQL
-     * predicate, if applicable.
-     * 
-     * @return SQL predicate.
-     */
-    protected String postBuildCustomClientCriteria() {
-        StringBuffer criteria = new StringBuffer(100);
-        String temp = null;
-        String temp2 = null;
-        ArrayList activeInactive = new ArrayList();
-
-        temp = this.request.getParameter("qry_Active");
-        temp2 = this.request.getParameter("qry_Inactive");
-        if (temp != null && !temp.equals("")) {
-            activeInactive.add(temp);
-        }
-        if (temp2 != null && !temp2.equals("")) {
-            activeInactive.add(temp2);
-        }
-        if (activeInactive.size() > 0) {
-            if (criteria.length() > 0) {
-                criteria.append(" and ");
-            }
-            criteria.append(" active in(");
-            for (int ndx = 0; ndx < activeInactive.size(); ndx++) {
-                if (ndx > 0) {
-                    criteria.append(", ");
-                }
-                temp = (String) activeInactive.get(ndx);
-                criteria.append(temp);
-            }
-            criteria.append(") ");
-        }
-        if (criteria.length() > 0) {
-            return criteria.toString();
-        }
-        return null;
-    }
+    // /**
+    // * Includes the item master values, "Active" and "Inactive", into the SQL
+    // * predicate, if applicable.
+    // *
+    // * @return SQL predicate.
+    // */
+    // protected String postBuildCustomClientCriteria() {
+    // StringBuffer criteria = new StringBuffer(100);
+    // String temp = null;
+    // String temp2 = null;
+    // ArrayList activeInactive = new ArrayList();
+    //
+    // temp = this.request.getParameter("qry_Active");
+    // temp2 = this.request.getParameter("qry_Inactive");
+    // if (temp != null && !temp.equals("")) {
+    // activeInactive.add(temp);
+    // }
+    // if (temp2 != null && !temp2.equals("")) {
+    // activeInactive.add(temp2);
+    // }
+    // if (activeInactive.size() > 0) {
+    // if (criteria.length() > 0) {
+    // criteria.append(" and ");
+    // }
+    // criteria.append(" active in(");
+    // for (int ndx = 0; ndx < activeInactive.size(); ndx++) {
+    // if (ndx > 0) {
+    // criteria.append(", ");
+    // }
+    // temp = (String) activeInactive.get(ndx);
+    // criteria.append(temp);
+    // }
+    // criteria.append(") ");
+    // }
+    // if (criteria.length() > 0) {
+    // return criteria.toString();
+    // }
+    // return null;
+    // }
 
     /**
      * Prepares the client for adding an item to inventory and retrieves a list
@@ -240,9 +244,27 @@ public class ItemMasterSearchAction extends AbstractInventoryAction {
         return;
     }
 
-    protected void listData() throws ActionCommandException {
-        this.setupLookupData();
-        this.sendClientData();
+    /**
+     * Verifies that the Inventory Item Master Id and Unit Cost fields are
+     * numeric when either is provided as input by the client.
+     * 
+     * @param criteria
+     *            instance of {@link ItemMasterCriteria}
+     * @throws ActionCommandException
+     *             When either of the above input fields are found to not be
+     *             numeric.
+     */
+    private void validateCriteria(ItemMasterCriteria criteria) throws ActionCommandException {
+        if (RMT2String2.isNotEmpty(criteria.getQry_Id()) && !RMT2Money.isNumeric(criteria.getQry_Id())) {
+            this.msg = "Invenotry Item Master Id field must be numeric when used as selection criteria";
+            this.logger.log(Level.ERROR, this.msg);
+            throw new ActionCommandException(this.msg);
+        }
+        if (RMT2String2.isNotEmpty(criteria.getQry_UnitCost()) && !RMT2Money.isNumeric(criteria.getQry_UnitCost())) {
+            this.msg = "Unit Cost field must be numeric when used as selection criteria";
+            this.logger.log(Level.ERROR, this.msg);
+            throw new ActionCommandException(this.msg);
+        }
     }
 
     /**
