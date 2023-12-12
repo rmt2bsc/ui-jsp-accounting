@@ -18,16 +18,8 @@
     <script Language="JavaScript" src="<%=APP_ROOT%>/js/RMT2Menu.js"></script>
   </head>
   
-<%--   <%@include file="../../includes/SessionQuerySetup.jsp"%>  	  	  --%>
-    
   <%
 	  String pageTitle = "Item Master Maintenance Console";
-// 	  String jspOrigin = request.getParameter("jspOrigin");
-	  String itemCriteria = null;
-	  String overrideInd = null;
-//  	  ItemMasterCriteria query = (custObj != null && custObj instanceof ItemMasterCriteria ? (ItemMasterCriteria)baseQueryObj.getCustomObj() : ItemMasterCriteria.getInstance());
-//  	  itemCriteria = baseQueryObj.getWhereClause();
-//  	  query.setJspOrigin(jspOrigin);
   %>
 				
   <body bgcolor="#FFFFFF" text="#000000">
