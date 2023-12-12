@@ -107,7 +107,7 @@
 		   <tr>
 		      <td colspan="2">
 		         <input name="search" type="button" value="Search" style="width:90" onClick="handleAction('_self', document.SearchForm, this.name)">
-		         <input name="reset" type="reset" value="Clear" style="width:90">
+		         <input name="newsearch" type="button" value="Clear" style="width:90" onClick="handleAction('_self', document.SearchForm, this.name)">
 		      </td>
 	       </tr>		
        </table>            
