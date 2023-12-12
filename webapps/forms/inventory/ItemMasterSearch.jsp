@@ -5,6 +5,8 @@
 <%@ page import="com.AccountingConst" %>
 <%@ page import="com.action.inventory.ItemConst" %>
 <%@ page import="com.api.util.RMT2Utility" %>
+<%@ page import="com.api.constants.RMT2ServletConst" %>
+
 
 <gen:InitAppRoot id="APP_ROOT"/>
 <html>
@@ -48,7 +50,7 @@
 				     	 			       name="qry_VendorId" 
 					 					   codeProperty="CreditorId" 
 										   displayProperty="Longname" 
-										   selectedValue="QUERY_BEAN.CustomObj.qry_VendorId"/>
+										   selectedValue="#QUERY_BEAN.CustomObj.qry_VendorId"/>
                   </td>
                   <td class="clsTableFormHeader">Item Type</td>
                   <td>
@@ -57,7 +59,7 @@
 				     	 			       name="qry_ItemTypeId" 
 					 					   codeProperty="ItemTypeId" 
 										   displayProperty="Description" 
-										   selectedValue="QUERY_BEAN.CustomObj.qry_ItemTypeId"/>
+										   selectedValue="#QUERY_BEAN.CustomObj.qry_ItemTypeId"/>
                   </td>                  
                </tr>
                
@@ -95,33 +97,6 @@
 										   displayProperty="Description" 
 										   selectedValue="#QUERY_BEAN.CustomObj.qry_ItemStatusId"/>
                   </td>
-                  <td>&nbsp;</td>
-                  <td>
-                     <table width="15%" border="0">
-				        <tr>
-				            <th>Active</th>
-				            <td>
-				                <input type="radio" 
-				                       name="qry_Active" 
-				                       value="1"
-				                       size="10" 
-					                <gen:Evaluate  expression="#QUERY_BEAN.CustomObj.qry_Active">
-										<gen:When expression="1">checked</gen:When>
-									</gen:Evaluate> >
-				            </td>
-							<th>Inactive</th>
-				            <td>
-				                <input type="radio" 
-				                       name="qry_Active" 
-				                       value="0" 
-				                       size="10" 
- 						               <gen:Evaluate  expression="#QUERY_BEAN.CustomObj.qry_Active">
-										<gen:When expression="0">checked</gen:When>
-								   </gen:Evaluate>  >
-				            </td>					            
-				        </tr>
-			         </table>
-                  </td>                  
                </tr>            
             </table>
         </div>
@@ -208,7 +183,19 @@
         </div>       
         <br>
         
-        <!-- Display command buttons -->  
+        <!-- Display any messages -->
+		<table>
+			 <tr>
+	  		   <td>
+			     <font color="red">
+				     <gen:ShowPageMessages dataSource="<%=RMT2ServletConst.REQUEST_MSG_MESSAGES%>"/>
+			     </font>
+		 	   </td>
+			 </tr>
+		</table>
+	 
+        <!-- Display command buttons -->
+        <br>  
         <table width="100%" cellpadding="0" cellspacing="0">
 		   <tr>
 		      <td colspan="2">

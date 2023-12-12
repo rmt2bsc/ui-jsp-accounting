@@ -130,6 +130,8 @@ public class ItemMasterSearchAction extends AbstractInventoryAction {
         this.query = (RMT2TagQueryBean) this.getSession().getAttribute(RMT2ServletConst.QUERY_BEAN);
         this.getSession().setAttribute(RMT2ServletConst.QUERY_BEAN, this.query);
         this.setupLookupData();
+        ItemMasterCriteria criteria = (ItemMasterCriteria) this.query.getCustomObj();
+        this.items = this.getInventory(criteria);
         this.sendClientData();
 
     }

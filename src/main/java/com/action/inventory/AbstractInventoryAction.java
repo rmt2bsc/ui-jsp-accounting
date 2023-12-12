@@ -14,6 +14,7 @@ import com.SystemException;
 import com.action.gl.subsidiary.creditor.CreditorConst;
 import com.action.gl.subsidiary.creditor.CreditorSoapRequests;
 import com.api.constants.GeneralConst;
+import com.api.constants.RMT2ServletConst;
 import com.api.jsp.action.AbstractActionHandler;
 import com.api.persistence.DatabaseException;
 import com.api.util.RMT2Money;
@@ -201,6 +202,36 @@ public abstract class AbstractInventoryAction extends AbstractActionHandler impl
     }
 
     /**
+     * Call SOAP web service to get a list of Inventory Master Items
+     * 
+     * @param criteria
+     *            {@link ItemMasterCriteria}
+     * @return List<{@link VwItemMaster}>
+     * @throws AccountingUIException
+     */
+    private List<VwItemMaster> getInventoryItems(ItemMasterCriteria criteria) throws AccountingUIException {
+        try {
+            InventoryResponse response = ItemMasterSoapRequests.callGet(criteria, this.loginId, this.session.getId());
+            ReplyStatusType rst = response.getReplyStatus();
+            if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
+                this.throwActionError(rst.getMessage(), rst.getExtMessage());
+            }
+            List<VwItemMaster> results = null;
+            if (response.getProfile() != null && response.getProfile().getInvItem() != null) {
+                results = VwItemMasterFactory.create(response.getProfile().getInvItem());
+            }
+            else {
+                results = new ArrayList<>();
+            }
+            this.msg += ": " + results.size();
+            return results;
+        } catch (Exception e) {
+            logger.log(Level.ERROR, e.getMessage());
+            throw new AccountingUIException(e.getMessage());
+        }
+    }
+
+    /**
      * Call SOAP web service to get a list of Creditors based on selection
      * criteria
      * 
@@ -346,5 +377,6 @@ public abstract class AbstractInventoryAction extends AbstractActionHandler impl
         this.request.setAttribute(ItemConst.CLIENT_DATA_VENDORLIST, this.vendorList);
         this.request.setAttribute(ItemConst.CLIENT_DATA_ITEMTYPELIST, this.itemTypeList);
         this.request.setAttribute(ItemConst.CLIENT_DATA_ITEMSTATUSLIST, this.itemStatusList);
+        this.request.setAttribute(RMT2ServletConst.REQUEST_MSG_INFO, this.msg);
     }
 }

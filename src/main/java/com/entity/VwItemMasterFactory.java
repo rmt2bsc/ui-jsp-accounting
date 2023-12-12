@@ -46,7 +46,7 @@ public class VwItemMasterFactory {
             if (item.getItemStatus() != null) {
                 o.setItemStatusId(item.getItemStatus().getItemStatusId() != null ? item.getItemStatus().getItemStatusId()
                         .intValue() : 0);
-                o.setItemTypeDescription(item.getItemStatus().getDescription());
+                o.setItemStatus(item.getItemStatus().getDescription());
             }
 
             o.setDescription(item.getDescription());
