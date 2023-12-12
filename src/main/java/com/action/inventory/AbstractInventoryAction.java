@@ -5,10 +5,14 @@ import java.util.List;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.rmt2.jaxb.AccountingTransactionResponse;
 import org.rmt2.jaxb.InventoryResponse;
 import org.rmt2.jaxb.ReplyStatusType;
 
+import com.AccountingUIException;
 import com.SystemException;
+import com.action.gl.subsidiary.creditor.CreditorConst;
+import com.action.gl.subsidiary.creditor.CreditorSoapRequests;
 import com.api.constants.GeneralConst;
 import com.api.jsp.action.AbstractActionHandler;
 import com.api.persistence.DatabaseException;
@@ -20,7 +24,13 @@ import com.api.web.Request;
 import com.api.web.Response;
 import com.api.web.util.RMT2WebUtility;
 import com.entity.Creditor;
+import com.entity.CreditorCriteria;
+import com.entity.CreditorFactory;
 import com.entity.ItemMasterCriteria;
+import com.entity.ItemMasterStatus;
+import com.entity.ItemMasterStatusFactory;
+import com.entity.ItemMasterType;
+import com.entity.ItemMasterTypeFactory;
 import com.entity.VwItemMaster;
 import com.entity.VwItemMasterFactory;
 
@@ -185,12 +195,97 @@ public abstract class AbstractInventoryAction extends AbstractActionHandler impl
      * @throws ActionCommandException
      */
     protected void setupLookupData() throws ActionCommandException {
-        this.vendorList = this.getVendorList();
-
+        this.vendorList = this.getVendors();
+        this.itemTypeList = this.getItemTypes();
+        this.itemStatusList = this.getItemStatuses();
     }
 
-    private List<Creditor> getVendorList() {
-        return null;
+    /**
+     * Call SOAP web service to get a list of Creditors based on selection
+     * criteria
+     * 
+     * @return List<{@link Creditor}>
+     * @throws AccountingUIException
+     */
+    private List<Creditor> getVendors() throws AccountingUIException {
+        try {
+            CreditorCriteria criteria = CreditorCriteria.getInstance();
+            criteria.setQry_CreditorTypeId(String.valueOf(CreditorConst.CREDITORTYPE_VENDOR));
+            AccountingTransactionResponse response = CreditorSoapRequests.callGet(criteria, this.loginId,
+                    this.session.getId());
+            ReplyStatusType rst = response.getReplyStatus();
+            if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
+                this.throwActionError(rst.getMessage(), rst.getExtMessage());
+            }
+            List<Creditor> results = null;
+            if (response.getProfile() != null && response.getProfile().getCreditors() != null) {
+                results = CreditorFactory.create(response.getProfile().getCreditors().getCreditor());
+            }
+            else {
+                results = new ArrayList<>();
+            }
+            this.msg += ": " + results.size();
+            return results;
+        } catch (Exception e) {
+            logger.log(Level.ERROR, e.getMessage());
+            throw new AccountingUIException(e.getMessage());
+        }
+    }
+
+    /**
+     * Call SOAP web service to get a list of Item Master Types
+     * 
+     * @return List<{@link ItemMasterType}>
+     * @throws AccountingUIException
+     */
+    private List<ItemMasterType> getItemTypes() throws AccountingUIException {
+        try {
+            InventoryResponse response = ItemTypeSoapRequests.callGet(this.loginId, this.session.getId());
+            ReplyStatusType rst = response.getReplyStatus();
+            if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
+                this.throwActionError(rst.getMessage(), rst.getExtMessage());
+            }
+            List<ItemMasterType> results = null;
+            if (response.getProfile() != null && response.getProfile().getInvItemType() != null) {
+                results = ItemMasterTypeFactory.create(response.getProfile().getInvItemType());
+            }
+            else {
+                results = new ArrayList<>();
+            }
+            this.msg += ": " + results.size();
+            return results;
+        } catch (Exception e) {
+            logger.log(Level.ERROR, e.getMessage());
+            throw new AccountingUIException(e.getMessage());
+        }
+    }
+
+    /**
+     * Call SOAP web service to get a list of Item Master Statuses
+     * 
+     * @return List<{@link ItemMasterStatus}>
+     * @throws AccountingUIException
+     */
+    private List<ItemMasterStatus> getItemStatuses() throws AccountingUIException {
+        try {
+            InventoryResponse response = ItemStatusSoapRequests.callGet(this.loginId, this.session.getId());
+            ReplyStatusType rst = response.getReplyStatus();
+            if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
+                this.throwActionError(rst.getMessage(), rst.getExtMessage());
+            }
+            List<ItemMasterStatus> results = null;
+            if (response.getProfile() != null && response.getProfile().getInvItemStatus() != null) {
+                results = ItemMasterStatusFactory.create(response.getProfile().getInvItemStatus());
+            }
+            else {
+                results = new ArrayList<>();
+            }
+            this.msg += ": " + results.size();
+            return results;
+        } catch (Exception e) {
+            logger.log(Level.ERROR, e.getMessage());
+            throw new AccountingUIException(e.getMessage());
+        }
     }
 
     /**

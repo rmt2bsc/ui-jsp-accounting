@@ -110,6 +110,7 @@ public class ItemMasterSearchAction extends AbstractInventoryAction {
         this.startSearchConsole();
         this.items = new ArrayList<>();
         this.query = (RMT2TagQueryBean) this.getSession().getAttribute(RMT2ServletConst.QUERY_BEAN);
+        this.setupLookupData();
         this.sendClientData();
         return;
     }
@@ -124,10 +125,10 @@ public class ItemMasterSearchAction extends AbstractInventoryAction {
         this.setFirstTime(false);
         this.buildXMLSearchCriteria();
         this.query = (RMT2TagQueryBean) this.getSession().getAttribute(RMT2ServletConst.QUERY_BEAN);
-        this.query.setQuerySource(this.getBaseView());
-        this.query.setOrderByClause("description asc");
-        this.listData();
         this.getSession().setAttribute(RMT2ServletConst.QUERY_BEAN, this.query);
+        this.setupLookupData();
+        this.sendClientData();
+
     }
 
     /**
@@ -240,7 +241,7 @@ public class ItemMasterSearchAction extends AbstractInventoryAction {
     }
 
     /**
-     * Sends vendor list to the client.
+     * Sends selection criteria data to the client.
      * 
      * @throws ActionCommandException
      */

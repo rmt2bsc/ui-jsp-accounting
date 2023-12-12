@@ -18,16 +18,16 @@
     <script Language="JavaScript" src="<%=APP_ROOT%>/js/RMT2Menu.js"></script>
   </head>
   
-  <%@include file="../../includes/SessionQuerySetup.jsp"%>  	  	 
+<%--   <%@include file="../../includes/SessionQuerySetup.jsp"%>  	  	  --%>
     
   <%
 	  String pageTitle = "Item Master Maintenance Console";
-	  String jspOrigin = request.getParameter("jspOrigin");
-// 	  String itemCriteria = null;
-// 	  String overrideInd = null;
+// 	  String jspOrigin = request.getParameter("jspOrigin");
+	  String itemCriteria = null;
+	  String overrideInd = null;
 //  	  ItemMasterCriteria query = (custObj != null && custObj instanceof ItemMasterCriteria ? (ItemMasterCriteria)baseQueryObj.getCustomObj() : ItemMasterCriteria.getInstance());
 //  	  itemCriteria = baseQueryObj.getWhereClause();
- 	  query.setJspOrigin(jspOrigin);
+//  	  query.setJspOrigin(jspOrigin);
   %>
 				
   <body bgcolor="#FFFFFF" text="#000000">
@@ -54,8 +54,8 @@
                       <beanlib:InputControl dataSource="<%=ItemConst.CLIENT_DATA_VENDORLIST %>" 
 					                       type="select" 
 				     	 			       name="qry_VendorId" 
-					 					   codeProperty="creditorId" 
-										   displayProperty="name" 
+					 					   codeProperty="CreditorId" 
+										   displayProperty="Longname" 
 										   selectedValue="QUERY_BEAN.CustomObj.qry_VendorId"/>
                   </td>
                   <td class="clsTableFormHeader">Item Type</td>
@@ -84,7 +84,7 @@
                   <td class="clsTableFormHeader">Unit Cost</td>
                   <td>
                      <gen:CondOps name="qryRelOp_UnitCost" 
-                                  selectedValue="<%=query.getQryRelOp_UnitCost()%>"/>
+                                  selectedValue="#QUERY_BEAN.getQryRelOp_UnitCost()"/>
                      <beanlib:InputControl type="text" name="qry_UnitCost" size="15" value="#QUERY_BEAN.CustomObj.qry_UnitCost"/>
                   </td>
                   <td class="clsTableFormHeader">Qty On Hand</td>
@@ -167,64 +167,46 @@
 				   <th width="6%" class="clsTableListHeader" style="text-align:left">Vendor</th>
 			   </tr>
                
-   			   <db:LoopRows dataSource="itemDso"> 
+   			   <beanlib:LoopRows bean="item" list="<%=ItemConst.CLIENT_DATA_ITEMS %>">
 			     <gen:ColorBarLines evenColor="#CCFFCC" oddColor="#FFFFFF"/>
 			        <td class="clsTableListHeader">
-			            <db:InputControl  type="radio" name="selCbx" value="rowid"/>
-					    <db:InputControl type="hidden" name="Id" value="#itemDso.Id" uniqueName="yes"/>
+			            <beanlib:InputControl  type="radio" name="selCbx" value="rowid"/>
+					    <beanlib:InputControl type="hidden" name="Id" value="#item.Id" uniqueName="yes"/>
 			        <td>
-			            <db:InputControl  value="#itemDso.Id"/> 
+			            <beanlib:InputControl  value="#item.Id"/> 
 			        </td>
 			        <td>
-			            <db:InputControl  value="#itemDso.Description"/> 
+			            <beanlib:InputControl  value="#item.Description"/> 
 			        </td>
 			        <td align="right">&nbsp;</td>
 			        <td>
-			            <db:InputControl  value="#itemDso.ItemTypeDescription"/> 
+			            <beanlib:InputControl  value="#item.ItemTypeDescription"/> 
 			        </td>
 			        <td align="right">
 			            <font color="blue">
-			               <db:InputControl  value="#itemDso.UnitCost" format="$#,##0.00;($#,##0.00)"/> 
+			               <beanlib:InputControl  value="#item.UnitCost" format="$#,##0.00;($#,##0.00)"/> 
 			            </font>
 			        </td>
 			        <td align="right">
 			            <font color="blue">
-			               <db:InputControl  value="#itemDso.QtyOnHand" format="#,##0;(#,##0)"/> 
+			               <beanlib:InputControl  value="#item.QtyOnHand" format="#,##0;(#,##0)"/> 
 			            </font>
 			        </td>
-							<td align="center">
-							    <%
-							        overrideInd = itemDso.getColumnValue("OverrideRetail");
-							        if (overrideInd.equals("1")) {
-							           overrideInd = "Yes";
-							        }
-							        else {
-							            overrideInd = "No";
-							        }
-							    %>
-							    <%=overrideInd%>
+					<td align="center">
+					   <gen:Evaluate  expression="#item.OverrideRetail">
+						  <gen:When expression="1">Yes</gen:When>
+						  <gen:WhenElse>No</gen:WhenElse>
+				       </gen:Evaluate>
 			        </td>			        
 			        <td align="right">&nbsp;</td>			        
 			        <td>
-			            <%
-			               String itemStatusColor = "black";
-			               int itemStatusId = Integer.parseInt(itemDso.getColumnValue("ItemStatusId"));
-			               if (itemStatusId == ItemConst.ITEM_STATUS_OUTSTOCK) {
-			                  itemStatusColor = "red";
-			               }
-			               if (itemStatusId == ItemConst.ITEM_STATUS_OUTSRVC) {
-			                  itemStatusColor = "gray";
-			               }
-			            %>
-			            <font color="<%=itemStatusColor%>">
-			               <db:InputControl  value="#itemDso.ItemStatus"/> 
-			            </font>
+			             <beanlib:InputControl  value="#item.ItemStatus"/> 
 			        </td>			        			        			        			        			        
 			        <td>
-			            <db:InputControl  value="#itemDso.VendorId"/> 
+			            <beanlib:InputControl  value="#item.VendorId"/> 
 			        </td>			        
 			     </tr>
-			   </db:LoopRows> 
+			   </beanlib:LoopRows> 
 			   <% if (pageContext.getAttribute("ROW") == null) {
 				     out.println("<tr><td colspan=10 align=center>Data Not Found</td></tr>");
 				  }
@@ -246,6 +228,5 @@
         </table>            
 		<input name="clientAction" type="hidden">
      </form>
-     <db:Dispose/>
  </body>
 </html>
