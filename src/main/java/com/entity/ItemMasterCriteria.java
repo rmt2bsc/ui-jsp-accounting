@@ -26,6 +26,8 @@ public class ItemMasterCriteria extends OrmBean {
 
     private String qry_QtyOnHand;
 
+    private String qryRelOp_QtyOnHand;
+
     private String qry_Active;
 
     private String qry_Inactive;
@@ -141,5 +143,13 @@ public class ItemMasterCriteria extends OrmBean {
     }
 
     public void initBean() throws SystemException {
+    }
+
+    public String getQryRelOp_QtyOnHand() {
+        return qryRelOp_QtyOnHand;
+    }
+
+    public void setQryRelOp_QtyOnHand(String qryRelOp_QtyOnHand) {
+        this.qryRelOp_QtyOnHand = qryRelOp_QtyOnHand;
     }
 }
