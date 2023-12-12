@@ -208,6 +208,11 @@ public class ItemMasterSearchAction extends AbstractInventoryAction {
             this.logger.log(Level.ERROR, this.msg);
             throw new ActionCommandException(this.msg);
         }
+        if (RMT2String2.isNotEmpty(criteria.getQry_QtyOnHand()) && !RMT2Money.isNumeric(criteria.getQry_QtyOnHand())) {
+            this.msg = "Quantity on Hand field must be numeric when used as selection criteria";
+            this.logger.log(Level.ERROR, this.msg);
+            throw new ActionCommandException(this.msg);
+        }
     }
 
     /**
