@@ -33,6 +33,8 @@ public class ItemMasterSearchAction extends AbstractInventoryAction {
 
     public static final String COMMAND_LIST = "Inventory.Search.list";
 
+    public static final String COMMAND_BACK = "Inventory.Search.back";
+
     private Logger logger;
 
     /**
@@ -96,6 +98,9 @@ public class ItemMasterSearchAction extends AbstractInventoryAction {
         }
         if (command.equalsIgnoreCase(ItemMasterSearchAction.COMMAND_LIST)) {
             this.listData();
+        }
+        if (command.equalsIgnoreCase(ItemMasterSearchAction.COMMAND_BACK)) {
+            this.doBack();
         }
     }
 
