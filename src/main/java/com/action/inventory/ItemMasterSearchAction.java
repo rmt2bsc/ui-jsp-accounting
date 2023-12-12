@@ -159,65 +159,6 @@ public class ItemMasterSearchAction extends AbstractInventoryAction {
         return criteria;
     }
 
-    // /**
-    // * This method signals to the caller to ignore the selection criteria that
-    // * was setup for _filedName in the ancestor script. Typically, this is
-    // true
-    // * when _fieldName is pointing to the Active or Inactive fields.
-    // *
-    // * @return String - Return "" which means to ignore the criteria of
-    // * _fieldName which was setup in the ancestor script. Returns null
-    // * to indicate that there is no custom criteria to be applied and to
-    // * apply that which was built in the ancestor.
-    // */
-    // protected String buildCustomClientCriteria(String _fieldName) {
-    // if (_fieldName.equalsIgnoreCase("qry_Active") ||
-    // _fieldName.equalsIgnoreCase("qry_Inactive")) {
-    // return "";
-    // }
-    // return null;
-    // }
-
-    // /**
-    // * Includes the item master values, "Active" and "Inactive", into the SQL
-    // * predicate, if applicable.
-    // *
-    // * @return SQL predicate.
-    // */
-    // protected String postBuildCustomClientCriteria() {
-    // StringBuffer criteria = new StringBuffer(100);
-    // String temp = null;
-    // String temp2 = null;
-    // ArrayList activeInactive = new ArrayList();
-    //
-    // temp = this.request.getParameter("qry_Active");
-    // temp2 = this.request.getParameter("qry_Inactive");
-    // if (temp != null && !temp.equals("")) {
-    // activeInactive.add(temp);
-    // }
-    // if (temp2 != null && !temp2.equals("")) {
-    // activeInactive.add(temp2);
-    // }
-    // if (activeInactive.size() > 0) {
-    // if (criteria.length() > 0) {
-    // criteria.append(" and ");
-    // }
-    // criteria.append(" active in(");
-    // for (int ndx = 0; ndx < activeInactive.size(); ndx++) {
-    // if (ndx > 0) {
-    // criteria.append(", ");
-    // }
-    // temp = (String) activeInactive.get(ndx);
-    // criteria.append(temp);
-    // }
-    // criteria.append(") ");
-    // }
-    // if (criteria.length() > 0) {
-    // return criteria.toString();
-    // }
-    // return null;
-    // }
-
     /**
      * Prepares the client for adding an item to inventory and retrieves a list
      * of vendors.
