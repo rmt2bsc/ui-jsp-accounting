@@ -157,45 +157,25 @@ public class ItemMasterEditAction extends AbstractInventoryAction {
      *             general database errors
      */
     public void delete() throws ActionCommandException {
-        // DatabaseTransApi tx = DatabaseTransFactory.create();
-        // InventoryApi api =
-        // InventoryFactory.createApi((DatabaseConnectionBean)
-        // tx.getConnector(), this.request);
-        // int itemId = 0;
-        // ItemMaster im = null;
-        // boolean deleteFailed = false;
-        //
-        // this.itemHelper.refreshData();
-        // this.vendorList = this.getVendorList();
-        // itemId = this.itemHelper.getItem().getItemId();
-        // im = this.itemHelper.getItem();
-        //
-        // try {
-        // api.deleteItemMaster(itemId);
-        // tx.commitUOW();
-        // this.msg = "Item was deleted from the database successfully";
-        // } catch (ItemMasterException e) {
-        // tx.rollbackUOW();
-        // deleteFailed = true;
-        // }
-        //
-        // if (deleteFailed) {
-        // try {
-        // im.setActive(0);
-        // api.maintainItemMaster(im, null);
-        // tx.commitUOW();
-        // this.msg =
-        // "Item was not deleted from the database.   Instead marked inactive since item is linked to one or more orders.";
-        // } catch (ItemMasterException e) {
-        // this.msg = e.getMessage();
-        // logger.log(Level.ERROR, this.msg);
-        // tx.rollbackUOW();
-        // }
-        // }
-        // tx.close();
-        // api = null;
-        // tx = null;
-        return;
+        // Call SOAP web service to delete inventory item master from the
+        // database.
+        try {
+            InventoryResponse response = ItemMasterSoapRequests.callDelete(this.item, this.loginId, this.session.getId());
+            ReplyStatusType rst = response.getReplyStatus();
+            if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
+                this.throwActionError(rst.getMessage(), rst.getExtMessage());
+            }
+            super.delete();
+
+            // Delayed the assignment of the
+            // "inventory item master deleted successfully"
+            // confirmation message due to other web service calls are message
+            // property as well.
+            this.msg = rst.getMessage() + " .  " + rst.getExtMessage();
+        } catch (Exception e) {
+            logger.log(Level.ERROR, e.getMessage());
+            throw new ActionCommandException(e.getMessage());
+        }
     }
 
     /**

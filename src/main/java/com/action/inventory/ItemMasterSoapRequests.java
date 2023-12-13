@@ -7,10 +7,7 @@ import java.util.Date;
 import org.apache.log4j.Logger;
 import org.rmt2.constants.ApiHeaderNames;
 import org.rmt2.constants.ApiTransactionCodes;
-import org.rmt2.jaxb.AccountingTransactionRequest;
-import org.rmt2.jaxb.AccountingTransactionResponse;
 import org.rmt2.jaxb.CreditorType;
-import org.rmt2.jaxb.CustomerCriteriaType;
 import org.rmt2.jaxb.HeaderType;
 import org.rmt2.jaxb.InventoryCriteriaGroup;
 import org.rmt2.jaxb.InventoryDetailGroup;
@@ -21,7 +18,6 @@ import org.rmt2.jaxb.InventoryRequest;
 import org.rmt2.jaxb.InventoryResponse;
 import org.rmt2.jaxb.ItemCriteriaType;
 import org.rmt2.jaxb.ObjectFactory;
-import org.rmt2.jaxb.TransactionCriteriaGroup;
 import org.rmt2.util.HeaderTypeBuilder;
 import org.rmt2.util.accounting.inventory.InventoryItemStatusTypeBuilder;
 import org.rmt2.util.accounting.inventory.InventoryItemTypeBuilder;
@@ -31,9 +27,7 @@ import org.rmt2.util.accounting.subsidiary.CreditorTypeBuilder;
 import com.AccountingUIException;
 import com.action.gl.subsidiary.SubsidiarySoapRequests;
 import com.api.messaging.webservice.soap.client.SoapJaxbClientWrapper;
-import com.api.security.authentication.web.AuthenticationException;
 import com.api.util.RMT2String2;
-import com.entity.Customer;
 import com.entity.ItemMasterCriteria;
 import com.entity.VwItemMaster;
 
@@ -211,29 +205,29 @@ public class ItemMasterSoapRequests extends SubsidiarySoapRequests {
     
     
     /**
-     * SOAP call to delete one or more customer's profile.
+     * SOAP call to delete one or more inventory item master profiles.
      * <p>
-     * Currently, this implementation only deletes a single customer profile.
+     * Currently, this implementation only deletes a single item master profile.
      * 
      * @param data
-     *            {@link Customer}
+     *            {@link VwItemMaster}
      * @param loginId
      *            the id of logged in user
      * @param sessionId
      *            the web session id of the logged in user.
-     * @return {@link AccountingTransactionResponse}
+     * @return {@link InventoryResponse}
      * @throws AccountingUIException
      */
-    public static final AccountingTransactionResponse callDelete(Customer data, String loginId, String sessionId)
+    public static final InventoryResponse callDelete(VwItemMaster data, String loginId, String sessionId)
             throws AccountingUIException {
 
         ObjectFactory fact = new ObjectFactory();
-        AccountingTransactionRequest req = fact.createAccountingTransactionRequest();
+        InventoryRequest req = fact.createInventoryRequest();
 
         HeaderType head = HeaderTypeBuilder.Builder.create()
                 .withApplication(ApiHeaderNames.APP_NAME_ACCOUNTING)
-                .withModule(ApiTransactionCodes.MODULE_ACCOUNTING_SUBSIDIARY)
-                .withTransaction(ApiTransactionCodes.SUBSIDIARY_CUSTOMER_DELETE)
+                .withModule(ApiTransactionCodes.MODULE_ACCOUNTING_INV)
+                .withTransaction(ApiTransactionCodes.INVENTORY_ITEM_MASTER_DELETE)
                 .withMessageMode(ApiHeaderNames.MESSAGE_MODE_REQUEST)
                 .withDeliveryDate(new Date())
                 .withRouting(ApiTransactionCodes.ROUTE_ACCOUNTING)
@@ -242,21 +236,20 @@ public class ItemMasterSoapRequests extends SubsidiarySoapRequests {
                 .withSessionId(sessionId)
                 .build();
 
-        CustomerCriteriaType criteria = fact.createCustomerCriteriaType();
-        criteria.setCustomer(fact.createCustomerType());
-        criteria.getCustomer().setCustomerId(BigInteger.valueOf(data.getCustomerId()));
+        ItemCriteriaType criteria = fact.createItemCriteriaType();
+        criteria.setItemId(BigInteger.valueOf(data.getId()));
         
-        TransactionCriteriaGroup criteriaGroup = fact.createTransactionCriteriaGroup();
-        criteriaGroup.setCustomerCriteria(criteria);
+        InventoryCriteriaGroup criteriaGroup = fact.createInventoryCriteriaGroup();
+        criteriaGroup.setItemCriteria(criteria);
         req.setCriteria(criteriaGroup);
         req.setHeader(head);
 
-        AccountingTransactionResponse response = null;
+        InventoryResponse response = null;
         try {
             response = SoapJaxbClientWrapper.callSoapRequest(req);
             return response;
         } catch (Exception e) {
-            throw new AuthenticationException(ItemMasterSoapRequests.MSG, e);
+            throw new AccountingUIException(ItemMasterSoapRequests.MSG, e);
         }
     }
 }
