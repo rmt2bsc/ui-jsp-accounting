@@ -18,6 +18,7 @@ import com.api.web.Request;
 import com.api.web.Response;
 import com.api.web.util.RMT2WebUtility;
 import com.entity.ItemMasterCriteria;
+import com.entity.VwItemMasterFactory;
 
 /**
  * This class provides action handlers to server Item Master Search requests.
@@ -160,30 +161,31 @@ public class ItemMasterSearchAction extends AbstractInventoryAction {
     }
 
     /**
-     * Prepares the client for adding an item to inventory and retrieves a list
-     * of vendors.
+     * Prepares the client for adding an item to inventory.
      * 
      * @throws ActionCommandException
      */
     public void add() throws ActionCommandException {
         super.add();
-        this.setupLookupData();
+        this.item = VwItemMasterFactory.create();
+        this.msg = null;
         return;
     }
 
     /**
-     * Uses data from the client's request object to retrieve target
-     * VwItemMaster and ItemMasterStatusHist objects from the database for a
-     * single Item Master record edit session.
-     * <p>
-     * The following objects are set on the request object identified as "item"
-     * and "itemhistory", respectively: {@link VwItemMaster} and
-     * {@link ItemMasterStatusHist}.
+     * Gathers the data necessary for editing the selected inventory item
      * 
      * @throws ItemMasterException
      */
     public void edit() throws ActionCommandException {
-        this.setupLookupData();
+        super.edit();
+        ItemMasterCriteria criteria = new ItemMasterCriteria();
+        criteria.setQry_Id(String.valueOf(this.itemMasterId));
+        this.items = this.getInventory(criteria);
+        if (items.size() == 1) {
+            this.item = this.items.get(0);
+        }
+        this.msg = null;
         return;
     }
 
@@ -214,7 +216,6 @@ public class ItemMasterSearchAction extends AbstractInventoryAction {
                 this.logger.log(Level.ERROR, this.msg);
                 throw new ActionCommandException(this.msg);
             }
-
         }
         if (RMT2String2.isNotEmpty(criteria.getQry_QtyOnHand())) {
             if (!RMT2Money.isNumeric(criteria.getQry_QtyOnHand())) {
@@ -227,7 +228,6 @@ public class ItemMasterSearchAction extends AbstractInventoryAction {
                 this.logger.log(Level.ERROR, this.msg);
                 throw new ActionCommandException(this.msg);
             }
-
         }
     }
 

@@ -1,10 +1,7 @@
 <%@ taglib uri="/rmt2-beantaglib" prefix="beanlib" %>
 <%@ taglib uri="/rmt2-generaltaglib" prefix="gen" %>
-<%@ page import="com.entity.ItemMasterCriteria" %>
-<%@ page import="com.api.security.RMT2TagQueryBean" %>
 <%@ page import="com.AccountingConst" %>
 <%@ page import="com.action.inventory.ItemConst" %>
-<%@ page import="com.api.util.RMT2Utility" %>
 <%@ page import="com.api.constants.RMT2ServletConst" %>
 
 
@@ -21,7 +18,7 @@
   </head>
   
   <%
-	  String pageTitle = "Item Master Maintenance Console";
+	  String pageTitle = "Inventory Item Master Console";
   %>
 				
   <body bgcolor="#FFFFFF" text="#000000">
