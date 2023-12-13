@@ -16,9 +16,11 @@ import org.rmt2.jaxb.InventoryItemType;
 import org.rmt2.jaxb.InventoryItemtypeType;
 import org.rmt2.jaxb.InventoryRequest;
 import org.rmt2.jaxb.InventoryResponse;
+import org.rmt2.jaxb.InventoryStatusHistoryType;
 import org.rmt2.jaxb.ItemCriteriaType;
 import org.rmt2.jaxb.ObjectFactory;
 import org.rmt2.util.HeaderTypeBuilder;
+import org.rmt2.util.accounting.inventory.InventoryItemStatusHistTypeBuilder;
 import org.rmt2.util.accounting.inventory.InventoryItemStatusTypeBuilder;
 import org.rmt2.util.accounting.inventory.InventoryItemTypeBuilder;
 import org.rmt2.util.accounting.inventory.InventoryItemtypeTypeBuilder;
@@ -168,11 +170,14 @@ public class ItemMasterSoapRequests extends SubsidiarySoapRequests {
                 .withSessionId(sessionId)
                 .build();
 
-        CreditorType cred = fact.createCreditorType();
-        cred.setCreditorId(BigInteger.valueOf(data.getVendorId()));
-        
         InventoryItemtypeType iit = fact.createInventoryItemtypeType();
         iit.setItemTypeId(BigInteger.valueOf(data.getItemTypeId()));
+
+        InventoryStatusHistoryType isht = InventoryItemStatusHistTypeBuilder.Builder.create()
+                .withItemId(data.getId())
+                .withStatusHistId(0)
+                .withReason(data.getReason())
+                .build();
                 
         InventoryItemType item = InventoryItemTypeBuilder.Builder.create()
                 .withItemId(data.getId())
@@ -187,6 +192,7 @@ public class ItemMasterSoapRequests extends SubsidiarySoapRequests {
                 .withOverrideRetail(data.getOverrideRetail())
                 .withCreditorId(data.getVendorId())
                 .withItemType(iit)
+                .withStatusHistory(isht)
                 .build();
         
         InventoryDetailGroup detailGroup = fact.createInventoryDetailGroup();

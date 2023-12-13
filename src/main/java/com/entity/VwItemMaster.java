@@ -55,7 +55,7 @@ public class VwItemMaster extends OrmBean {
   public static final String PROP_ITEMSTATUS = "ItemStatus";
 /** The property name constant equivalent to property, ItemStatusId, of respective DataSource view. */
   public static final String PROP_ITEMSTATUSID = "ItemStatusId";
-
+    public static final String PROP_REASON = "Reason";
 
 
 	/** The javabean property equivalent of database column vw_item_master.id */
@@ -94,6 +94,11 @@ public class VwItemMaster extends OrmBean {
   private String itemStatus;
 /** The javabean property equivalent of database column vw_item_master.item_status_id */
   private int itemStatusId;
+    /**
+     * The javabean property equivalent of database column
+     * item_master_status_hist.reason
+     */
+    private String reason;
 
 
 
@@ -440,4 +445,12 @@ public String toString() {
 
  */
   public void initBean() throws SystemException {}
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
 }

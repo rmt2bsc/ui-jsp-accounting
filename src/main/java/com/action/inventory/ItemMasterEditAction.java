@@ -12,6 +12,7 @@ import com.api.constants.GeneralConst;
 import com.api.constants.RMT2ServletConst;
 import com.api.persistence.DatabaseException;
 import com.api.security.RMT2TagQueryBean;
+import com.api.util.RMT2String2;
 import com.api.web.ActionCommandException;
 import com.api.web.Context;
 import com.api.web.Request;
@@ -104,6 +105,8 @@ public class ItemMasterEditAction extends AbstractInventoryAction {
      * @throws ActionCommandException
      */
     public void save() throws ActionCommandException {
+        this.validateData(this.item);
+
         // Call SOAP web service to persist Creditor data changes to the
         // database.
         try {
@@ -124,10 +127,9 @@ public class ItemMasterEditAction extends AbstractInventoryAction {
             }
             super.save();
 
-            // Delayed the assignment of the
-            // "inventory item master saved successfully"
-            // confirmation message due to other web service calls are message
-            // property as well.
+            // Delayed the assignment of the inventory item master's
+            // "saved successfully" confirmation message due to other web
+            // service calls are message property as well.
             this.msg = rst.getMessage();
         } catch (Exception e) {
             logger.log(Level.ERROR, e.getMessage());
@@ -189,6 +191,24 @@ public class ItemMasterEditAction extends AbstractInventoryAction {
         ItemMasterCriteria criteria = (ItemMasterCriteria) this.query.getCustomObj();
         this.items = this.getInventory(criteria);
         this.sendClientData();
+    }
+
+    /**
+     * Verifies that the Inventory Item Master record meet all editing
+     * requirements.
+     * 
+     * @param criteria
+     *            instance of {@link VwItemMaster}
+     * @throws ActionCommandException
+     *             User made a change to existing record, but there is no
+     *             evidence of change reason entered.
+     */
+    private void validateData(VwItemMaster data) throws ActionCommandException {
+        if (data.getId() > 0 && RMT2String2.isEmpty(data.getReason())) {
+            this.msg = "Change reason is required when changes are made to existing Invenotry Item Master records";
+            this.logger.log(Level.ERROR, this.msg);
+            throw new ActionCommandException(this.msg);
+        }
     }
 
     /**

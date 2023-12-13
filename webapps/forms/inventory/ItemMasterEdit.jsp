@@ -187,21 +187,27 @@
                </tr>
                <tr>
                   <td>&nbsp;</td>
-               </tr>               
-               <tr>
-                  <td>
-<!--                      <div id="NotesLayer" align="center" style="border-style:double;border-color:#999999; width:50%; height:20%"> -->
-                        <table width="100%" cellpadding="0" cellspacing="2">
-                           <tr>
-                              <td width="30%" valign="top" class="clsTableFormHeader">Reason for Change</td>
-                              <td width="70%">
-                                  <TEXTAREA name="Reason" rows="2" cols="40">&nbsp;</TEXTAREA>
-                              </td>
-                           </tr>
-                        </table>
-<!--                      </div>                   -->
-                  </td>
-               </tr>               
+               </tr>     
+               
+               <gen:Evaluate  expression="#item.Id">
+				  <gen:When expression="0">
+				     <tr><td></td></tr>
+				  </gen:When>
+				  <gen:WhenElse>
+					   <tr>
+		                  <td>
+	                        <table width="100%" cellpadding="0" cellspacing="2">
+	                           <tr>
+	                              <td width="30%" valign="top" class="clsTableFormHeader">Reason for Change</td>
+	                              <td width="70%">
+	                                  <TEXTAREA name="Reason" rows="2" cols="40"></TEXTAREA>
+	                              </td>
+	                           </tr>
+	                        </table>
+		                  </td>
+		               </tr>               
+				  </gen:WhenElse>
+			   </gen:Evaluate>          
             </table>
          </div>
            	
