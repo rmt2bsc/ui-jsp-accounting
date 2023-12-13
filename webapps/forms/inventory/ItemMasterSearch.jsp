@@ -78,13 +78,13 @@
                   <td class="clsTableFormHeader">Unit Cost</td>
                   <td>
                      <gen:CondOps name="qryRelOp_UnitCost" 
-                                  selectedValue="#QUERY_BEAN.getQryRelOp_UnitCost()"/>
+                                  selectedValue="#QUERY_BEAN.CustomObj.qryRelOp_UnitCost"/>
                      <beanlib:InputControl type="text" name="qry_UnitCost" size="15" value="#QUERY_BEAN.CustomObj.qry_UnitCost"/>
                   </td>
                   <td class="clsTableFormHeader">Qty On Hand</td>
                   <td>
                      <gen:CondOps name="qryRelOp_QtyOnHand" 
-                                  selectedValue="#QUERY_BEAN.getQryRelOp_QtyOnHand()"/>
+                                  selectedValue="#QUERY_BEAN.CustomObj.qryRelOp_QtyOnHand"/>
                      <beanlib:InputControl type="text" name="qry_QtyOnHand" size="10" value="#QUERY_BEAN.CustomObj.qry_QtyOnHand"/>
                   </td>                  
                </tr>                              

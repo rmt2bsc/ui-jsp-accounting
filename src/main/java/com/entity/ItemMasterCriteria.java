@@ -115,6 +115,14 @@ public class ItemMasterCriteria extends OrmBean {
         this.qry_QtyOnHand = value;
     }
 
+    public String getQryRelOp_QtyOnHand() {
+        return qryRelOp_QtyOnHand;
+    }
+
+    public void setQryRelOp_QtyOnHand(String qryRelOp_QtyOnHand) {
+        this.qryRelOp_QtyOnHand = qryRelOp_QtyOnHand;
+    }
+
     public void setQry_Active(String value) {
         this.qry_Active = value;
     }
@@ -140,13 +148,5 @@ public class ItemMasterCriteria extends OrmBean {
     }
 
     public void initBean() throws SystemException {
-    }
-
-    public String getQryRelOp_QtyOnHand() {
-        return qryRelOp_QtyOnHand;
-    }
-
-    public void setQryRelOp_QtyOnHand(String qryRelOp_QtyOnHand) {
-        this.qryRelOp_QtyOnHand = qryRelOp_QtyOnHand;
     }
 }

@@ -119,15 +119,12 @@ public class ItemMasterSoapRequests extends SubsidiarySoapRequests {
             }
             if (RMT2String2.isNotEmpty(parms.getQry_UnitCost())) {
                 criteria.setUnitCost(BigDecimal.valueOf(Integer.valueOf(parms.getQry_UnitCost())));
+                criteria.setUnitCostPredicate(parms.getQryRelOp_UnitCost());
             }
-
-            // TODO: Add logic to get the Unit Cost's conditional operator to
-            // use in building custom query predicate.
-
             if (RMT2String2.isNotEmpty(parms.getQry_QtyOnHand())) {
                 criteria.setQtyOnHand(BigInteger.valueOf(Integer.valueOf(parms.getQry_QtyOnHand())));
+                criteria.setQtyOnHandPredicate(parms.getQryRelOp_QtyOnHand());
             }
-
             if (RMT2String2.isNotEmpty(parms.getQry_ItemStatusId())) {
                 intTemp = BigInteger.valueOf(Integer.valueOf(parms.getQry_ItemStatusId())).intValue();
                 InventoryItemStatusType iit = InventoryItemStatusTypeBuilder.Builder.create()
@@ -135,7 +132,6 @@ public class ItemMasterSoapRequests extends SubsidiarySoapRequests {
                         .build();
                 criteria.getStatus().add(iit);
             }
-
             if (RMT2String2.isNotEmpty(parms.getQry_Active())) {
                 criteria.setActive(BigInteger.valueOf(Integer.valueOf(parms.getQry_Active())));
             }

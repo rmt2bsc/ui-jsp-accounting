@@ -203,15 +203,31 @@ public class ItemMasterSearchAction extends AbstractInventoryAction {
             this.logger.log(Level.ERROR, this.msg);
             throw new ActionCommandException(this.msg);
         }
-        if (RMT2String2.isNotEmpty(criteria.getQry_UnitCost()) && !RMT2Money.isNumeric(criteria.getQry_UnitCost())) {
-            this.msg = "Unit Cost field must be numeric when used as selection criteria";
-            this.logger.log(Level.ERROR, this.msg);
-            throw new ActionCommandException(this.msg);
+        if (RMT2String2.isNotEmpty(criteria.getQry_UnitCost())) {
+            if (!RMT2Money.isNumeric(criteria.getQry_UnitCost())) {
+                this.msg = "Unit Cost field must be numeric when used as selection criteria";
+                this.logger.log(Level.ERROR, this.msg);
+                throw new ActionCommandException(this.msg);
+            }
+            if (RMT2String2.isEmpty(criteria.getQryRelOp_UnitCost())) {
+                this.msg = "Unit Cost field must be used with a relational operater when present";
+                this.logger.log(Level.ERROR, this.msg);
+                throw new ActionCommandException(this.msg);
+            }
+
         }
-        if (RMT2String2.isNotEmpty(criteria.getQry_QtyOnHand()) && !RMT2Money.isNumeric(criteria.getQry_QtyOnHand())) {
-            this.msg = "Quantity on Hand field must be numeric when used as selection criteria";
-            this.logger.log(Level.ERROR, this.msg);
-            throw new ActionCommandException(this.msg);
+        if (RMT2String2.isNotEmpty(criteria.getQry_QtyOnHand())) {
+            if (!RMT2Money.isNumeric(criteria.getQry_QtyOnHand())) {
+                this.msg = "Quantity on Hand field must be numeric when used as selection criteria";
+                this.logger.log(Level.ERROR, this.msg);
+                throw new ActionCommandException(this.msg);
+            }
+            if (RMT2String2.isEmpty(criteria.getQryRelOp_QtyOnHand())) {
+                this.msg = "Quantity on Hand field must be used with a relational operater when present";
+                this.logger.log(Level.ERROR, this.msg);
+                throw new ActionCommandException(this.msg);
+            }
+
         }
     }
 
