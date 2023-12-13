@@ -9,32 +9,24 @@ import org.rmt2.constants.ApiHeaderNames;
 import org.rmt2.constants.ApiTransactionCodes;
 import org.rmt2.jaxb.AccountingTransactionRequest;
 import org.rmt2.jaxb.AccountingTransactionResponse;
-import org.rmt2.jaxb.AddressType;
-import org.rmt2.jaxb.BusinessType;
-import org.rmt2.jaxb.CodeDetailType;
 import org.rmt2.jaxb.CreditorType;
 import org.rmt2.jaxb.CustomerCriteriaType;
-import org.rmt2.jaxb.CustomerType;
 import org.rmt2.jaxb.HeaderType;
 import org.rmt2.jaxb.InventoryCriteriaGroup;
+import org.rmt2.jaxb.InventoryDetailGroup;
 import org.rmt2.jaxb.InventoryItemStatusType;
+import org.rmt2.jaxb.InventoryItemType;
 import org.rmt2.jaxb.InventoryItemtypeType;
 import org.rmt2.jaxb.InventoryRequest;
 import org.rmt2.jaxb.InventoryResponse;
 import org.rmt2.jaxb.ItemCriteriaType;
 import org.rmt2.jaxb.ObjectFactory;
 import org.rmt2.jaxb.TransactionCriteriaGroup;
-import org.rmt2.jaxb.TransactionDetailGroup;
-import org.rmt2.jaxb.ZipcodeType;
 import org.rmt2.util.HeaderTypeBuilder;
 import org.rmt2.util.accounting.inventory.InventoryItemStatusTypeBuilder;
+import org.rmt2.util.accounting.inventory.InventoryItemTypeBuilder;
 import org.rmt2.util.accounting.inventory.InventoryItemtypeTypeBuilder;
 import org.rmt2.util.accounting.subsidiary.CreditorTypeBuilder;
-import org.rmt2.util.accounting.subsidiary.CustomerTypeBuilder;
-import org.rmt2.util.addressbook.AddressTypeBuilder;
-import org.rmt2.util.addressbook.BusinessTypeBuilder;
-import org.rmt2.util.addressbook.CodeDetailTypeBuilder;
-import org.rmt2.util.addressbook.ZipcodeTypeBuilder;
 
 import com.AccountingUIException;
 import com.action.gl.subsidiary.SubsidiarySoapRequests;
@@ -42,8 +34,8 @@ import com.api.messaging.webservice.soap.client.SoapJaxbClientWrapper;
 import com.api.security.authentication.web.AuthenticationException;
 import com.api.util.RMT2String2;
 import com.entity.Customer;
-import com.entity.CustomerCriteria;
 import com.entity.ItemMasterCriteria;
+import com.entity.VwItemMaster;
 
 /**
  * Help class for constructing and invoking SOAP calls pertaining to the
@@ -151,82 +143,29 @@ public class ItemMasterSoapRequests extends SubsidiarySoapRequests {
         }
     }
 
-    /**
-     * SOAP call to fetch the transaction history of one or more creditors.
-     * <p>
-     * At this time, this method only supports querying transaction history for
-     * only one creditor at a time.
-     * 
-     * @param parms
-     *            {@link CreditorCriteria}
-     * @param loginId
-     *            the id of logged in user
-     * @param sessionId
-     *            the web session id of the logged in user.
-     * @return {@link AccountingTransactionResponse}
-     * @throws AccountingUIException
-     */
-    public static final AccountingTransactionResponse callGetHistory(CustomerCriteria parms, String loginId, String sessionId)
-            throws AccountingUIException {
-        ObjectFactory fact = new ObjectFactory();
-        AccountingTransactionRequest req = fact.createAccountingTransactionRequest();
 
-        HeaderType head = HeaderTypeBuilder.Builder.create()
-                .withApplication(ApiHeaderNames.APP_NAME_ACCOUNTING)
-                .withModule(ApiTransactionCodes.MODULE_ACCOUNTING_SUBSIDIARY)
-                .withTransaction(ApiTransactionCodes.SUBSIDIARY_CUSTOMER_TRAN_HIST_GET)
-                .withMessageMode(ApiHeaderNames.MESSAGE_MODE_REQUEST)
-                .withDeliveryDate(new Date())
-                .withRouting(ApiTransactionCodes.ROUTE_ACCOUNTING)
-                .withDeliveryMode(ApiHeaderNames.DELIVERY_MODE_SYNC)
-                .withUserId(loginId)
-                .withSessionId(sessionId)
-                .build();
-
-        CustomerCriteriaType criteria = fact.createCustomerCriteriaType();
-        criteria.setCustomer(fact.createCustomerType());
-        if (parms != null) {
-            if (RMT2String2.isNotEmpty(parms.getQry_CustomerId())) {
-                criteria.getCustomer().setCustomerId(BigInteger.valueOf(Integer.valueOf(parms.getQry_CustomerId())));
-            }
-        }
-
-        TransactionCriteriaGroup criteriaGroup = fact.createTransactionCriteriaGroup();
-        criteriaGroup.setCustomerCriteria(criteria);
-        req.setCriteria(criteriaGroup);
-        req.setHeader(head);
-
-        AccountingTransactionResponse response = null;
-        try {
-            response = SoapJaxbClientWrapper.callSoapRequest(req);
-            return response;
-        } catch (Exception e) {
-            throw new AuthenticationException(e);
-        }
-    }
 
     /**
-     * SOAP call to apply data changes to a customer's profile.
+     * SOAP call to apply data changes to an Inventory Item Master record.
      * 
      * @param data
-     *            {@link Customer}
+     *            {@link VwItemMaster}
      * @param loginId
      *            the id of logged in user
      * @param sessionId
      *            the web session id of the logged in user.
-     * @return {@link AccountingTransactionResponse}
+     * @return {@link InventoryResponse}
      * @throws AccountingUIException
      */
-    public static final AccountingTransactionResponse callSave(Customer data, String loginId, String sessionId)
+    public static final InventoryResponse callSave(VwItemMaster data, String loginId, String sessionId)
             throws AccountingUIException {
-        // Retrieve all code group records from the database
         ObjectFactory fact = new ObjectFactory();
-        AccountingTransactionRequest req = fact.createAccountingTransactionRequest();
+        InventoryRequest req = fact.createInventoryRequest();
 
         HeaderType head = HeaderTypeBuilder.Builder.create()
                 .withApplication(ApiHeaderNames.APP_NAME_ACCOUNTING)
-                .withModule(ApiTransactionCodes.MODULE_ACCOUNTING_SUBSIDIARY)
-                .withTransaction(ApiTransactionCodes.SUBSIDIARY_CUSTOMER_UPDATE)
+                .withModule(ApiTransactionCodes.MODULE_ACCOUNTING_INV)
+                .withTransaction(ApiTransactionCodes.INVENTORY_ITEM_MASTER_UPDATE)
                 .withMessageMode(ApiHeaderNames.MESSAGE_MODE_REQUEST)
                 .withDeliveryDate(new Date())
                 .withRouting(ApiTransactionCodes.ROUTE_ACCOUNTING)
@@ -235,70 +174,38 @@ public class ItemMasterSoapRequests extends SubsidiarySoapRequests {
                 .withSessionId(sessionId)
                 .build();
 
-        CodeDetailType cdtEntity = CodeDetailTypeBuilder.Builder.create()
-                .withCodeId(data.getEntityTypeId())
-                .build();
+        CreditorType cred = fact.createCreditorType();
+        cred.setCreditorId(BigInteger.valueOf(data.getVendorId()));
         
-        CodeDetailType cdtServType = CodeDetailTypeBuilder.Builder.create()
-                .withCodeId(data.getServTypeId())
-                .build();
-        
-        ZipcodeType zip = ZipcodeTypeBuilder.Builder.create()
-                .withZipcode(data.getZip())
-                .withCity(data.getCity())
-                .withState(data.getState())
-                .build();
-
-        AddressType addr = AddressTypeBuilder.Builder.create()
-                .withAddrId(data.getAddrId())
-                .withAddressLine1(data.getAddr1())
-                .withAddressLine2(data.getAddr2())
-                .withAddressLine3(data.getAddr3())
-                .withAddressLine4(data.getAddr4())
-                .withPhoneMain(data.getPhoneMain())
-                .withPhoneFax(data.getPhoneFax())
-                .withZipcode(zip)
-                .build();
+        InventoryItemtypeType iit = fact.createInventoryItemtypeType();
+        iit.setItemTypeId(BigInteger.valueOf(data.getItemTypeId()));
                 
-        BusinessType busType = BusinessTypeBuilder.Builder.create()
-                .withBusinessId(data.getBusinessId())
-                .withLongname(data.getLongname())
-                .withContactEmail(data.getContactEmail())
-                .withContactFirstname(data.getContactFirstname())
-                .withContactLastname(data.getContactLastname())
-                .withContactPhone(data.getContactPhone())
-                .withContactPhoneExt(data.getContactExt())
-                .withShortname(data.getShortname())
-                .withTaxId(data.getTaxId())
-                .withWebsite(data.getWebsite())
-                .withEntityType(cdtEntity)
-                .withServiceType(cdtServType)
-                .withAddress(addr)
+        InventoryItemType item = InventoryItemTypeBuilder.Builder.create()
+                .withItemId(data.getId())
+                .withActive(true)
+                .withItemName(data.getDescription())
+                .withItemSerialNo(data.getItemSerialNo())
+                .withMarkup(data.getMarkup())
+                .withUnitCost(data.getUnitCost())
+                .withQtyOnHand(data.getQtyOnHand())
+                .withVendorItemNo(data.getVendorItemNo())
+                .withRetailPrice(data.getRetailPrice())
+                .withOverrideRetail(data.getOverrideRetail())
+                .withCreditorId(data.getVendorId())
+                .withItemType(iit)
                 .build();
         
-        CustomerType custType = CustomerTypeBuilder.Builder.create()
-                .withCustomerId(data.getCustomerId())
-                .withAcctId(data.getAcctId())
-                .withBusinessType(busType)
-                .withAccountNo(data.getAccountNo())
-                .withAcctDescription(data.getDescription())
-                .withCreditLimit(data.getCreditLimit())
-                .withBalance(data.getBalance())
-                .withActive(data.getActive())
-                .build();
-                
-        TransactionDetailGroup profileGroup = fact.createTransactionDetailGroup();
-        profileGroup.setCustomers(fact.createCustomerListType());
-        profileGroup.getCustomers().getCustomer().add(custType);
+        InventoryDetailGroup detailGroup = fact.createInventoryDetailGroup();
+        detailGroup.getInvItem().add(item);
+        req.setProfile(detailGroup);
         req.setHeader(head);
-        req.setProfile(profileGroup);
 
-        AccountingTransactionResponse response = null;
+        InventoryResponse response = null;
         try {
             response = SoapJaxbClientWrapper.callSoapRequest(req);
             return response;
         } catch (Exception e) {
-            throw new AuthenticationException(ItemMasterSoapRequests.MSG, e);
+            throw new AccountingUIException(ItemMasterSoapRequests.MSG, e);
         }
     }
     

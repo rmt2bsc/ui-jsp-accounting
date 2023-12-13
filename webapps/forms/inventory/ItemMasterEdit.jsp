@@ -23,6 +23,16 @@
 	<link rel=STYLESHEET type="text/css" href="<%=APP_ROOT%>/css/RMT2General.css">
 	<script Language="JavaScript" src="<%=APP_ROOT%>/js/RMT2General.js"></script>
 	<script Language="JavaScript" src="<%=APP_ROOT%>/js/RMT2Menu.js"></script>
+	<script>
+	   function handleOverrideRetailChange(item) {
+		  if (item.checked == true) {
+			  item.value = "1";
+		  }
+		  else {
+			  item.value = "0";
+		  }
+	   }
+	</script>
   </head>
  				
   <body bgcolor="#FFFFFF" text="#000000">
@@ -44,7 +54,7 @@
                               <td width="25%" class="clsTableFormHeader">Item Number</td>
                               <td width="25%">
                					  <beanlib:InputControl value="#item.Id"/>
-               					  <beanlib:InputControl type="hidden" name="ItemId" value="#item.Id"/>
+               					  <beanlib:InputControl type="hidden" name="Id" value="#item.Id"/>
                               </td>
                               <td width="25%" align="right" class="clsTableFormHeader">Item Status</td>
                               <td width="25%">
@@ -118,7 +128,12 @@
                            <tr>
                               <td class="clsTableFormHeader">Override Retail</td>
                               <td colspan="3" align="left">
-                                  <input type="checkbox" name="OverrideRetail" value="1" <%=item.getOverrideRetail() == 1 ? "checked" : ""%>>
+                                  <beanlib:InputControl dataSource="item" 
+                                                        type="checkbox" 
+                                                        name="OverrideRetail"
+                                                        value="#item.OverrideRetail"
+                                                        checkedValue="1"
+                                                        onClick="handleOverrideRetailChange(this)"/>
                               </td>
                            </tr>                                                                                 
                         </table>

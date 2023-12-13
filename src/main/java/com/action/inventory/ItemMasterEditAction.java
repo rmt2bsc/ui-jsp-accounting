@@ -1,8 +1,14 @@
 package com.action.inventory;
 
+import java.util.List;
+
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.rmt2.jaxb.InventoryResponse;
+import org.rmt2.jaxb.ReplyStatusType;
 
 import com.SystemException;
+import com.api.constants.GeneralConst;
 import com.api.constants.RMT2ServletConst;
 import com.api.persistence.DatabaseException;
 import com.api.security.RMT2TagQueryBean;
@@ -11,6 +17,7 @@ import com.api.web.Context;
 import com.api.web.Request;
 import com.api.web.Response;
 import com.entity.ItemMasterCriteria;
+import com.entity.VwItemMaster;
 import com.entity.VwItemMasterFactory;
 
 /**
@@ -92,17 +99,42 @@ public class ItemMasterEditAction extends AbstractInventoryAction {
     }
 
     /**
-     * Prepares the user to navigate back to the search page.
+     * Persist the changes made to an item master to the database.
      * 
      * @throws ActionCommandException
      */
-    protected void doBack() throws ActionCommandException {
-        this.setupLookupData();
-        this.query = (RMT2TagQueryBean) this.getSession().getAttribute(RMT2ServletConst.QUERY_BEAN);
-        ItemMasterCriteria criteria = (ItemMasterCriteria) this.query.getCustomObj();
-        this.items = this.getInventory(criteria);
-        this.sendClientData();
+    public void save() throws ActionCommandException {
+        // Call SOAP web service to persist Creditor data changes to the
+        // database.
+        try {
+            InventoryResponse response = ItemMasterSoapRequests.callSave(this.item, this.loginId, this.session.getId());
+            ReplyStatusType rst = response.getReplyStatus();
+            if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
+                this.throwActionError(rst.getMessage(), rst.getExtMessage());
+            }
+            List<VwItemMaster> results = null;
+            if (response.getProfile() != null) {
+                results = VwItemMasterFactory.create(response.getProfile().getInvItem());
+                if (results != null && results.size() == 1) {
+                    this.item = results.get(0);
+                }
+            }
+            else {
+                this.item = VwItemMasterFactory.create();
+            }
+            super.save();
+
+            // Delayed the assignment of the
+            // "inventory item master saved successfully"
+            // confirmation message due to other web service calls are message
+            // property as well.
+            this.msg = rst.getMessage();
+        } catch (Exception e) {
+            logger.log(Level.ERROR, e.getMessage());
+            throw new ActionCommandException(e.getMessage());
+        }
     }
+
 
     /**
      * Creates a new VwItemMaster view object and retrieves a list of vendors.
@@ -114,42 +146,6 @@ public class ItemMasterEditAction extends AbstractInventoryAction {
         this.item = VwItemMasterFactory.create();
         this.msg = null;
         return;
-    }
-
-    /**
-     * Sends vendor list to the client.
-     * 
-     * @throws ActionCommandException
-     */
-    public void sendClientData() throws ActionCommandException {
-        super.sendClientData();
-    }
-
-    /**
-     * Persist the changes made to an item master to the database.
-     * 
-     * @throws ActionCommandException
-     */
-    public void save() throws ActionCommandException {
-        // DatabaseTransApi tx = DatabaseTransFactory.create();
-        // InventoryApi api =
-        // InventoryFactory.createApi((DatabaseConnectionBean)
-        // tx.getConnector(), this.request);
-        // try {
-        // api.maintainItemMaster(this.itemHelper.getItem(), null);
-        // tx.commitUOW();
-        // this.itemHelper.refreshData();
-        // this.vendorList = this.getVendorList();
-        // this.msg = "Item was saved successfully";
-        // return;
-        // } catch (ItemMasterException e) {
-        // tx.rollbackUOW();
-        // throw new ActionCommandException(e);
-        // } finally {
-        // tx.close();
-        // api = null;
-        // tx = null;
-        // }
     }
 
     /**
@@ -200,5 +196,27 @@ public class ItemMasterEditAction extends AbstractInventoryAction {
         // api = null;
         // tx = null;
         return;
+    }
+
+    /**
+     * Prepares the user to navigate back to the search page.
+     * 
+     * @throws ActionCommandException
+     */
+    protected void doBack() throws ActionCommandException {
+        this.setupLookupData();
+        this.query = (RMT2TagQueryBean) this.getSession().getAttribute(RMT2ServletConst.QUERY_BEAN);
+        ItemMasterCriteria criteria = (ItemMasterCriteria) this.query.getCustomObj();
+        this.items = this.getInventory(criteria);
+        this.sendClientData();
+    }
+
+    /**
+     * Sends vendor list to the client.
+     * 
+     * @throws ActionCommandException
+     */
+    public void sendClientData() throws ActionCommandException {
+        super.sendClientData();
     }
 }
