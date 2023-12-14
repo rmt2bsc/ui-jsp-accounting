@@ -1,5 +1,6 @@
 package com.action.xact.sales;
 
+
 /**
  * Constants for the sales order module.
  * 
@@ -63,6 +64,9 @@ public class SalesConst {
 
     /** Make A Payment Sales order client action code */
     public static final String REQ_PAYMENT = "acceptpayment";
+
+    /** Present customer data in view mode */
+    public final static String REQ_VIEW = "view";
 
     /** Reverse Sales order payment client action code */
     public static final String REQ_REVERSEPAYMENT = "reversepaymentedit";
