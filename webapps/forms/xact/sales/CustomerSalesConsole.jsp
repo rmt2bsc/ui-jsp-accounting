@@ -51,6 +51,7 @@
           		<input type="button" name="<%=SalesConst.REQ_PAYMENT%>" value="Receive Payment" style="width:120" onClick="handleAction('_self', document.DataForm, this.name)">
 		      	<input type="button" name="<%=SalesConst.REQ_VIEW%>" value="Transactions" style="width:120" onClick="handleAction('_self', document.DataForm, this.name)">
 		        <input type="button" name="<%=GeneralConst.REQ_BACK%>" value="Back" style="width:90" onClick="handleAction('_self', document.DataForm, this.name)">
+		        <a href="/ui-jsp-accounting/">Main Menu</a>
 			 </td>
 		  </tr>
 		</table>
