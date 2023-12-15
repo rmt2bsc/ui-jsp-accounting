@@ -2,7 +2,7 @@
 <%@ taglib uri="/rmt2-generaltaglib" prefix="gen" %>
 <%@ page import="com.action.xact.sales.SalesConst" %>
 <%@ page import="com.api.constants.GeneralConst" %>
-<%@ page import="com.api.constants.GeneralConst" %>
+<%@ page import="com.api.constants.RMT2ServletConst" %>
 
 
 <gen:InitAppRoot id="APP_ROOT"/>
