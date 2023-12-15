@@ -20,6 +20,7 @@
 		</td>	
 		<td width="81%">
 			<beanlib:InputControl type="hidden" name="CustomerId" value="#subsidiary.CustomerId"/>
+			<beanlib:InputControl type="hidden" name="Longname" value="#subsidiary.Longname"/>
 			<beanlib:InputControl type="hidden" name="AccountNo" value="#subsidiary.AccountNo"/>
 		    <beanlib:InputControl value="#subsidiary.AccountNo"/>
 		</td>									 

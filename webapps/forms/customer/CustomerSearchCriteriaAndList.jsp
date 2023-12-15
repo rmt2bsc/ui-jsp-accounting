@@ -125,7 +125,8 @@
 			 <td>
 				<font size="2"> 
 				  <beanlib:InputControl value="#item.Longname"/>
-				  </font>
+				  <beanlib:InputControl type="hidden" name="Longname" value="#item.Longname" uniqueName="yes"/>
+				</font>
 			 </td>
 			 <td>
 				<font size="2"> 

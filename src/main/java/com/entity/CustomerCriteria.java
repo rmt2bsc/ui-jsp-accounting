@@ -55,7 +55,7 @@ public class CustomerCriteria extends AncestorQueryCriteria {
 
     /**
      * Initializes all properties to spaces. This is required so that the JSP
-     * client will not display null lieterals in its respective input fields.
+     * client will not display null literals in its respective input fields.
      *
      * @author Roy Terrell.
      */

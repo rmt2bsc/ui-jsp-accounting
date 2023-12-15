@@ -1,13 +1,17 @@
 package com.action.xact.sales;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.rmt2.jaxb.AccountingTransactionResponse;
+import org.rmt2.jaxb.ReplyStatusType;
 
 import testcases.bean.Xact;
 
 import com.SystemException;
+import com.api.constants.GeneralConst;
 import com.api.persistence.DatabaseException;
 import com.api.web.ActionCommandException;
 import com.api.web.Context;
@@ -15,6 +19,10 @@ import com.api.web.Request;
 import com.api.web.Response;
 import com.entity.Customer;
 import com.entity.CustomerCriteria;
+import com.entity.CustomerFactory;
+import com.entity.SalesOrderInvoiceCriteria;
+import com.entity.VwSalesOrderInvoice;
+import com.entity.VwSalesOrderInvoiceFactory;
 
 /**
  * This class provides action handlers needed to serve the request of the
@@ -36,13 +44,9 @@ public class CustomerSalesConsoleAction extends CustomerSalesSearchAction {
 
     private Logger logger;
 
-    private Customer cust;
+    private List custOrders;
 
-    private Object custExt;
-
-    private List<Object> custOrders;
-
-    private List<Object> payments;
+    private List payments;
 
     private Xact xact;
 
@@ -73,7 +77,7 @@ public class CustomerSalesConsoleAction extends CustomerSalesSearchAction {
 
     /**
      * Initializes this object using _conext and _request. This is needed in the
-     * event this object is inistantiated using the default constructor.
+     * event this object is instantiated using the default constructor.
      * 
      * @throws SystemException
      */
@@ -96,7 +100,7 @@ public class CustomerSalesConsoleAction extends CustomerSalesSearchAction {
         super.processRequest(request, response, command);
 
         if (command.equalsIgnoreCase(CustomerSalesConsoleAction.COMMAND_VEIWORDERS)) {
-            this.getCustomerSalesOrders();
+            this.doSalesOrderHistory();
         }
         if (command.equalsIgnoreCase(CustomerSalesConsoleAction.COMMAND_NEWORDER)) {
             this.setupNewSalesOrderSelection(0);
@@ -112,19 +116,18 @@ public class CustomerSalesConsoleAction extends CustomerSalesSearchAction {
         }
     }
 
-
-
     /**
      * Gathers a list of sales orders for the target customer found in the
      * client's request and sends the results back to the client.
      * 
      * @throws ActionCommandException
      */
-    public void getCustomerSalesOrders() throws ActionCommandException {
+    protected void doSalesOrderHistory() throws ActionCommandException {
         this.receiveClientData();
-        // this.custOrders = this.getCustomerSalesOrders(this.cust);
+        this.custOrders = this.getCustomerSalesOrders();
         this.sendClientData();
     }
+
 
     /*
      * Retrieves the customer's sales order history using _cust.
@@ -302,33 +305,52 @@ public class CustomerSalesConsoleAction extends CustomerSalesSearchAction {
     }
 
     /**
-     * Retreives the customer data from the client's request.
+     * Gathers and returns a list of sales orders for the target customer found
+     * in the client's request and sends the results back to the client.
+     * 
+     * @return List <{@link VwSalesOrderInvoice}>
+     * @throws ActionCommandException
+     */
+    private List<VwSalesOrderInvoice> getCustomerSalesOrders() throws ActionCommandException {
+        // Make SOAP call to get selected customer's sales order history
+        SalesOrderInvoiceCriteria criteria = SalesOrderInvoiceCriteria.getInstance();
+        criteria.setQry_CustomerId(String.valueOf(this.customerId));
+        criteria.setQry_FullQuery(false);
+
+        try {
+            AccountingTransactionResponse response = CustomerSalesOrderSoapRequests.callGet(criteria, this.loginId,
+                    this.session.getId());
+            ReplyStatusType rst = response.getReplyStatus();
+            this.msg = rst.getMessage();
+            if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
+                this.throwActionError(rst.getMessage(), rst.getExtMessage());
+            }
+            List<VwSalesOrderInvoice> results = null;
+            if (response.getProfile() != null && response.getProfile().getSalesOrders() != null) {
+                results = VwSalesOrderInvoiceFactory.create(response.getProfile().getSalesOrders().getSalesOrder());
+            }
+            else {
+                results = new ArrayList<>();
+            }
+            this.msg += ": " + results.size();
+            return results;
+        } catch (Exception e) {
+            logger.log(Level.ERROR, e.getMessage());
+            throw new ActionCommandException(e.getMessage());
+        }
+    }
+
+    /**
+     * Retrieves the customer data from the client's request.
      */
     public void receiveClientData() throws ActionCommandException {
-        // DatabaseTransApi tx = DatabaseTransFactory.create();
-        // this.custApi = CustomerFactory.createApi((DatabaseConnectionBean)
-        // tx.getConnector(), this.request);
-        // try {
-        // // Obtain Customer data from the request object.
-        // this.cust = this.httpHelper.getHttpCustomer();
-        // this.custExt =
-        // custApi.findCustomerBusiness(this.cust.getCustomerId());
-        // try {
-        // this.xact = this.httpHelper.getHttpXact();
-        // } catch (Exception e) {
-        // this.xact = XactFactory.createXact();
-        // }
-        //
-        // } catch (CustomerException e) {
-        // logger.log(Level.ERROR, "GLAcctException occurred. " +
-        // e.getMessage());
-        // throw new ActionCommandException(e);
-        // } finally {
-        // this.custApi.close();
-        // tx.close();
-        // this.custApi = null;
-        // tx = null;
-        // }
+        super.receiveClientData();
+        // Attempt to locate and obtain creditor ID from the JSP.
+        String custName = this.getInputValue("Longname", null);
+
+        this.cust = CustomerFactory.create();
+        this.cust.setCustomerId(this.customerId);
+        this.cust.setLongname(custName);
     }
 
     /**
@@ -340,8 +362,7 @@ public class CustomerSalesConsoleAction extends CustomerSalesSearchAction {
     public void sendClientData() throws ActionCommandException {
         super.sendClientData();
 
-        // this.request.setAttribute(SalesConst.CLIENT_DATA_ORDERLIST,
-        // this.custOrders);
+        this.request.setAttribute(SalesConst.CLIENT_DATA_ORDERLIST, this.custOrders);
         // this.request.setAttribute(SalesConst.CLIENT_DATA_CUSTOMER_EXT,
         // this.custExt);
         // this.request.setAttribute(SalesConst.CLIENT_DATA_SALESORDER,
