@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.rmt2.jaxb.SalesOrderType;
+import org.rmt2.jaxb.TransactionDetailGroup;
 
 /**
  * A factory that creates new VwSalesOrderInvoice related instances.
@@ -58,41 +59,52 @@ public class VwSalesOrderInvoiceFactory {
                 if (item.getInvoiceDetails().getInvoiceDate() != null) {
                     o.setInvoiceDate(item.getInvoiceDetails().getInvoiceDate().toGregorianCalendar().getTime());
                 }
-                if (item.getInvoiceDetails().getTransaction() != null
-                        && item.getInvoiceDetails().getTransaction().getXactId() != null) {
-                    o.setXactId(item.getInvoiceDetails().getTransaction().getXactId().intValue());
+                if (item.getInvoiceDetails().getTransaction() != null) {
+                    if (item.getInvoiceDetails().getTransaction().getXactId() != null) {
+                        o.setXactId(item.getInvoiceDetails().getTransaction().getXactId().intValue());
+                    }
+                    o.setXactReason(item.getInvoiceDetails().getTransaction().getXactReason());
                 }
             }
 
+            // Capture sales order items
+            if (item.getSalesOrderItems() != null) {
+                o.setLineItems(SalesOrderItemsFactory.create(item.getSalesOrderItems().getSalesOrderItem()));
+            }
             return o;
         } catch (Exception e) {
             return null;
         }
     }
-
+    
 
     /**
      * Create a List of new VwSalesOrderInvoice instances.
      * 
-     * @param items
-     *            List of {@link SalesOrderType}
+     * @param profile
+     *            List of {@link TransactionDetailGroup}
      * @return List<{@link VwSalesOrderInvoice}>} or null when <I>items</i> is
      *         found to be null or when an error occurs.
      */
-    public static List<VwSalesOrderInvoice> create(List<SalesOrderType> items) {
-        if (items == null) {
+    public static List<VwSalesOrderInvoice> create(TransactionDetailGroup profile) {
+        if (profile == null || profile.getSalesOrders() == null) {
             return null;
         }
 
+
         try {
             List<VwSalesOrderInvoice> obj = new ArrayList<>();
-            for (SalesOrderType item : items) {
-                obj.add(VwSalesOrderInvoiceFactory.create(item));
+            for (SalesOrderType item : profile.getSalesOrders().getSalesOrder()) {
+                VwSalesOrderInvoice result = VwSalesOrderInvoiceFactory.create(item);
+                if (profile.getCustomers() != null && profile.getCustomers().getCustomer().get(0).getBusinessContactDetails() != null) {
+                    result.setDescription(profile.getCustomers().getCustomer().get(0).getBusinessContactDetails().getLongName());
+                }
+                obj.add(result);
             }
             return obj;
         } catch (Exception e) {
             return null;
         }
     }
-
+    
 }

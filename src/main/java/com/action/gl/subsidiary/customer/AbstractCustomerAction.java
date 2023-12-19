@@ -45,7 +45,6 @@ public abstract class AbstractCustomerAction extends AbstractSubsidiaryAction im
     private Object custDetail;
     protected int customerId;
 
-
     /**
      * Default constructor
      * 
@@ -185,10 +184,10 @@ public abstract class AbstractCustomerAction extends AbstractSubsidiaryAction im
     public void receiveClientData() throws ActionCommandException {
         super.receiveClientData();
 
-        // Attempt to locate and obtain creditor ID from the JSP.
+        // Attempt to locate and obtain customer ID from the JSP.
         String temp = this.getInputValue("CustomerId", null);
         this.customerId = RMT2Money.stringToNumber(temp).intValue();
-
+        
         // Attempt to locate and obtain creditor profile data from the JSP.
         try {
             this.cust = CustomerFactory.create();

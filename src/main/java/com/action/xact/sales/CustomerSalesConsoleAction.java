@@ -13,6 +13,8 @@ import testcases.bean.Xact;
 import com.SystemException;
 import com.api.constants.GeneralConst;
 import com.api.persistence.DatabaseException;
+import com.api.util.RMT2Money;
+import com.api.util.RMT2String2;
 import com.api.web.ActionCommandException;
 import com.api.web.Context;
 import com.api.web.Request;
@@ -49,6 +51,12 @@ public class CustomerSalesConsoleAction extends CustomerSalesSearchAction {
     private List payments;
 
     private Xact xact;
+
+    protected int salesOrderId;
+
+    protected VwSalesOrderInvoice salesOrder;
+
+    protected List SalesOrderItems;
 
     /**
      * Default constructor
@@ -124,7 +132,7 @@ public class CustomerSalesConsoleAction extends CustomerSalesSearchAction {
      */
     protected void doSalesOrderHistory() throws ActionCommandException {
         this.receiveClientData();
-        this.custOrders = this.getCustomerSalesOrders();
+        this.custOrders = this.getCustomerSalesOrderHeaders();
         this.sendClientData();
     }
 
@@ -305,18 +313,40 @@ public class CustomerSalesConsoleAction extends CustomerSalesSearchAction {
     }
 
     /**
-     * Gathers and returns a list of sales orders for the target customer found
-     * in the client's request and sends the results back to the client.
+     * Gathers and returns a list of sales orders, which is in HEADER format,
+     * for the target customer(s) found in the client's request and sends the
+     * results back to the client.
      * 
      * @return List <{@link VwSalesOrderInvoice}>
      * @throws ActionCommandException
      */
-    private List<VwSalesOrderInvoice> getCustomerSalesOrders() throws ActionCommandException {
+    protected List<VwSalesOrderInvoice> getCustomerSalesOrderHeaders() throws ActionCommandException {
         // Make SOAP call to get selected customer's sales order history
         SalesOrderInvoiceCriteria criteria = SalesOrderInvoiceCriteria.getInstance();
         criteria.setQry_CustomerId(String.valueOf(this.customerId));
         criteria.setQry_FullQuery(false);
+        return this.getCustomerSalesOrders(criteria);
+    }
 
+    /**
+     * Gathers and returns a list of sales orders, which is in FULL format, for
+     * the target customer(s) found in the client's request and sends the
+     * results back to the client.
+     * 
+     * @return List <{@link VwSalesOrderInvoice}>
+     * @throws ActionCommandException
+     */
+    protected List<VwSalesOrderInvoice> getCustomerSalesOrderFull() throws ActionCommandException {
+        // Make SOAP call to get selected customer's sales order history
+        SalesOrderInvoiceCriteria criteria = SalesOrderInvoiceCriteria.getInstance();
+        criteria.setQry_CustomerId(String.valueOf(this.customerId));
+        criteria.setQry_SalesOrderId(String.valueOf(this.salesOrderId));
+        criteria.setQry_FullQuery(true);
+        return this.getCustomerSalesOrders(criteria);
+    }
+
+    private List<VwSalesOrderInvoice> getCustomerSalesOrders(SalesOrderInvoiceCriteria criteria) throws ActionCommandException {
+        // Make SOAP call to get customer's sales order history data
         try {
             AccountingTransactionResponse response = CustomerSalesOrderSoapRequests.callGet(criteria, this.loginId,
                     this.session.getId());
@@ -327,7 +357,7 @@ public class CustomerSalesConsoleAction extends CustomerSalesSearchAction {
             }
             List<VwSalesOrderInvoice> results = null;
             if (response.getProfile() != null && response.getProfile().getSalesOrders() != null) {
-                results = VwSalesOrderInvoiceFactory.create(response.getProfile().getSalesOrders().getSalesOrder());
+                results = VwSalesOrderInvoiceFactory.create(response.getProfile());
             }
             else {
                 results = new ArrayList<>();
@@ -341,12 +371,16 @@ public class CustomerSalesConsoleAction extends CustomerSalesSearchAction {
     }
 
     /**
-     * Retrieves the customer data from the client's request.
+     * Retrieves the sales order data from the client's request.
      */
     public void receiveClientData() throws ActionCommandException {
         super.receiveClientData();
         // Attempt to locate and obtain creditor ID from the JSP.
         String custName = this.getInputValue("Longname", null);
+
+        // Attempt to locate and obtain Sales Order ID from the JSP.
+        String temp = this.getInputValue("SalesOrderId", null);
+        this.salesOrderId = RMT2String2.isNotEmpty(temp) ? RMT2Money.stringToNumber(temp).intValue() : 0;
 
         this.cust = CustomerFactory.create();
         this.cust.setCustomerId(this.customerId);
@@ -363,13 +397,15 @@ public class CustomerSalesConsoleAction extends CustomerSalesSearchAction {
         super.sendClientData();
 
         this.request.setAttribute(SalesConst.CLIENT_DATA_ORDERLIST, this.custOrders);
+        this.request.setAttribute(SalesConst.CLIENT_DATA_SALESORDER, this.salesOrder);
+        this.request.setAttribute(SalesConst.CLIENT_DATA_SALESORDER_ITEMS,
+                (this.salesOrder != null ? this.salesOrder.getLineItems() : null));
+
         // this.request.setAttribute(SalesConst.CLIENT_DATA_CUSTOMER_EXT,
         // this.custExt);
-        // this.request.setAttribute(SalesConst.CLIENT_DATA_SALESORDER,
-        // this.so);
+
         // if (this.itemHelper != null) {
-        // this.request.setAttribute(SalesConst.CLIENT_DATA_SERVICE_ITEMS,
-        // this.itemHelper.getSrvcItems());
+
         // this.request.setAttribute(SalesConst.CLIENT_DATA_MERCHANDISE_ITEMS,
         // this.itemHelper.getMerchItems());
         // }

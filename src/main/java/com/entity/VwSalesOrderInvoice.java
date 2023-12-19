@@ -1,6 +1,8 @@
 package com.entity;
 
 
+import java.util.List;
+
 import com.SystemException;
 import com.api.persistence.db.orm.OrmBean;
 import com.api.util.assistants.EqualityAssistant;
@@ -35,6 +37,7 @@ public class VwSalesOrderInvoice extends OrmBean {
   public static final String PROP_INVOICEID = "InvoiceId";
 /** The property name constant equivalent to property, XactId, of respective DataSource view. */
   public static final String PROP_XACTID = "XactId";
+    public static final String PROP_XACTREASON = "XactReason";
 /** The property name constant equivalent to property, InvoiceNo, of respective DataSource view. */
   public static final String PROP_INVOICENO = "InvoiceNo";
 /** The property name constant equivalent to property, InvoiceDate, of respective DataSource view. */
@@ -49,6 +52,8 @@ public class VwSalesOrderInvoice extends OrmBean {
   public static final String PROP_CREDITLIMIT = "CreditLimit";
 /** The property name constant equivalent to property, Description, of respective DataSource view. */
   public static final String PROP_DESCRIPTION = "Description";
+
+    public static final String PROP_LINEITEMS = "LineItems";
 
 
 
@@ -68,6 +73,8 @@ public class VwSalesOrderInvoice extends OrmBean {
   private int invoiceId;
 /** The javabean property equivalent of database column vw_sales_order_invoice.xact_id */
   private int xactId;
+    private String XactReason;
+
 /** The javabean property equivalent of database column vw_sales_order_invoice.invoice_no */
   private String invoiceNo;
 /** The javabean property equivalent of database column vw_sales_order_invoice.invoice_date */
@@ -82,6 +89,7 @@ public class VwSalesOrderInvoice extends OrmBean {
   private double creditLimit;
 /** The javabean property equivalent of database column vw_sales_order_invoice.description */
   private String description;
+    private List<SalesOrderItems> lineItems;
 
 
 
@@ -377,4 +385,20 @@ public String toString() {
 
  */
   public void initBean() throws SystemException {}
+
+    public List<SalesOrderItems> getLineItems() {
+        return lineItems;
+    }
+
+    public void setLineItems(List<SalesOrderItems> items) {
+        this.lineItems = items;
+    }
+
+    public String getXactReason() {
+        return XactReason;
+    }
+
+    public void setXactReason(String xactReason) {
+        XactReason = xactReason;
+    }
 }

@@ -114,7 +114,7 @@ public class SalesConst {
     public static final String CLIENT_DATA_XACT = "xact";
 
     /** Request attribute name mapping to Sales Order service items */
-    public static final String CLIENT_DATA_SERVICE_ITEMS = "services";
+    public static final String CLIENT_DATA_SALESORDER_ITEMS = "salesOrderItems";
 
     /** Request attribute name mapping to Sales Order merchandise items */
     public static final String CLIENT_DATA_MERCHANDISE_ITEMS = "merchandise";

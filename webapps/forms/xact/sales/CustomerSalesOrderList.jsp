@@ -17,7 +17,22 @@
   </head>
   <script Language="JavaScript" src="<%=APP_ROOT%>/js/RMT2General.js"></script>
   <script Language="JavaScript" src="<%=APP_ROOT%>/js/RMT2Menu.js"></script>   
-  
+  <script>
+     function enableViewEditButton(component) {
+    	 rowNdx = component.value;
+    	 orderStatusId = document.getElementById("OrderStatusId" + rowNdx).value;
+    	 if (orderStatusId > 1) {
+    		 // Invoiced=2, Closed=3, Cancelled=100, Refunded=200
+    		 document.DataForm.view.disabled = false;
+    		 document.DataForm.edit.disabled = true;
+    	 }
+    	 else {
+    		 // New=0, Quote=1
+    		 document.DataForm.view.disabled = true;
+    		 document.DataForm.edit.disabled = false;
+    	 }
+     }
+  </script>
 
   <%
 	 String pageTitle = "Customer Order History:&nbsp;&nbsp;&nbsp; ";
@@ -32,7 +47,7 @@
 			  </caption>
 		      <tr>
 		        <td>
-  					  <div id="Layer1" style="width:100%; height:650px; z-index:1; overflow:auto; background-color: buttonface" >
+  				   <div id="Layer1" style="width:100%; height:650px; z-index:1; overflow:auto; background-color: buttonface" >
 					 <table  width="100%" border="0" bgcolor="white" cellpadding="0" cellspacing="0"> 
 						 <tr>
 							 <th class="clsTableListHeader">&nbsp;</th>
@@ -48,11 +63,11 @@
 						 <beanlib:LoopRows bean="beanObj" list="<%=SalesConst.CLIENT_DATA_ORDERLIST%>">
 							  <gen:ColorBarLines evenColor="#CCFFCC" oddColor="#FFFFFF"/>
 								 <td width="5%" align="center" class="clsTableListHeader">
-									 <beanlib:InputControl type="radio" name="selCbx" value="rowid"/>
+									 <beanlib:InputControl type="radio" name="selCbx" value="rowid" onClick="enableViewEditButton(this)"/>
 									 <beanlib:InputControl type="hidden" name="SalesOrderId" value="#beanObj.SalesOrderId" uniqueName="yes"/>
 									 <beanlib:InputControl type="hidden" name="CustomerId" value="#beanObj.CustomerId" uniqueName="yes"/>   
 									 <beanlib:InputControl type="hidden" name="XactId" value="#beanObj.XactId" uniqueName="yes"/>                                                                 
-									 <beanlib:InputControl type="hidden" name="OrderStatusId" value="#beanObj.OrderStatusId" uniqueName="yes"/>                                                                 
+									 <beanlib:InputControl type="hidden" id="OrderStatusId" name="OrderStatusId" value="#beanObj.OrderStatusId" uniqueName="yes"/>                                                                 
 								 </td>   
 								 <td width="10%" align="center" >
 									<font size="2">
@@ -102,7 +117,7 @@
 							}
 						 %>
 					 </table>
-				  </div>	
+				   </div>	
 			    </td>
 			  </tr>
 			   </table>
