@@ -10,6 +10,7 @@ import com.api.web.ActionCommandException;
 import com.api.web.Context;
 import com.api.web.Request;
 import com.api.web.Response;
+import com.entity.CustomerCriteria;
 import com.entity.VwSalesOrderInvoice;
 
 /**
@@ -28,6 +29,8 @@ public class CustomerSalesOrderListAction extends CustomerSalesConsoleAction {
     private static final String COMMAND_PRINT = "SalesCustomerOrderList.OrderList.print";
 
     private static final String COMMAND_BACK = "SalesCustomerOrderList.OrderList.back";
+
+    private static final String COMMAND_SEARCH = "SalesCustomerOrderList.OrderList.search";
 
     private static Logger logger;
 
@@ -79,6 +82,9 @@ public class CustomerSalesOrderListAction extends CustomerSalesConsoleAction {
         if (command.equalsIgnoreCase(CustomerSalesOrderListAction.COMMAND_BACK)) {
             this.doBack();
         }
+        if (command.equalsIgnoreCase(CustomerSalesOrderListAction.COMMAND_SEARCH)) {
+            this.doBackToSearch();
+        }
     }
 
 
@@ -104,7 +110,20 @@ public class CustomerSalesOrderListAction extends CustomerSalesConsoleAction {
      * @throws ActionCommandException
      */
     protected void doBack() throws ActionCommandException {
-        // this.prepareCustomerSalesConsole();
+        this.getCurrentCustomerProfile();
+        this.sendClientData();
+    }
+
+    /**
+     * Navigates the user back to the customer search console JSP and performs
+     * the previous customer query.
+     * 
+     * @throws ActionCommandException
+     */
+    private void doBackToSearch() throws ActionCommandException {
+        CustomerCriteria criteria = (CustomerCriteria) this.query.getCustomObj();
+        this.customers = this.getCustomers(criteria);
+        this.sendClientData();
     }
 
     /**

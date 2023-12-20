@@ -189,7 +189,17 @@ public class CustomerSearchAction extends AbstractCustomerAction {
             throw new ActionCommandException("Client must select a row to edit");
         }
 
-        // Make SOAP call to get selected creditor's profile
+        // Make SOAP call to get selected customer's profile
+        this.getCurrentCustomerProfile();
+        return;
+    }
+
+    /**
+     * Get the profile of the customer belonging to the current session
+     * 
+     * @throws ActionCommandException
+     */
+    protected void getCurrentCustomerProfile() throws ActionCommandException {
         CustomerCriteria c = CustomerCriteria.getInstance();
         c.setQry_CustomerId(String.valueOf(this.customerId));
         List<Customer> list = this.getCustomers(c);

@@ -141,7 +141,9 @@
 				      <input type="button" name="<%=GeneralConst.REQ_EDIT%>" value="Edit" disabled style="width:90" onClick="handleAction('_self', document.DataForm, this.name)">
 				      <input type="button" name="<%=GeneralConst.REQ_VIEW%>" value="View" disabled style="width:90" onClick="handleAction('_self', document.DataForm, this.name)">
  					  <input type="button" name="<%=GeneralConst.REQ_PRINT%>" value="Print Invoice" style="width:90" onClick="handleAction('_blank', document.DataForm, this.name)">
-					  <input type="button" name="<%=GeneralConst.REQ_BACK%>" value="Back" style="width:90" onClick="handleAction('_self', document.DataForm, this.name)">	 					
+					  <input type="button" name="<%=GeneralConst.REQ_BACK%>" value="Console" style="width:90" onClick="handleAction('_self', document.DataForm, this.name)">
+					  <input type="button" name="<%=GeneralConst.REQ_SEARCH%>" value="Search" style="width:90" onClick="handleAction('_self', document.DataForm, this.name)">
+					  <a href="/ui-jsp-accounting/">Main Menu</a>	 					
 			      </td>
 			    </tr>
 		      </table>
