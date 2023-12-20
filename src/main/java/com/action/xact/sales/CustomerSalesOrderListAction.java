@@ -110,6 +110,7 @@ public class CustomerSalesOrderListAction extends CustomerSalesConsoleAction {
      * @throws ActionCommandException
      */
     protected void doBack() throws ActionCommandException {
+        this.receiveClientData();
         this.getCurrentCustomerProfile();
         this.sendClientData();
     }
