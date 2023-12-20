@@ -40,10 +40,10 @@
   
   <body>
      <form name="DataForm" method="POST" action="<%=APP_ROOT%>/unsecureRequestProcessor/SalesCustomerOrderList.OrderList">
-	     <beanlib:InputControl type="hidden" value="#beanObj.customerId" name="CustomerId"/>
+	     <beanlib:InputControl type="hidden" value="#subsidiary.customerId" name="CustomerId"/>
 		   <table width="55%" border="3">
 		      <caption align="left">
-	 			  <h3><%=pageTitle%><font color="blue"><beanlib:InputControl value="#beanObj.Description"/></font></h3> 
+	 			  <h3><%=pageTitle%><font color="blue"><beanlib:InputControl value="#subsidiary.Longname"/></font></h3> 
 			  </caption>
 		      <tr>
 		        <td>
