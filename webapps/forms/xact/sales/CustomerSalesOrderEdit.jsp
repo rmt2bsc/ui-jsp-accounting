@@ -73,6 +73,7 @@
 				 </td>
 				 <td width="65%">
 				     <beanlib:InputControl value="#salesorder.Description"/> 
+				     <beanlib:InputControl type="hidden" name="Longname" value="#salesorder.Description"/>
 				 </td>
 			</tr>   
 			<tr> 
@@ -142,7 +143,7 @@
 				</tr>	
 			</table>
 			
-			<!-- Display any messgaes -->
+			<!-- Display any messages -->
 			<table>
 				<tr>
 				  <td colspan="3">
@@ -249,7 +250,7 @@
 						  </gen:When>
 				  	</gen:Evaluate>
 					  <input name="<%=GeneralConst.REQ_DELETE%>" type="button" value="Delete" style="width:90" onClick="handleAction('_self', document.DataForm, this.name)">
-					  <input name="<%=GeneralConst.REQ_BACK%>" type="button" value="Order List" style="width:90" onClick="handleAction('_self', document.DataForm, this.name)">
+					  <input name="<%=GeneralConst.REQ_BACK%>" type="button" value="Order History" style="width:90" onClick="handleAction('_self', document.DataForm, this.name)">
 					</td>
 				 </tr>		
 			  </table>			   

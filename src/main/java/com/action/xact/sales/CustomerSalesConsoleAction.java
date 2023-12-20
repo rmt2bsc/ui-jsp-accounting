@@ -46,7 +46,7 @@ public class CustomerSalesConsoleAction extends CustomerSalesSearchAction {
 
     private Logger logger;
 
-    private List custOrders;
+    protected List custOrders;
 
     private List payments;
 

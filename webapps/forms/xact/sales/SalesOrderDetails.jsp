@@ -17,6 +17,7 @@
 	 </td>
 	 <td width="65%">
 		 <beanlib:InputControl value="#salesorder.Description"/> 
+		 <beanlib:InputControl type="hidden" name="Longname" value="#salesorder.Description"/>
 	 </td>
 </tr>   
 <tr> 

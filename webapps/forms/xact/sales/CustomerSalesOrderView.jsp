@@ -23,7 +23,7 @@
    %>
   <body bgcolor="#FFFFFF" text="#000000">
     <form name="DataForm" method="POST" action="<%=APP_ROOT%>/unsecureRequestProcessor/SalesCustomerOrderView.OrderView">
-      <beanlib:InputControl type="hidden" name="CustomerId" value="#salesorder.CustomerId"/>                                  
+      <beanlib:InputControl type="hidden" name="CustomerId" value="#salesorder.CustomerId"/>    
       <beanlib:InputControl type="hidden" name="OrderId" value="#salesorder.SalesOrderId"/>                                           
       <h3><strong>Sales Order View</strong></h3>
 	  
@@ -72,7 +72,7 @@
 			        </gen:When>			        
 			     </gen:Evaluate>
 			   <input type="button" name="<%=GeneralConst.REQ_PRINT%>" value="Print" style="width:90" onClick="handleAction('_blank', document.DataForm, this.name)">
-			   <input name="<%=SalesConst.REQ_VIEWORDERS%>" type="button" value="Order List" style="width:90" onClick="handleAction('_self', document.DataForm, this.name)">
+			   <input name="<%=SalesConst.REQ_VIEWORDERS%>" type="button" value="Order History" style="width:90" onClick="handleAction('_self', document.DataForm, this.name)">
 			</td>
 		 </tr>		
 	  </table>			   
