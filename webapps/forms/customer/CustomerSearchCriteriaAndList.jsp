@@ -88,7 +88,7 @@
     <table  width="100%" border="0" bgcolor="white" cellpadding="0" cellspacing="0"> 
 		 <tr>
 			 <th width="2%" class="clsTableListHeader">&nbsp;</th>
-			 <th width="8%" class="clsTableListHeader"><div align="center">Creditor Id</div></th>
+			 <th width="8%" class="clsTableListHeader"><div align="center">Customer Id</div></th>
 			 <th width="8%" class="clsTableListHeader"><div align="center">Business Id</div></th>
 			 <th width="10%" class="clsTableListHeader"><div align="left">Account No.</div></th>
 			 <th width="30%" class="clsTableListHeader"><div align="left">Customer Name </div></th>
