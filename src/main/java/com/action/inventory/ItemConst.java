@@ -24,10 +24,18 @@ public class ItemConst {
 
     public static final String SEL_NEW_ITEM_MERCH = "MerchItems";
 
-    /** Code for Service item types */
+    /**
+     * Code for Service item types
+     * 
+     * @deprecated
+     * */
     public final static String ITEMTYPE_SRVC = "Srvc";
 
-    /** Code for Merchandise item types */
+    /**
+     * Code for Merchandise item types
+     * 
+     * @deprecated
+     * */
     public final static String ITEMTYPE_MERCH = "Merch";
 
     /** Edit Inventory Item client action code */
@@ -69,7 +77,7 @@ public class ItemConst {
     /** Action code for overriding an inventory item with a vendor item */
     public static final String REQ_VEND_ITEM_OVERRIDE = "venditemoverride";
 
-    /** Action code for removing an inventory itemo override */
+    /** Action code for removing an inventory item override */
     public static final String REQ_VEND_ITEM_OVERRIDEREMOVE = "removevenditemoverride";
 
     /** Action code for returning back to vendor detail edit page from the vendor-item assoication page */

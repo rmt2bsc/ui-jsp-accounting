@@ -6,11 +6,14 @@ import java.util.List;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.rmt2.jaxb.AccountingTransactionResponse;
+import org.rmt2.jaxb.InventoryResponse;
 import org.rmt2.jaxb.ReplyStatusType;
 
 import testcases.bean.Xact;
 
 import com.SystemException;
+import com.action.inventory.ItemConst;
+import com.action.inventory.ItemMasterSoapRequests;
 import com.api.constants.GeneralConst;
 import com.api.persistence.DatabaseException;
 import com.api.util.RMT2Money;
@@ -22,7 +25,10 @@ import com.api.web.Response;
 import com.entity.Customer;
 import com.entity.CustomerCriteria;
 import com.entity.CustomerFactory;
+import com.entity.ItemMasterCriteria;
 import com.entity.SalesOrderInvoiceCriteria;
+import com.entity.VwItemMaster;
+import com.entity.VwItemMasterFactory;
 import com.entity.VwSalesOrderInvoice;
 import com.entity.VwSalesOrderInvoiceFactory;
 
@@ -57,6 +63,10 @@ public class CustomerSalesConsoleAction extends CustomerSalesSearchAction {
     protected VwSalesOrderInvoice salesOrder;
 
     protected List SalesOrderItems;
+
+    protected List itemsService;
+
+    protected List itemsMerchandise;
 
     /**
      * Default constructor
@@ -111,7 +121,7 @@ public class CustomerSalesConsoleAction extends CustomerSalesSearchAction {
             this.doSalesOrderHistory();
         }
         if (command.equalsIgnoreCase(CustomerSalesConsoleAction.COMMAND_NEWORDER)) {
-            this.setupNewSalesOrderSelection(0);
+            this.doNewSalesOrder(0);
         }
         if (command.equalsIgnoreCase(CustomerSalesConsoleAction.COMMAND_PAYMENT)) {
             this.acceptPaymentOnAccount();
@@ -208,16 +218,19 @@ public class CustomerSalesConsoleAction extends CustomerSalesSearchAction {
      * @throws ActionCommandException
      *             System or Database errors.
      */
-    public void setupNewSalesOrderSelection(int salesOrderId) throws ActionCommandException {
+    public void doNewSalesOrder(int salesOrderId) throws ActionCommandException {
         this.receiveClientData();
         try {
-            // Create new sales order object.
-            // this.so = SalesFactory.createSalesOrder();
-            // this.so.setSoId(salesOrderId);
-            // // Get inventory items that are available for selection
-            // this.itemHelper = new SalesOrderItemHelper(this.context,
-            // this.request, this.cust, this.so);
-            // this.itemHelper.setupAvailSalesOrderItems();
+            ItemMasterCriteria criteria = ItemMasterCriteria.getInstance();
+
+            // Get service inventory items
+            criteria.setQry_ItemTypeId(String.valueOf(ItemConst.ITEM_TYPE_SRVC));
+            this.itemsService = this.getInventory(criteria);
+
+            // Get merchandise inventory items
+            criteria.setQry_ItemTypeId(String.valueOf(ItemConst.ITEM_TYPE_MERCH));
+            this.itemsMerchandise = this.getInventory(criteria);
+
         } catch (Exception e) {
             logger.log(Level.ERROR, e.getMessage());
             throw new ActionCommandException(e.getMessage());
@@ -371,12 +384,51 @@ public class CustomerSalesConsoleAction extends CustomerSalesSearchAction {
     }
 
     /**
+     * Fetches the list inventory items from the database using the where clause
+     * criteria previously stored on the session during the phase of the request
+     * to builds the query predicate.
+     * 
+     * @param criteria
+     *            {@link ItemMasterCriteria}
+     * @return List<{@link VwItemMaster}>
+     * @throws ActionCommandException
+     */
+    protected List<VwItemMaster> getInventory(ItemMasterCriteria criteria) throws ActionCommandException {
+        // Call SOAP web service to get a list of Inventory Item Master records
+        // based on selection criteria
+        try {
+            InventoryResponse response = ItemMasterSoapRequests.callGet(criteria, this.loginId,
+                    this.session.getId());
+            ReplyStatusType rst = response.getReplyStatus();
+            this.msg = rst.getMessage();
+            if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
+                this.throwActionError(rst.getMessage(), rst.getExtMessage());
+            }
+            List<VwItemMaster> results = null;
+            if (response.getProfile() != null && response.getProfile().getInvItem() != null) {
+                results = VwItemMasterFactory.create(response.getProfile().getInvItem());
+            }
+            else {
+                results = new ArrayList<>();
+            }
+            this.msg += ": " + results.size();
+            return results;
+        } catch (Exception e) {
+            logger.log(Level.ERROR, e.getMessage());
+            throw new ActionCommandException(e.getMessage());
+        }
+    }
+
+    /**
      * Retrieves the sales order data from the client's request.
      */
     public void receiveClientData() throws ActionCommandException {
         super.receiveClientData();
         // Attempt to locate and obtain creditor ID from the JSP.
         String custName = this.getInputValue("Longname", null);
+
+        // Attempt to locate and obtain account number from the JSP.
+        String acctNo = this.getInputValue("AccountNo", null);
 
         // Attempt to locate and obtain Sales Order ID from the JSP.
         String temp = this.getInputValue("SalesOrderId", null);
@@ -385,6 +437,7 @@ public class CustomerSalesConsoleAction extends CustomerSalesSearchAction {
         this.cust = CustomerFactory.create();
         this.cust.setCustomerId(this.customerId);
         this.cust.setLongname(custName);
+        this.cust.setAccountNo(acctNo);
     }
 
     /**
@@ -401,13 +454,14 @@ public class CustomerSalesConsoleAction extends CustomerSalesSearchAction {
         this.request.setAttribute(SalesConst.CLIENT_DATA_SALESORDER_ITEMS,
                 (this.salesOrder != null ? this.salesOrder.getLineItems() : null));
 
+        this.request.setAttribute(SalesConst.CLIENT_DATA_ITEMS_SERVICE, this.itemsService);
+        this.request.setAttribute(SalesConst.CLIENT_DATA_ITEMS_MERCHANDISE, this.itemsMerchandise);
+
         // this.request.setAttribute(SalesConst.CLIENT_DATA_CUSTOMER_EXT,
         // this.custExt);
 
         // if (this.itemHelper != null) {
 
-        // this.request.setAttribute(SalesConst.CLIENT_DATA_MERCHANDISE_ITEMS,
-        // this.itemHelper.getMerchItems());
         // }
         // this.request.setAttribute(XactConst.CLIENT_DATA_XACT, this.xact);
         // this.request.setAttribute(XactConst.CLIENT_DATA_SALESPAYMENT_HIST,
