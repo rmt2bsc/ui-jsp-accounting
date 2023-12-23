@@ -32,6 +32,8 @@ public class ItemMasterCriteria extends OrmBean {
 
     private String qry_ItemStatusId;
 
+    private Integer qry_ItemIdList[];
+
     public ItemMasterCriteria() throws SystemException {
     }
 
@@ -148,5 +150,13 @@ public class ItemMasterCriteria extends OrmBean {
     }
 
     public void initBean() throws SystemException {
+    }
+
+    public Integer[] getQry_ItemIdList() {
+        return qry_ItemIdList;
+    }
+
+    public void setQry_ItemIdList(Integer[] qry_ItemIdList) {
+        this.qry_ItemIdList = qry_ItemIdList;
     }
 }

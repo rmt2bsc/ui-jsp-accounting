@@ -19,6 +19,8 @@ import org.rmt2.jaxb.InventoryResponse;
 import org.rmt2.jaxb.InventoryStatusHistoryType;
 import org.rmt2.jaxb.ItemCriteriaType;
 import org.rmt2.jaxb.ObjectFactory;
+import org.rmt2.jaxb.SimpleItemListType;
+import org.rmt2.jaxb.SimpleItemType;
 import org.rmt2.util.HeaderTypeBuilder;
 import org.rmt2.util.accounting.inventory.InventoryItemStatusHistTypeBuilder;
 import org.rmt2.util.accounting.inventory.InventoryItemStatusTypeBuilder;
@@ -122,6 +124,17 @@ public class ItemMasterSoapRequests extends SubsidiarySoapRequests {
             }
             if (RMT2String2.isNotEmpty(parms.getQry_Active())) {
                 criteria.setActive(BigInteger.valueOf(Integer.valueOf(parms.getQry_Active())));
+            }
+
+            // UI-31: Setup list of inventory item master id's to query for.
+            if (parms.getQry_ItemIdList() != null) {
+                SimpleItemListType silt = fact.createSimpleItemListType();
+                for (Integer id : parms.getQry_ItemIdList()) {
+                    SimpleItemType sit = fact.createSimpleItemType();
+                    sit.setItemId(BigInteger.valueOf(id));
+                    silt.getItem().add(sit);
+                }
+                criteria.setItems(silt);
             }
         }
 

@@ -1,5 +1,7 @@
+<%@page import="com.action.inventory.ItemConst"%>
 <%@ taglib uri="/rmt2-generaltaglib" prefix="gen" %>
 <%@ taglib uri="/rmt2-beantaglib" prefix="beanlib" %>
+<%@ page import="com.action.inventory.ItemConst" %>
 <%@ page import="com.action.xact.sales.SalesConst" %>
 <%@ page import="com.api.constants.GeneralConst" %>
 <%@ page import="com.api.util.RMT2Utility" %>
@@ -37,6 +39,7 @@
 				</td>
 				<td width="70%">
 		   		   	<beanlib:InputControl value="#subsidiary.AccountNo"/>
+		   		   	<beanlib:InputControl type="hidden" name="AccountNo" value="#subsidiary.AccountNo"/>
 				</td>
 			</tr>    
 			<tr> 
@@ -47,6 +50,7 @@
 				</td>
 				<td width="70%">
 				   <beanlib:InputControl value="#subsidiary.Longname"/>
+				   <beanlib:InputControl type="hidden" name="Longname" value="#subsidiary.Longname"/>
 				</td>
 			</tr>    
 			<tr> 
@@ -79,7 +83,7 @@
 				<td width="50%" > 
 					 <beanlib:InputControl dataSource="<%=SalesConst.CLIENT_DATA_ITEMS_SERVICE %>"
 										 type="select"
-										 name="ServiceItems"
+										 name="<%=ItemConst.SEL_NEW_ITEM_SRVC %>"
 										 codeProperty="Id"
 										 displayProperty="Description"
 										 multiSelect="Yes"
@@ -89,7 +93,7 @@
 				<td width="50%"> 
 					 <beanlib:InputControl dataSource="<%=SalesConst.CLIENT_DATA_ITEMS_MERCHANDISE %>"
 										 type="select"
-										 name="MerchItems"
+										 name="<%=ItemConst.SEL_NEW_ITEM_MERCH %>"
 										 codeProperty="Id"
 										 displayProperty="Description"
 										 multiSelect="Yes"
