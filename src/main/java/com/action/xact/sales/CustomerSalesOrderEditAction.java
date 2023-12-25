@@ -19,9 +19,8 @@ import com.api.web.ActionCommandException;
 import com.api.web.Context;
 import com.api.web.Request;
 import com.api.web.Response;
-import com.entity.SalesOrder;
-import com.entity.SalesOrderFactory;
 import com.entity.SalesOrderItemsFactory;
+import com.entity.VwSalesOrderInvoiceFactory;
 
 /**
  * This class provides functionality to serve the requests of the Customer New
@@ -381,12 +380,13 @@ public class CustomerSalesOrderEditAction extends CustomerSalesOrderListAction {
         List<com.entity.SalesOrderItems> items = this.getRequestItems();
 
         // Build request sales order
-        SalesOrder so = SalesOrderFactory.create();
-        so.setSoId(this.salesOrderId);
-        so.setCustomerId(this.customerId);
-        so.setOrderTotal(this.orderTotal);
-        so.setEffectiveDate(this.effectiveDate);
-        so.setInvoiced(this.invoiced ? 1 : 0);
+        this.salesOrder = VwSalesOrderInvoiceFactory.create();
+        this.salesOrder.setSalesOrderId(this.salesOrderId);
+        this.salesOrder.setCustomerId(this.customerId);
+        this.salesOrder.setOrderTotal(this.orderTotal);
+        this.salesOrder.setSalesOrderDate(this.effectiveDate);
+        this.salesOrder.setInvoiced(this.invoiced ? 1 : 0);
+        this.salesOrder.setLineItems(items);
 
         // TODO: make SOAP call to save sales order using the request sales
         // order data
