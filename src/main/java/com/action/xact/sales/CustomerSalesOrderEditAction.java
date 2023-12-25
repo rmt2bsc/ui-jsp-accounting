@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.rmt2.jaxb.AccountingTransactionResponse;
 
 import testcases.bean.Xact;
 
@@ -388,8 +389,10 @@ public class CustomerSalesOrderEditAction extends CustomerSalesOrderListAction {
         this.salesOrder.setInvoiced(this.invoiced ? 1 : 0);
         this.salesOrder.setLineItems(items);
 
-        // TODO: make SOAP call to save sales order using the request sales
+        // Make SOAP call to save sales order using the request sales
         // order data
+        AccountingTransactionResponse response = CustomerSalesOrderSoapRequests.callSave(this.salesOrder, this.loginId,
+                this.session.getId());
 
         // , DatabaseException
     // , SalesOrderException

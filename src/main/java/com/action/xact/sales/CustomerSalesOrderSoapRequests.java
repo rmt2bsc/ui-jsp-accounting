@@ -8,24 +8,14 @@ import org.rmt2.constants.ApiHeaderNames;
 import org.rmt2.constants.ApiTransactionCodes;
 import org.rmt2.jaxb.AccountingTransactionRequest;
 import org.rmt2.jaxb.AccountingTransactionResponse;
-import org.rmt2.jaxb.AddressType;
-import org.rmt2.jaxb.BusinessType;
-import org.rmt2.jaxb.CodeDetailType;
 import org.rmt2.jaxb.CustomerCriteriaType;
-import org.rmt2.jaxb.CustomerType;
 import org.rmt2.jaxb.HeaderType;
 import org.rmt2.jaxb.ObjectFactory;
 import org.rmt2.jaxb.SalesOrderCriteria;
 import org.rmt2.jaxb.TransactionCriteriaGroup;
 import org.rmt2.jaxb.TransactionDetailGroup;
 import org.rmt2.jaxb.XactCustomCriteriaTargetType;
-import org.rmt2.jaxb.ZipcodeType;
 import org.rmt2.util.HeaderTypeBuilder;
-import org.rmt2.util.accounting.subsidiary.CustomerTypeBuilder;
-import org.rmt2.util.addressbook.AddressTypeBuilder;
-import org.rmt2.util.addressbook.BusinessTypeBuilder;
-import org.rmt2.util.addressbook.CodeDetailTypeBuilder;
-import org.rmt2.util.addressbook.ZipcodeTypeBuilder;
 
 import com.AccountingUIException;
 import com.action.gl.subsidiary.SubsidiarySoapRequests;
@@ -34,6 +24,7 @@ import com.api.security.authentication.web.AuthenticationException;
 import com.api.util.RMT2String2;
 import com.entity.Customer;
 import com.entity.SalesOrderInvoiceCriteria;
+import com.entity.VwSalesOrderInvoice;
 
 /**
  * Help class for constructing and invoking SOAP calls pertaining to the
@@ -117,10 +108,10 @@ public class CustomerSalesOrderSoapRequests extends SubsidiarySoapRequests {
 
 
     /**
-     * SOAP call to apply data changes to a customer's profile.
+     * SOAP call to apply data changes to a customer's sales order profile.
      * 
      * @param data
-     *            {@link Customer}
+     *            {@link VwSalesOrderInvoice}
      * @param loginId
      *            the id of logged in user
      * @param sessionId
@@ -128,7 +119,7 @@ public class CustomerSalesOrderSoapRequests extends SubsidiarySoapRequests {
      * @return {@link AccountingTransactionResponse}
      * @throws AccountingUIException
      */
-    public static final AccountingTransactionResponse callSave(Customer data, String loginId, String sessionId)
+    public static final AccountingTransactionResponse callSave(VwSalesOrderInvoice data, String loginId, String sessionId)
             throws AccountingUIException {
         // Retrieve all code group records from the database
         ObjectFactory fact = new ObjectFactory();
@@ -137,7 +128,8 @@ public class CustomerSalesOrderSoapRequests extends SubsidiarySoapRequests {
         HeaderType head = HeaderTypeBuilder.Builder.create()
                 .withApplication(ApiHeaderNames.APP_NAME_ACCOUNTING)
                 .withModule(ApiTransactionCodes.MODULE_ACCOUNTING_SUBSIDIARY)
-                .withTransaction(ApiTransactionCodes.SUBSIDIARY_CUSTOMER_UPDATE)
+                .withTransaction(data.getSalesOrderId() > 0 ? ApiTransactionCodes.ACCOUNTING_SALESORDER_UPDATE
+                                : ApiTransactionCodes.ACCOUNTING_SALESORDER_CREATE)
                 .withMessageMode(ApiHeaderNames.MESSAGE_MODE_REQUEST)
                 .withDeliveryDate(new Date())
                 .withRouting(ApiTransactionCodes.ROUTE_ACCOUNTING)
@@ -146,61 +138,11 @@ public class CustomerSalesOrderSoapRequests extends SubsidiarySoapRequests {
                 .withSessionId(sessionId)
                 .build();
 
-        CodeDetailType cdtEntity = CodeDetailTypeBuilder.Builder.create()
-                .withCodeId(data.getEntityTypeId())
-                .build();
-        
-        CodeDetailType cdtServType = CodeDetailTypeBuilder.Builder.create()
-                .withCodeId(data.getServTypeId())
-                .build();
-        
-        ZipcodeType zip = ZipcodeTypeBuilder.Builder.create()
-                .withZipcode(data.getZip())
-                .withCity(data.getCity())
-                .withState(data.getState())
-                .build();
 
-        AddressType addr = AddressTypeBuilder.Builder.create()
-                .withAddrId(data.getAddrId())
-                .withAddressLine1(data.getAddr1())
-                .withAddressLine2(data.getAddr2())
-                .withAddressLine3(data.getAddr3())
-                .withAddressLine4(data.getAddr4())
-                .withPhoneMain(data.getPhoneMain())
-                .withPhoneFax(data.getPhoneFax())
-                .withZipcode(zip)
-                .build();
-                
-        BusinessType busType = BusinessTypeBuilder.Builder.create()
-                .withBusinessId(data.getBusinessId())
-                .withLongname(data.getLongname())
-                .withContactEmail(data.getContactEmail())
-                .withContactFirstname(data.getContactFirstname())
-                .withContactLastname(data.getContactLastname())
-                .withContactPhone(data.getContactPhone())
-                .withContactPhoneExt(data.getContactExt())
-                .withShortname(data.getShortname())
-                .withTaxId(data.getTaxId())
-                .withWebsite(data.getWebsite())
-                .withEntityType(cdtEntity)
-                .withServiceType(cdtServType)
-                .withAddress(addr)
-                .build();
-        
-        CustomerType custType = CustomerTypeBuilder.Builder.create()
-                .withCustomerId(data.getCustomerId())
-                .withAcctId(data.getAcctId())
-                .withBusinessType(busType)
-                .withAccountNo(data.getAccountNo())
-                .withAcctDescription(data.getDescription())
-                .withCreditLimit(data.getCreditLimit())
-                .withBalance(data.getBalance())
-                .withActive(data.getActive())
-                .build();
                 
         TransactionDetailGroup profileGroup = fact.createTransactionDetailGroup();
         profileGroup.setCustomers(fact.createCustomerListType());
-        profileGroup.getCustomers().getCustomer().add(custType);
+        // profileGroup.getCustomers().getCustomer().add(custType);
         req.setHeader(head);
         req.setProfile(profileGroup);
 
