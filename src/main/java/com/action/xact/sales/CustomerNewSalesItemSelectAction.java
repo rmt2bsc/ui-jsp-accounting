@@ -152,6 +152,7 @@ public class CustomerNewSalesItemSelectAction extends CustomerSalesConsoleAction
             soi.setItemId(item.getId());
             soi.setItemName(item.getDescription());
             soi.setOrderQty(0);
+            soi.setQtyOnHand(item.getQtyOnHand());
             soi.setInitUnitCost(item.getRetailPrice() > 0 && item.getOverrideRetail() == 1 ? item.getRetailPrice() : item
                     .getUnitCost());
             newItemList.add(soi);

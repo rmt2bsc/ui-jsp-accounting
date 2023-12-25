@@ -36,7 +36,7 @@ public class SalesOrderItems extends OrmBean {
   public static final String PROP_INITUNITCOST = "InitUnitCost";
 /** The property name constant equivalent to property, InitMarkup, of respective DataSource view. */
   public static final String PROP_INITMARKUP = "InitMarkup";
-
+    public static final String PROP_QTYONHAND = "QtyOnHand";
 
 
 	/** The javabean property equivalent of database column sales_order_items.so_item_id */
@@ -56,6 +56,11 @@ public class SalesOrderItems extends OrmBean {
   private double initUnitCost;
 /** The javabean property equivalent of database column sales_order_items.init_markup */
   private double initMarkup;
+    /**
+     * The javabean property equivalent of database column
+     * vw_item_master.qty_on_hand
+     */
+    private int qtyOnHand;
 
 
 
@@ -163,6 +168,20 @@ public class SalesOrderItems extends OrmBean {
   public double getInitMarkup() {
     return this.initMarkup;
   }
+
+    /**
+     * Sets the value of member variable qtyOnHand
+     */
+    public void setQtyOnHand(int value) {
+        this.qtyOnHand = value;
+    }
+
+    /**
+     * Gets the value of member variable qtyOnHand
+     */
+    public int getQtyOnHand() {
+        return this.qtyOnHand;
+    }
 
 @Override
 public boolean equals(Object obj) {

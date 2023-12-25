@@ -114,26 +114,32 @@
 							 <table width="100% border="0">
 							    <tr>
 								     <th width="6%" align="left" bgcolor="#FFCC00">Del</th>
-								     <th width="54%" align="left" bgcolor="#FFCC00">Item Name</th>
-									 <th width="25%"  align="center" bgcolor="#FFCC00">Price</th>
-									 <th width="15%"  align="left" bgcolor="#FFCC00">Order Qty</th>
+								     <th width="64%" align="left" bgcolor="#FFCC00">Item Name</th>
+									 <th width="10%"  align="center" bgcolor="#FFCC00">Price</th>
+									 <th width="10%"  align="center" bgcolor="#FFCC00">Order Qty</th>
+									 <th width="10%"  align="center" bgcolor="#FFCC00">Qty Avail</th>
 								 </tr>
-								<beanlib:LoopRows bean="srvcItem" list="<%=SalesConst.CLIENT_DATA_SALESORDER_ITEMS %>">
+								<beanlib:LoopRows bean="item" list="<%=SalesConst.CLIENT_DATA_SALESORDER_ITEMS %>">
 									<tr>
 									     <td>
-										     <beanlib:InputControl dataSource="srvcItem" type="checkbox" name="selCbxSrvc" value="rowid" uniqueName="yes"/>
-											 <beanlib:InputControl dataSource="srvcItem" type="hidden" name="rowIdSrvc" value="rowid"/>
+										     <beanlib:InputControl dataSource="item" type="checkbox" name="selCbx" value="rowid" uniqueName="yes"/>
+											 <beanlib:InputControl dataSource="item" type="hidden" name="rowId" value="rowid"/>
 										 </td>
 										 <td>
-										      <beanlib:InputControl type="hidden" name="SalesOrderId" value="#srvcItem.SoId" uniqueName="yes"/>                                  
-										      <beanlib:InputControl type="hidden" name="ItemId" value="#srvcItem.ItemId" uniqueName="yes"/>                                  										 
-  											  <beanlib:InputControl value="#srvcItem.ItemName"/>                                  
+										      <beanlib:InputControl type="hidden" name="SalesOrderId" value="#item.SoId" uniqueName="yes"/>                                  
+										      <beanlib:InputControl type="hidden" name="ItemId" value="#item.ItemId" uniqueName="yes"/>                                  										 
+  											  <beanlib:InputControl value="#item.ItemName"/>                                  
+  											  <beanlib:InputControl type="hidden" name="ItemName" value="#item.ItemName" uniqueName="yes"/>  
 										 </td>
 										 <td  align="right" valign="bottom">
-											  <beanlib:InputControl type="text" name="InitUnitCost" value="#srvcItem.InitUnitCost" style="text-align:right" format="#,##0.00;(#,##0.00)" uniqueName="yes"/>                                  
+											  <beanlib:InputControl value="#item.InitUnitCost" style="text-align:right" format="#,##0.00;(#,##0.00)"/>                                  
+											  <beanlib:InputControl type="hidden" name="InitUnitCost" value="#item.InitUnitCost" uniqueName="yes"/>
 										 </td>
 										 <td  align="right" valign="bottom">
-											  <beanlib:InputControl type="text" name="OrderQty" value="#srvcItem.OrderQty" size="5" uniqueName="yes"/>                                  
+											  <beanlib:InputControl type="text" name="OrderQty" value="#item.OrderQty" style="text-align:right" size="5" uniqueName="yes"/>                                  
+										 </td>
+										 <td  align="center" valign="bottom">
+											  <beanlib:InputControl value="#item.QtyOnHand"/>                                  
 										 </td>
 									 </tr>
 								 </beanlib:LoopRows>
