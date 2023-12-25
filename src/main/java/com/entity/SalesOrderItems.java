@@ -183,6 +183,7 @@ public class SalesOrderItems extends OrmBean {
         return this.qtyOnHand;
     }
 
+
 @Override
 public boolean equals(Object obj) {
    if (this == obj) {

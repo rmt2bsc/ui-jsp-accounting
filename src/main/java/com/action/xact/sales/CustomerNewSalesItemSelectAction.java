@@ -143,6 +143,7 @@ public class CustomerNewSalesItemSelectAction extends CustomerSalesConsoleAction
             this.salesOrder.setCustomerId(this.cust.getCustomerId());
             this.salesOrder.setSalesOrderId(this.salesOrderId);
             this.salesOrder.setDescription(this.cust.getLongname());
+            this.salesOrder.setInvoiced(0);
         }
 
         // Added new items to sales order profile
@@ -151,6 +152,7 @@ public class CustomerNewSalesItemSelectAction extends CustomerSalesConsoleAction
             com.entity.SalesOrderItems soi = SalesOrderItemsFactory.create();
             soi.setItemId(item.getId());
             soi.setItemName(item.getDescription());
+            soi.setInitMarkup(item.getMarkup());
             soi.setOrderQty(0);
             soi.setQtyOnHand(item.getQtyOnHand());
             soi.setInitUnitCost(item.getRetailPrice() > 0 && item.getOverrideRetail() == 1 ? item.getRetailPrice() : item

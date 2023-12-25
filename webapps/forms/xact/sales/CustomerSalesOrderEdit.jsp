@@ -49,8 +49,8 @@
 	     <beanlib:InputControl type="hidden" name="CustomerId" value="#salesorder.CustomerId"/>                                  
 		   <beanlib:InputControl type="hidden" name="BusinessId" value="#salesorder.BusinessId"/>                                  
 		   <beanlib:InputControl type="hidden" name="OrderId" value="#salesorder.SoId"/>                                  
-		   <beanlib:InputControl type="hidden" name="XactId" value="#salesorder.XactId"/>                                  
-	      
+		   <beanlib:InputControl type="hidden" name="XactId" value="#salesorder.XactId"/>
+		   <beanlib:InputControl type="hidden" name="Invoiced" value="#salesorder.Invoiced"/>                                              
 	      
 		  <h3><strong><%=pageTitle%></strong></h3>
 	  
@@ -63,6 +63,7 @@
 				</td>
 				<td width="70%">
 				   <beanlib:InputControl value="#salesorder.AccountNo"/> 
+				    <beanlib:InputControl type="hidden" name="AccountNo" value="#salesorder.AccountNo"/>
 				</td>
 			</tr>    
 			<tr> 
@@ -84,16 +85,17 @@
 				 </td>
 				 <td width="65%">
 				    <beanlib:InputControl value="#salesorder.SalesOrderId"/> 
+				    <beanlib:InputControl type="hidden" name="SalesOrderId" value="#salesorder.SalesOrderId"/>
 				</td>
 			</tr>   			
 			<tr> 
 				<td align="right" width="35%" bgcolor="#FFCC00"> 
 					<font size="2">
-						<b>Date Created</b>
+						<b>Sales Order Date</b>
 					</font>
 				</td>
 				<td width="70%">
-				   <beanlib:InputControl value="#salesorder.SalesOrderDate" format="MM-dd-yyyy"/>
+				   <beanlib:InputControl type="text" name="EffectiveDate" value="#salesorder.SalesOrderDate" format="MM-dd-yyyy"/>
 				</td>
 			</tr>    			
 		</table>
@@ -110,7 +112,7 @@
 				</tr>
 				<tr> 
 					<td width="100%"> 
-						 <div id="SrvcLayer" style="position:relative; width:100%; height:45%; z-index:1; overflow:auto">
+						 <div id="SrvcLayer" style="position:relative; width:100%; height:40%; z-index:1; overflow:auto;">
 							 <table width="100% border="0">
 							    <tr>
 								     <th width="6%" align="left" bgcolor="#FFCC00">Del</th>
@@ -133,13 +135,15 @@
 										 </td>
 										 <td  align="right" valign="bottom">
 											  <beanlib:InputControl value="#item.InitUnitCost" style="text-align:right" format="#,##0.00;(#,##0.00)"/>                                  
-											  <beanlib:InputControl type="hidden" name="InitUnitCost" value="#item.InitUnitCost" uniqueName="yes"/>
+											  <beanlib:InputControl type="hidden" name="RetailPrice" value="#item.InitUnitCost" uniqueName="yes"/>
 										 </td>
 										 <td  align="right" valign="bottom">
 											  <beanlib:InputControl type="text" name="OrderQty" value="#item.OrderQty" style="text-align:right" size="5" uniqueName="yes"/>                                  
 										 </td>
 										 <td  align="center" valign="bottom">
-											  <beanlib:InputControl value="#item.QtyOnHand"/>                                  
+											  <beanlib:InputControl value="#item.QtyOnHand"/> 
+											  <beanlib:InputControl type="hidden" name="QtyOnHand" value="#item.QtyOnHand" uniqueName="yes"/>                                 
+											  <beanlib:InputControl type="hidden" name="InitMarkup" value="#item.InitMarkup" uniqueName="yes"/>
 										 </td>
 									 </tr>
 								 </beanlib:LoopRows>
@@ -160,9 +164,8 @@
 				</tr>
 		  </table>
 		  				  
-			<div id="OrderTotalLayer" style="position:relative; top:50px; width:100%; height:80px; z-index:1">
+			<div id="OrderTotalLayer" style="position:relative; top:25px; width:100%; height:80px; z-index:1">
 			  <table width="80%" cellpadding="0" cellspacing="0">
-				  <!-- Display command buttons -->
 				  <tr>
 					<td width="14%" align="right">
 					    <font size="2">
@@ -173,9 +176,9 @@
 					<td width="85%" align="left">
    					    <font size="3" color="blue">
    					      <strong>
-                    <beanlib:InputControl value="#salesorder.OrderTotal" format="$#,##0.00;($#,##0.00)"/>
-                  </strong>
-						      <beanlib:InputControl type="hidden" name="XactAmount" value="#salesorder.OrderTotal"/>                                  
+                            <beanlib:InputControl value="#salesorder.OrderTotal" format="$#,##0.00;($#,##0.00)"/>
+                          </strong>
+						  <beanlib:InputControl type="hidden" name="XactAmount" value="#salesorder.OrderTotal"/>                                  
 					    </font>
 					</td>
 				 </tr>		
@@ -209,40 +212,37 @@
 						</td>
 					</tr>
 				    <tr>
-							<td id="ReasonLabel" align="right" style="visibility:hidden">
-								<font size="2">
-									<b>Invoice Reason:</b>
-								</font>
-							</td>
-							<td><img src="/images/clr.gif" width="1"></td>
-							<td align="left">
-								<font size="3" color="blue">
-								   <beanlib:InputControl type="text" name="Reason" value="#salesorder.Reason" size="90" maxLength="100" style="visibility:hidden"/>
-								</font>
-							</td>
-						 </tr>						 	
+						<td id="ReasonLabel" align="right" style="visibility:hidden">
+							<font size="2">
+								<b>Invoice Reason:</b>
+							</font>
+						</td>
+						<td><img src="/images/clr.gif" width="1"></td>
+						<td align="left">
+							<font size="3" color="blue">
+							   <beanlib:InputControl type="text" name="Reason" value="#salesorder.Reason" size="90" maxLength="100" style="visibility:hidden"/>
+							</font>
+						</td>
+					 </tr>						 	
 				  </gen:When>
 				  <gen:When expression="1">
 				    <tr>
-							<td id="ReasonLabel" align="right">
-								<font size="2">
-									<b>Invoice Reason:</b>
-								</font>
-							</td>
-							<td><img src="/images/clr.gif" width="1"></td>
-							<td align="left">
-								<font size="3" color="black">
-								   <beanlib:InputControl value="#salesorder.Reason"/>
-								</font>
-							</td>
-						 </tr>						 	
+						<td id="ReasonLabel" align="right">
+							<font size="2">
+								<b>Invoice Reason:</b>
+							</font>
+						</td>
+						<td><img src="/images/clr.gif" width="1"></td>
+						<td align="left">
+							<font size="3" color="black">
+							   <beanlib:InputControl value="#salesorder.Reason"/>
+							</font>
+						</td>
+					 </tr>						 	
 				  </gen:When>
 		  	</gen:Evaluate>
-		  	
-	 						 
 		  </table>			   
 		 </div>	  <!-- end ButtonLayer div -->
-     <br>
      
 		  <!-- Display command buttons -->
 			<div id="ButtonLayer" style="position:relative; top:50px; width:100%; height:30px; z-index:1">

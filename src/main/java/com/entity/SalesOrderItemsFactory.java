@@ -39,16 +39,23 @@ public class SalesOrderItemsFactory {
             soi.setItemName(item.getItem().getDescription());
         }
         soi.setOrderQty(item.getOrderQty() != null ? item.getOrderQty().doubleValue() : 0);
+        if (item.getItem() != null) {
+            if (item.getItem().getOverrideRetail() != null && item.getItem().getOverrideRetail().intValue() == 1) {
+                soi.setInitUnitCost(item.getItem().getRetailPrice() != null ? item.getItem().getRetailPrice()
+                        .doubleValue() : 0);
+            }
+            else {
+                soi.setInitUnitCost(item.getUnitCost() != null && item.getMarkup() != null
+                        ? (item.getUnitCost().doubleValue() * item.getMarkup().doubleValue()) : 0);
+            }
+            if (item.getItem().getMarkup() != null) {
+                soi.setInitMarkup(item.getItem().getMarkup().doubleValue());
+            }
+            if (item.getItem().getQtyOnHand() != null) {
+                soi.setQtyOnHand(item.getItem().getQtyOnHand().intValue());
+            }
+        }
 
-        if (item.getItem() != null && item.getItem().getOverrideRetail() != null
-                && item.getItem().getOverrideRetail().intValue() == 1) {
-            soi.setInitUnitCost(item.getItem().getRetailPrice() != null ? item.getItem().getRetailPrice()
-                    .doubleValue() : 0);
-        }
-        else {
-            soi.setInitUnitCost(item.getUnitCost() != null && item.getMarkup() != null
-                    ? (item.getUnitCost().doubleValue() * item.getMarkup().doubleValue()) : 0);
-        }
         return soi;
     }
 

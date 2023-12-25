@@ -1,16 +1,27 @@
 package com.action.xact.sales;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import testcases.bean.Xact;
+
 import com.SystemException;
+import com.api.jsp.action.AbstractActionHandler;
 import com.api.persistence.DatabaseException;
 import com.api.persistence.db.DatabaseConnectionBean;
+import com.api.util.RMT2Date;
+import com.api.util.RMT2String;
 import com.api.web.ActionCommandException;
 import com.api.web.Context;
 import com.api.web.Request;
 import com.api.web.Response;
+import com.entity.SalesOrder;
+import com.entity.SalesOrderFactory;
+import com.entity.SalesOrderItemsFactory;
 
 /**
  * This class provides functionality to serve the requests of the Customer New
@@ -31,11 +42,17 @@ public class CustomerSalesOrderEditAction extends CustomerSalesOrderListAction {
 
     private boolean invoiceRequested;
 
+    private boolean invoiced;
+
     private boolean receivePaymentRequested;
 
     private static Logger logger;
 
     private List orderList;
+
+    private double orderTotal;
+
+    private Date effectiveDate;
 
     /**
      * Default constructor
@@ -149,8 +166,8 @@ public class CustomerSalesOrderEditAction extends CustomerSalesOrderListAction {
      * @throws ActionCommandException
      */
     public void save() throws ActionCommandException {
-        super.save();
-        // this.getServiceAndMerchandiseItems();
+        Xact invoiceXact = this.updateSalesOrder();
+
         // DatabaseTransApi tx = DatabaseTransFactory.create();
         // this.salesApi = SalesFactory.createApi((DatabaseConnectionBean)
         // tx.getConnector(), this.request);
@@ -215,8 +232,122 @@ public class CustomerSalesOrderEditAction extends CustomerSalesOrderListAction {
      * 
      * @throws ActionCommandException
      */
-    private void getServiceAndMerchandiseItems() throws ActionCommandException {
-        List items;
+    private List<com.entity.SalesOrderItems> getRequestItems() throws ActionCommandException {
+        com.entity.SalesOrderItems soi = null;
+        List<com.entity.SalesOrderItems> items = null;
+        String rowIndexes[] = null;
+        String msg = null;
+        String value = null;
+        String property = null;
+        int salesOrderItemId = 0;
+        int itemId = 0;
+        int orderQty = 0;
+        double markUp = 0;
+        Double retailPrice = null;
+        int row = 0;
+        double orderTotal = 0;
+
+        logger.log(Level.DEBUG, "Retrieving sales order items from client UI");
+        property = AbstractActionHandler.CLIENT_ITEM_ROWID;
+        rowIndexes = this.request.getParameterValues(property);
+        if (items == null) {
+            items = new ArrayList<>();
+        }
+
+        // Return to caller if there are no items to process.
+        if (rowIndexes == null) {
+            return items;
+        }
+
+        for (int ndx = 0; ndx < rowIndexes.length; ndx++) {
+            try {
+                // Get row number
+                msg = "Problem converting row value to integer.";
+                row = Integer.parseInt(rowIndexes[ndx]);
+
+                // Was item selected by the user?
+                property = AbstractActionHandler.CLIENT_ITEM_SELECTOR + row;
+                value = this.request.getParameter(property);
+                if (value != null) {
+                    // Do not include this item if it is selected to be removed
+                    // from the order
+                    property = "ItemId" + row;
+                    value = this.request.getParameter(property);
+                    logger.log(Level.DEBUG, "The following item was removed from sales order: " + value);
+                    continue;
+                }
+
+                // Get sales order item id
+                msg = "Problem converting sales order item id value to integer.";
+                property = "SalesOrderId" + row;
+                value = this.request.getParameter(property);
+                salesOrderItemId = Integer.parseInt(value);
+
+                // Get item master id
+                msg = "Problem converting Item Master id value to integer.";
+                property = "ItemId" + row;
+                value = this.request.getParameter(property);
+                itemId = Integer.parseInt(value);
+
+                // Get Quantity ordered for item
+                msg = "Problem converting Item Quantity ordered value to integer.";
+                property = "OrderQty" + row;
+                value = this.request.getParameter(property);
+                orderQty = new Double(value).intValue();
+                logger.log(Level.DEBUG, "Quantity Ordered for property, " + property + ", is : " + orderQty);
+
+                // Get item cost amount for item
+                msg = "Retail price for item was not editable/available from the UI";
+                property = "RetailPrice" + row;
+                value = this.request.getParameter(property);
+                if (value != null) {
+                    try {
+                        value = RMT2String.replace(value, "", "$");
+                        value = RMT2String.replace(value, "", ",");
+                        retailPrice = new Double(value);
+                    } catch (NumberFormatException e) {
+                        retailPrice = null;
+                        logger.log(Level.DEBUG, msg);
+                    }
+                }
+
+                // Get Mark Up
+                msg = "Problem converting Mark Up value to integer.";
+                property = "InitMarkup" + row;
+                value = this.request.getParameter(property);
+                markUp = new Double(value).intValue();
+                logger.log(Level.DEBUG, "Mark Up for property, " + property + ", is : " + markUp);
+            } catch (NumberFormatException e) {
+                logger.log(Level.DEBUG, msg);
+                continue;
+            }
+
+            // Get general item details from the database and store in array
+            // list.
+            try {
+                soi = SalesOrderItemsFactory.create();
+                soi.setSoItemId(salesOrderItemId);
+                soi.setSoId(this.salesOrderId);
+                // TODO: Add logic to determine if name override is needed.
+                soi.setItemNameOverride(null);
+                soi.setOrderQty(orderQty);
+                // TODO: Add logic to determine if back order quantity is
+                // needed.
+                soi.setBackOrderQty(0);
+                if (retailPrice != null) {
+                    soi.setInitUnitCost(retailPrice.doubleValue());
+                    soi.setInitMarkup(markUp);
+                }
+                items.add(soi);
+            } catch (SystemException e) {
+                logger.log(Level.ERROR, e.getMessage());
+            }
+
+            // Sum Order Total
+            this.orderTotal += ((markUp * retailPrice) * orderQty);
+        } // end for
+
+        return items;
 
         // Get existing sales order items
         // try {
@@ -245,9 +376,24 @@ public class CustomerSalesOrderEditAction extends CustomerSalesOrderListAction {
      * @throws DatabaseException
      * @throws SalesOrderException
      */
-    // private Xact updateSalesOrder(DatabaseConnectionBean con) throws
-    // ActionCommandException, DatabaseException,
-    // SalesOrderException {
+    private Xact updateSalesOrder() throws ActionCommandException {
+        // Get request sales order items
+        List<com.entity.SalesOrderItems> items = this.getRequestItems();
+
+        // Build request sales order
+        SalesOrder so = SalesOrderFactory.create();
+        so.setSoId(this.salesOrderId);
+        so.setCustomerId(this.customerId);
+        so.setOrderTotal(this.orderTotal);
+        so.setEffectiveDate(this.effectiveDate);
+        so.setInvoiced(this.invoiced ? 1 : 0);
+
+        // TODO: make SOAP call to save sales order using the request sales
+        // order data
+
+        // , DatabaseException
+    // , SalesOrderException
+
     // Xact xact = null;
     // int salesOrderId = 0;
     // boolean isOkToInvoice = false;
@@ -317,7 +463,9 @@ public class CustomerSalesOrderEditAction extends CustomerSalesOrderListAction {
     // SalesOrderException("Sales Order Update failed due to general exception",
     // e);
     // }
-    // }
+
+        return null;
+    }
 
     /**
      * Applies cash receipt transaction for the invoiced sales order.
@@ -370,9 +518,17 @@ public class CustomerSalesOrderEditAction extends CustomerSalesOrderListAction {
         super.receiveClientData();
         String temp;
 
+        // Attempt to locate and obtain Sales Order effective date.
+        temp = this.getInputValue("EffectiveDate", null);
+        try {
+            this.effectiveDate = RMT2Date.stringToDate(temp);
+        } catch (SystemException e) {
+            throw new ActionCommandException("The sales order effective date is invalid");
+        }
+
         // Get Invoiced indicator for single row page of client
         temp = this.request.getParameter("Invoiced");
-        this.invoiceRequested = (temp != null);
+        this.invoiced = this.invoiceRequested = (temp.equals("1") ? true : false);
         // Get receive payment indicator for single row page of client
         temp = this.request.getParameter("InvoiceAndReceive");
         this.receivePaymentRequested = (temp != null);
