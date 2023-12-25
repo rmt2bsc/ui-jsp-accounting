@@ -110,7 +110,7 @@
 				</tr>
 				<tr> 
 					<td width="100%"> 
-						 <div id="SrvcLayer" style="position:relative; width:100%; height:330px; z-index:1; overflow:auto">
+						 <div id="SrvcLayer" style="position:relative; width:100%; height:45%; z-index:1; overflow:auto">
 							 <table width="100% border="0">
 							    <tr>
 								     <th width="6%" align="left" bgcolor="#FFCC00">Del</th>
