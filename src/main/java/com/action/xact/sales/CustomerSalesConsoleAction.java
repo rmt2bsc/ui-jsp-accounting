@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.rmt2.jaxb.AccountingTransactionResponse;
 import org.rmt2.jaxb.InventoryResponse;
 import org.rmt2.jaxb.ReplyStatusType;
+import org.rmt2.jaxb.SalesOrderListType;
 
 import testcases.bean.Xact;
 
@@ -27,6 +28,7 @@ import com.entity.CustomerCriteria;
 import com.entity.CustomerFactory;
 import com.entity.ItemMasterCriteria;
 import com.entity.SalesOrderInvoiceCriteria;
+import com.entity.SalesOrderItemsFactory;
 import com.entity.VwItemMaster;
 import com.entity.VwItemMasterFactory;
 import com.entity.VwSalesOrderInvoice;
@@ -61,6 +63,8 @@ public class CustomerSalesConsoleAction extends CustomerSalesSearchAction {
     protected int salesOrderId;
 
     protected VwSalesOrderInvoice salesOrder;
+
+    protected SalesOrderListType jaxbSalesOrderList;
 
     protected List SalesOrderItems;
 
@@ -146,6 +150,16 @@ public class CustomerSalesConsoleAction extends CustomerSalesSearchAction {
         this.sendClientData();
     }
 
+    /**
+     * Base method for retrieving a list inventory item master id's for a given
+     * sales order.
+     * 
+     * @return null
+     * @throws ActionCommandException
+     */
+    protected Integer[] getSelectedItems() throws ActionCommandException {
+        return null;
+    }
 
     /*
      * Retrieves the customer's sales order history using _cust.
@@ -371,6 +385,9 @@ public class CustomerSalesConsoleAction extends CustomerSalesSearchAction {
             List<VwSalesOrderInvoice> results = null;
             if (response.getProfile() != null && response.getProfile().getSalesOrders() != null) {
                 results = VwSalesOrderInvoiceFactory.create(response.getProfile());
+                // Save JAXB SalesOrderList object graph to memory for later
+                // use...
+                this.jaxbSalesOrderList = response.getProfile().getSalesOrders();
             }
             else {
                 results = new ArrayList<>();
@@ -381,6 +398,65 @@ public class CustomerSalesConsoleAction extends CustomerSalesSearchAction {
             logger.log(Level.ERROR, e.getMessage());
             throw new ActionCommandException(e.getMessage());
         }
+    }
+
+    protected void getCustomerSalesOrderForEdit() throws ActionCommandException {
+        this.receiveClientData();
+
+        // Setup Sales order profile
+        if (this.salesOrderId > 0) {
+            // Call SOAP web service to get existing sales order and items.
+            List<VwSalesOrderInvoice> results = this.getCustomerSalesOrderFull();
+            if (results != null && results.size() == 1) {
+                this.salesOrder = results.get(0);
+            }
+        }
+        else {
+            // Create new sales order profile for customer
+            this.salesOrder = VwSalesOrderInvoiceFactory.create();
+            this.salesOrder.setAccountNo(this.cust.getAccountNo());
+            this.salesOrder.setCustomerId(this.cust.getCustomerId());
+            this.salesOrder.setSalesOrderId(this.salesOrderId);
+            this.salesOrder.setDescription(this.cust.getLongname());
+            this.salesOrder.setInvoiced(0);
+        }
+
+        // Call SOAP web service to get the details of the list of selected
+        // Inventory Item Master records based on selection criteria
+        Integer items[] = this.getSelectedItems();
+        ItemMasterCriteria criteria = ItemMasterCriteria.getInstance();
+        criteria.setQry_ItemIdList(items);
+
+        List<VwItemMaster> newItems = null;
+        try {
+            InventoryResponse response = ItemMasterSoapRequests.callGet(criteria, this.loginId, this.session.getId());
+            ReplyStatusType rst = response.getReplyStatus();
+            this.msg = rst.getMessage();
+            if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
+                this.throwActionError(rst.getMessage(), rst.getExtMessage());
+            }
+            if (response.getProfile() != null && response.getProfile().getInvItem() != null) {
+                newItems = VwItemMasterFactory.create(response.getProfile().getInvItem());
+            }
+        } catch (Exception e) {
+            logger.log(Level.ERROR, e.getMessage());
+            throw new ActionCommandException(e.getMessage());
+        }
+
+        // Added new items to sales order profile
+        List<com.entity.SalesOrderItems> newItemList = new ArrayList<>();
+        for (VwItemMaster item : newItems) {
+            com.entity.SalesOrderItems soi = SalesOrderItemsFactory.create();
+            soi.setItemId(item.getId());
+            soi.setItemName(item.getDescription());
+            soi.setInitMarkup(item.getMarkup());
+            soi.setOrderQty(0);
+            soi.setQtyOnHand(item.getQtyOnHand());
+            soi.setInitUnitCost(item.getRetailPrice() > 0 && item.getOverrideRetail() == 1 ? item.getRetailPrice() : item
+                    .getUnitCost());
+            newItemList.add(soi);
+        }
+        this.salesOrder.setLineItems(newItemList);
     }
 
     /**

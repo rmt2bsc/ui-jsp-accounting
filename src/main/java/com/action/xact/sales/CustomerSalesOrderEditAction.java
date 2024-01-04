@@ -7,10 +7,12 @@ import java.util.List;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.rmt2.jaxb.AccountingTransactionResponse;
+import org.rmt2.jaxb.ReplyStatusType;
 
 import testcases.bean.Xact;
 
 import com.SystemException;
+import com.api.constants.GeneralConst;
 import com.api.jsp.action.AbstractActionHandler;
 import com.api.persistence.DatabaseException;
 import com.api.persistence.db.DatabaseConnectionBean;
@@ -21,6 +23,7 @@ import com.api.web.Context;
 import com.api.web.Request;
 import com.api.web.Response;
 import com.entity.SalesOrderItemsFactory;
+import com.entity.VwSalesOrderInvoice;
 import com.entity.VwSalesOrderInvoiceFactory;
 
 /**
@@ -394,6 +397,21 @@ public class CustomerSalesOrderEditAction extends CustomerSalesOrderListAction {
         AccountingTransactionResponse response = CustomerSalesOrderSoapRequests.callSave(this.salesOrder, this.loginId,
                 this.session.getId());
 
+        ReplyStatusType rst = response.getReplyStatus();
+        this.msg = rst.getMessage();
+        if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
+            this.throwActionError(rst.getMessage(), rst.getExtMessage());
+        }
+        List<VwSalesOrderInvoice> results = null;
+        if (response.getProfile() != null && response.getProfile().getSalesOrders() != null) {
+            results = VwSalesOrderInvoiceFactory.create(response.getProfile());
+        }
+        else {
+            results = new ArrayList<>();
+        }
+        this.msg += ": " + results.size();
+        return null;
+
         // , DatabaseException
     // , SalesOrderException
 
@@ -467,7 +485,7 @@ public class CustomerSalesOrderEditAction extends CustomerSalesOrderListAction {
     // e);
     // }
 
-        return null;
+        // return null;
     }
 
     /**

@@ -5,15 +5,11 @@ import java.util.List;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.rmt2.jaxb.InventoryResponse;
 import org.rmt2.jaxb.ObjectFactory;
-import org.rmt2.jaxb.ReplyStatusType;
 import org.rmt2.jaxb.SimpleItemListType;
 
 import com.SystemException;
 import com.action.inventory.ItemConst;
-import com.action.inventory.ItemMasterSoapRequests;
-import com.api.constants.GeneralConst;
 import com.api.persistence.DatabaseException;
 import com.api.util.RMT2Money;
 import com.api.util.RMT2String2;
@@ -21,12 +17,6 @@ import com.api.web.ActionCommandException;
 import com.api.web.Context;
 import com.api.web.Request;
 import com.api.web.Response;
-import com.entity.ItemMasterCriteria;
-import com.entity.SalesOrderItemsFactory;
-import com.entity.VwItemMaster;
-import com.entity.VwItemMasterFactory;
-import com.entity.VwSalesOrderInvoice;
-import com.entity.VwSalesOrderInvoiceFactory;
 
 /**
  * This class provides functionality to serve the requests of the Customer New
@@ -108,58 +98,7 @@ public class CustomerNewSalesItemSelectAction extends CustomerSalesConsoleAction
 
         // Call SOAP web service to get the details of the list of selected
         // Inventory Item Master records based on selection criteria
-        Integer items[] = this.getSelectedItems();
-        ItemMasterCriteria criteria = ItemMasterCriteria.getInstance();
-        criteria.setQry_ItemIdList(items);
-
-        List<VwItemMaster> newItems = null;
-        try {
-            InventoryResponse response = ItemMasterSoapRequests.callGet(criteria, this.loginId, this.session.getId());
-            ReplyStatusType rst = response.getReplyStatus();
-            this.msg = rst.getMessage();
-            if (rst.getReturnCode().intValue() == GeneralConst.RC_FAILURE) {
-                this.throwActionError(rst.getMessage(), rst.getExtMessage());
-            }
-            if (response.getProfile() != null && response.getProfile().getInvItem() != null) {
-                newItems = VwItemMasterFactory.create(response.getProfile().getInvItem());
-            }
-        } catch (Exception e) {
-            logger.log(Level.ERROR, e.getMessage());
-            throw new ActionCommandException(e.getMessage());
-        }
-
-        // Setup Sales order profile
-        if (this.salesOrderId > 0) {
-            // Call SOAP web service to get existing sales order and items.
-            List<VwSalesOrderInvoice> results = this.getCustomerSalesOrderFull();
-            if (results != null && results.size() == 1) {
-                this.salesOrder = results.get(0);
-            }
-        }
-        else {
-            // Create new sales order profile for customer
-            this.salesOrder = VwSalesOrderInvoiceFactory.create();
-            this.salesOrder.setAccountNo(this.cust.getAccountNo());
-            this.salesOrder.setCustomerId(this.cust.getCustomerId());
-            this.salesOrder.setSalesOrderId(this.salesOrderId);
-            this.salesOrder.setDescription(this.cust.getLongname());
-            this.salesOrder.setInvoiced(0);
-        }
-
-        // Added new items to sales order profile
-        List<com.entity.SalesOrderItems> newItemList = new ArrayList<>();
-        for (VwItemMaster item : newItems) {
-            com.entity.SalesOrderItems soi = SalesOrderItemsFactory.create();
-            soi.setItemId(item.getId());
-            soi.setItemName(item.getDescription());
-            soi.setInitMarkup(item.getMarkup());
-            soi.setOrderQty(0);
-            soi.setQtyOnHand(item.getQtyOnHand());
-            soi.setInitUnitCost(item.getRetailPrice() > 0 && item.getOverrideRetail() == 1 ? item.getRetailPrice() : item
-                    .getUnitCost());
-            newItemList.add(soi);
-        }
-        this.salesOrder.setLineItems(newItemList);
+        this.getCustomerSalesOrderForEdit();
     }
 
     /**
@@ -167,8 +106,9 @@ public class CustomerNewSalesItemSelectAction extends CustomerSalesConsoleAction
      * service and merchandise items selected by the user.
      * 
      * @return String[] A list of Item Master id's as type String.
+     * @throws ActionCommandException
      */
-    private Integer[] getSelectedItems() {
+    protected Integer[] getSelectedItems() throws ActionCommandException {
         SimpleItemListType silt = this.f.createSimpleItemListType();
 
         List<Integer> list = new ArrayList<>();

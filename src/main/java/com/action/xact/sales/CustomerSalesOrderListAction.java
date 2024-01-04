@@ -1,8 +1,12 @@
 package com.action.xact.sales;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.rmt2.jaxb.SalesOrderItemType;
+import org.rmt2.jaxb.SalesOrderType;
 
 import com.SystemException;
 import com.api.persistence.DatabaseException;
@@ -11,7 +15,6 @@ import com.api.web.Context;
 import com.api.web.Request;
 import com.api.web.Response;
 import com.entity.CustomerCriteria;
-import com.entity.VwSalesOrderInvoice;
 
 /**
  * This class provides functionality to serve the requests of the Customer Sales
@@ -97,10 +100,42 @@ public class CustomerSalesOrderListAction extends CustomerSalesConsoleAction {
      * @throws ActionCommandException
      */
     public void edit() throws ActionCommandException {
-        List<VwSalesOrderInvoice> results = this.getCustomerSalesOrderFull();
-        if (results != null && results.size() == 1) {
-            this.salesOrder = results.get(0);
+        this.getCustomerSalesOrderForEdit();
+    }
+
+    /**
+     * Extracts a inventory item master identifiers from the <b>current</b>
+     * sales order's list of sales order items and fetches inventory details of
+     * each sales order item.
+     * 
+     * @return String[] A list of Item Master id's as type String.
+     * @throws ActionCommandException
+     *             when more than one sales order exists.
+     */
+    protected Integer[] getSelectedItems() throws ActionCommandException {
+        if (this.salesOrder == null || this.jaxbSalesOrderList == null || this.jaxbSalesOrderList.getSalesOrder() == null) {
+            return null;
         }
+        if (this.jaxbSalesOrderList.getSalesOrder().size() > 1) {
+            throw new ActionCommandException(
+                    "Unable to obtain list of inventory item master id's due multiple sales orders were found");
+        }
+        List<Integer> list = new ArrayList<>();
+        for (SalesOrderType so : this.jaxbSalesOrderList.getSalesOrder()) {
+            if (so.getSalesOrderItems() != null) {
+                List<SalesOrderItemType> items = so.getSalesOrderItems().getSalesOrderItem();
+                for (SalesOrderItemType item : items) {
+                    if (item.getItem() != null && item.getItem().getItemId() != null) {
+                        list.add(item.getItem().getItemId().intValue());
+                    }
+                }
+            }
+        }
+
+        Integer items[] = new Integer[list.size()];
+        items = (Integer[]) list.toArray(items);
+        logger.log(Level.INFO, "Total Items selected: " + items.length);
+        return items;
     }
 
     /**
