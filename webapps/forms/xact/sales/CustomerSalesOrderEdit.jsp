@@ -17,6 +17,7 @@
 	<link rel=STYLESHEET type="text/css" href="<%=APP_ROOT%>/css/RMT2General.css">
 	<script Language="JavaScript" src="<%=APP_ROOT%>/js/RMT2General.js"></script>
     <script Language="JavaScript" src="<%=APP_ROOT%>/js/RMT2Menu.js"></script>
+    <script type='text/javascript' language='javascript' src="<%=APP_ROOT%>/js/datetimepicker.js"></script>
     <script Language="JavaScript">
 			function enableReason() {
 			   var obj;
@@ -95,7 +96,8 @@
 					</font>
 				</td>
 				<td width="70%">
-				   <beanlib:InputControl type="text" name="EffectiveDate" value="#salesorder.SalesOrderDate" format="MM-dd-yyyy"/>
+				   <beanlib:InputControl id="SalesOrderDate" type="text" name="EffectiveDate" value="#salesorder.SalesOrderDate" format="MM-dd-yyyy"/>
+				   <a href="javascript:NewCal('SalesOrderDate','mmddyyyy')"><img src="<%=APP_ROOT%>/images/cal.gif" width="16" height="16" border="0" alt="Pick a date"></a>
 				</td>
 			</tr>    			
 		</table>
