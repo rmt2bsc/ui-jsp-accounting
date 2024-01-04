@@ -97,7 +97,9 @@
 				</td>
 				<td width="70%">
 				   <beanlib:InputControl id="SalesOrderDate" type="text" name="EffectiveDate" value="#salesorder.SalesOrderDate" format="MM-dd-yyyy"/>
-				   <a href="javascript:NewCal('SalesOrderDate','mmddyyyy')"><img src="<%=APP_ROOT%>/images/cal.gif" width="16" height="16" border="0" alt="Pick a date"></a>
+				   <a href="javascript:NewCal('SalesOrderDate','mmddyyyy')">
+				      <img src="<%=APP_ROOT%>/images/cal.gif" width="16" height="16" border="0" alt="Pick sales order date">
+				   </a>
 				</td>
 			</tr>    			
 		</table>
