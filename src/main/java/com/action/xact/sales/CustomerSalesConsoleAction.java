@@ -153,6 +153,9 @@ public class CustomerSalesConsoleAction extends CustomerSalesSearchAction {
     /**
      * Base method for retrieving a list inventory item master id's for a given
      * sales order.
+     * <p>
+     * Override this method in order to provided specific logic needed to obtain
+     * the correct details of each of the sales order's line items.
      * 
      * @return null
      * @throws ActionCommandException
