@@ -56,6 +56,16 @@
 		  <h3><strong><%=pageTitle%></strong></h3>
 	  
 		  <table width="60%" border="0">
+		     <tr> 
+				<td align="right" width="30%" bgcolor="#FFCC00"> 
+					<font size="2">
+						<b>Customer Id</b>
+					 </font>
+				</td>
+				<td width="70%">
+				   <beanlib:InputControl value="#salesorder.CustomerId"/> 
+				</td>
+			</tr>    
 			 <tr> 
 				<td align="right" width="30%" bgcolor="#FFCC00"> 
 					<font size="2">
