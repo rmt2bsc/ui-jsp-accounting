@@ -40,13 +40,19 @@ public class SalesOrderItemsFactory {
         }
         soi.setOrderQty(item.getOrderQty() != null ? item.getOrderQty().doubleValue() : 0);
         if (item.getItem() != null) {
-            if (item.getItem().getOverrideRetail() != null && item.getItem().getOverrideRetail().intValue() == 1) {
-                soi.setInitUnitCost(item.getItem().getRetailPrice() != null ? item.getItem().getRetailPrice()
+            if (item.getItem().getOverrideRetail() != null && item.getItem().getOverrideRetail().intValue() == 1
+                    && item.getItem().getItemType() != null & item.getItem().getItemType().getItemTypeId() != null
+                    && item.getItem().getItemType().getItemTypeId().intValue() == 2) {
+                soi.setRetailPrice(item.getItem().getRetailPrice() != null ? item.getItem().getRetailPrice()
                         .doubleValue() : 0);
             }
             else {
-                soi.setInitUnitCost(item.getUnitCost() != null && item.getMarkup() != null
+                soi.setRetailPrice(item.getUnitCost() != null && item.getMarkup() != null
                         ? (item.getUnitCost().doubleValue() * item.getMarkup().doubleValue()) : 0);
+            }
+
+            if (item.getUnitCost() != null) {
+                soi.setInitUnitCost(item.getUnitCost().doubleValue());
             }
             if (item.getItem().getMarkup() != null) {
                 soi.setInitMarkup(item.getItem().getMarkup().doubleValue());

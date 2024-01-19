@@ -24,6 +24,7 @@ public class SalesOrderItems extends OrmBean {
 /** The property name constant equivalent to property, ItemId, of respective DataSource view. */
   public static final String PROP_ITEMID = "ItemId";
     public static final String PROP_ITEMNAME = "ItemName";
+    public static final String PROP_ITEMTYPE = "ItemTypeId";
 /** The property name constant equivalent to property, SoId, of respective DataSource view. */
   public static final String PROP_SOID = "SoId";
 /** The property name constant equivalent to property, ItemNameOverride, of respective DataSource view. */
@@ -37,6 +38,7 @@ public class SalesOrderItems extends OrmBean {
 /** The property name constant equivalent to property, InitMarkup, of respective DataSource view. */
   public static final String PROP_INITMARKUP = "InitMarkup";
     public static final String PROP_QTYONHAND = "QtyOnHand";
+    public static final String PROP_RETAILPRICE = "RetailPrice";
 
 
 	/** The javabean property equivalent of database column sales_order_items.so_item_id */
@@ -62,6 +64,8 @@ public class SalesOrderItems extends OrmBean {
      */
     private int qtyOnHand;
 
+    private double retailPrice;
+    private int itemTypeId;
 
 
 	// Getter/Setter Methods
@@ -259,5 +263,21 @@ public String toString() {
 
     public void setItemName(String itemName) {
         this.itemName = itemName;
+    }
+
+    public double getRetailPrice() {
+        return retailPrice;
+    }
+
+    public void setRetailPrice(double retailPrice) {
+        this.retailPrice = retailPrice;
+    }
+
+    public int getItemTypeId() {
+        return itemTypeId;
+    }
+
+    public void setItemTypeId(int itemTypeId) {
+        this.itemTypeId = itemTypeId;
     }
 }

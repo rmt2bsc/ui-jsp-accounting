@@ -120,7 +120,7 @@
 				<tr> 
 					<td align="left" width="50%" bgcolor="#0000CC">
 						 <font size="3" color="white">
-							<b>Items</b>
+							<b>Line Items</b>
 						</font>
 					 </td>
 				</tr>
@@ -130,7 +130,9 @@
 							 <table width="100% border="0">
 							    <tr>
 								     <th width="6%" align="left" bgcolor="#FFCC00">Del</th>
-								     <th width="64%" align="left" bgcolor="#FFCC00">Item Name</th>
+								     <th width="10%" align="left" bgcolor="#FFCC00">ID</th>
+								     <th width="10%" align="left" bgcolor="#FFCC00">Type</th>
+								     <th width="44%" align="left" bgcolor="#FFCC00">Name</th>
 									 <th width="10%"  align="center" bgcolor="#FFCC00">Price</th>
 									 <th width="10%"  align="center" bgcolor="#FFCC00">Order Qty</th>
 									 <th width="10%"  align="center" bgcolor="#FFCC00">Qty Avail</th>
@@ -140,19 +142,59 @@
 									     <td>
 										     <beanlib:InputControl dataSource="item" type="checkbox" name="selCbx" value="rowid" uniqueName="yes"/>
 											 <beanlib:InputControl dataSource="item" type="hidden" name="rowId" value="rowid"/>
+											 <beanlib:InputControl type="hidden" name="SalesOrderId" value="#item.SoId" uniqueName="yes"/>
 										 </td>
 										 <td>
-										      <beanlib:InputControl type="hidden" name="SalesOrderId" value="#item.SoId" uniqueName="yes"/>                                  
 										      <beanlib:InputControl type="hidden" name="ItemId" value="#item.ItemId" uniqueName="yes"/>                                  										 
+  											  <beanlib:InputControl value="#item.ItemId"/>                                  
+										 </td>
+										 <td>
+										      <beanlib:InputControl type="hidden" name="ItemType" value="#item.ItemTypeId" uniqueName="yes"/>   
+										      <gen:Evaluate expression="#item.ItemTypeId">
+				                                  <gen:When expression="1">                               										 
+  											         <beanlib:InputControl value="SRVC"/>
+  											      </gen:When>
+  											      <gen:When expression="2">
+  											          <beanlib:InputControl value="MERCH"/>
+  											      </gen:When>        
+  											      <gen:WhenElse>
+  											          <beanlib:InputControl value="UKN"/>
+  											      </gen:WhenElse>    
+  											   </gen:Evaluate>                      
+										 </td>
+										 <td>
   											  <beanlib:InputControl value="#item.ItemName"/>                                  
   											  <beanlib:InputControl type="hidden" name="ItemName" value="#item.ItemName" uniqueName="yes"/>  
 										 </td>
+										 
+										 <!-- Determine whether Retail Price should allow editing -->
 										 <td  align="right" valign="bottom">
-											  <beanlib:InputControl value="#item.InitUnitCost" style="text-align:right" format="#,##0.00;(#,##0.00)"/>                                  
-											  <beanlib:InputControl type="hidden" name="RetailPrice" value="#item.InitUnitCost" uniqueName="yes"/>
+										      <gen:Evaluate expression="#item.ItemTypeId">
+				                                  <gen:When expression="1">                               										 
+  											         <beanlib:InputControl type="text" name="RetailPrice" value="#item.RetailPrice" style="text-align:right" size="7" uniqueName="yes"/>
+  											      </gen:When>
+  											      <gen:When expression="2">
+  											          <beanlib:InputControl value="#item.RetailPrice" style="text-align:right" format="#,##0.00;(#,##0.00)"/>                                  
+											          <beanlib:InputControl type="hidden" name="RetailPrice" value="#item.RetailPrice" uniqueName="yes"/>
+  											      </gen:When>        
+  											      <gen:WhenElse>
+  											          <beanlib:InputControl type="hidden" name="RetailPrice" value="0" uniqueName="yes"/>
+  											          <beanlib:InputControl value="0"/>
+  											      </gen:WhenElse>    
+  											   </gen:Evaluate>      
 										 </td>
+										 
 										 <td  align="right" valign="bottom">
-											  <beanlib:InputControl type="text" name="OrderQty" value="#item.OrderQty" style="text-align:right" size="5" uniqueName="yes"/>                                  
+										      <gen:Evaluate expression="#item.ItemTypeId">
+				                                  <gen:When expression="1">                               							
+				                                     <beanlib:InputControl value="1"/>			 
+  											         <beanlib:InputControl type="hidden" name="OrderQty" value="1" uniqueName="yes"/>
+  											      </gen:When>
+  											      <gen:When expression="2">
+  											          <beanlib:InputControl type="text" name="OrderQty" value="#item.OrderQty"  style="text-align:right" size="5" uniqueName="yes"/>
+  											      </gen:When>        
+  											   </gen:Evaluate>      
+											                                    
 										 </td>
 										 <td  align="center" valign="bottom">
 											  <beanlib:InputControl value="#item.QtyOnHand"/> 
@@ -208,7 +250,7 @@
 						<td><img src="/images/clr.gif" width="1"></td>
 						<td align="left">
 							<font size="3" color="blue">
-						  	 <beanlib:InputControl type="checkbox" name="Invoiced" value="#salesorder.Invoiced" checkedValue="1" onClick="enableReason()"/> 
+						  	 <beanlib:InputControl type="checkbox" name="InvoiceOnly" value="#salesorder.Invoiced" checkedValue="1" onClick="enableReason()"/> 
 							</font>
 						</td>
 					</tr>

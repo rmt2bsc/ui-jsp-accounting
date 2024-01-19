@@ -1,7 +1,9 @@
 package com.entity;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.rmt2.jaxb.InventoryItemType;
 
@@ -55,10 +57,12 @@ public class VwItemMasterFactory {
             o.setQtyOnHand(item.getQtyOnHand() != null ? item.getQtyOnHand().intValue() : 0);
             o.setUnitCost(item.getUnitCost() != null ? item.getUnitCost().doubleValue() : 0);
             o.setMarkup(item.getMarkup() != null ? item.getMarkup().doubleValue() : 0);
-            o.setRetailPrice(item.getRetailPrice() != null ? item.getRetailPrice().doubleValue() : 0);
             o.setOverrideRetail(item.getOverrideRetail() != null ? item.getOverrideRetail().intValue() : 0);
-            o.setActive(item.getActive() != null ? item.getActive().intValue() : 0);
 
+            if (item.getRetailPrice() != null) {
+                o.setRetailPrice(item.getRetailPrice().doubleValue());
+            }
+            o.setActive(item.getActive() != null ? item.getActive().intValue() : 0);
             if (item.getTracking() != null) {
                 o.setUpdateUserid(item.getTracking().getUserId());
             }
@@ -86,6 +90,30 @@ public class VwItemMasterFactory {
             List<VwItemMaster> obj = new ArrayList<>();
             for (InventoryItemType item : items) {
                 obj.add(VwItemMasterFactory.create(item));
+            }
+            return obj;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * Create a Map of new VwItemMaster instances keyed by item id.
+     * 
+     * @param items
+     *            List of {@link InventoryItemType}
+     * @return Map of Integer, {@link VwItemMaster} or null when <I>items</i> is
+     *         found to be null or when an error occurs.
+     */
+    public static Map<Integer, VwItemMaster> createMap(List<InventoryItemType> items) {
+        if (items == null) {
+            return null;
+        }
+
+        try {
+            Map<Integer, VwItemMaster> obj = new HashMap<Integer, VwItemMaster>();
+            for (InventoryItemType item : items) {
+                obj.put(item.getItemId().intValue(), VwItemMasterFactory.create(item));
             }
             return obj;
         } catch (Exception e) {

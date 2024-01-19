@@ -1,7 +1,9 @@
 package com.action.xact.sales;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.rmt2.constants.ApiHeaderNames;
@@ -10,12 +12,19 @@ import org.rmt2.jaxb.AccountingTransactionRequest;
 import org.rmt2.jaxb.AccountingTransactionResponse;
 import org.rmt2.jaxb.CustomerCriteriaType;
 import org.rmt2.jaxb.HeaderType;
+import org.rmt2.jaxb.InventoryItemType;
 import org.rmt2.jaxb.ObjectFactory;
 import org.rmt2.jaxb.SalesOrderCriteria;
+import org.rmt2.jaxb.SalesOrderItemType;
+import org.rmt2.jaxb.SalesOrderListType;
+import org.rmt2.jaxb.SalesOrderType;
 import org.rmt2.jaxb.TransactionCriteriaGroup;
 import org.rmt2.jaxb.TransactionDetailGroup;
 import org.rmt2.jaxb.XactCustomCriteriaTargetType;
 import org.rmt2.util.HeaderTypeBuilder;
+import org.rmt2.util.accounting.inventory.InventoryItemTypeBuilder;
+import org.rmt2.util.accounting.transaction.sales.SalesOrderItemTypeBuilder;
+import org.rmt2.util.accounting.transaction.sales.SalesOrderTypeBuilder;
 
 import com.AccountingUIException;
 import com.action.gl.subsidiary.SubsidiarySoapRequests;
@@ -24,6 +33,7 @@ import com.api.security.authentication.web.AuthenticationException;
 import com.api.util.RMT2String2;
 import com.entity.Customer;
 import com.entity.SalesOrderInvoiceCriteria;
+import com.entity.SalesOrderItems;
 import com.entity.VwSalesOrderInvoice;
 
 /**
@@ -121,15 +131,14 @@ public class CustomerSalesOrderSoapRequests extends SubsidiarySoapRequests {
      */
     public static final AccountingTransactionResponse callSave(VwSalesOrderInvoice data, String loginId, String sessionId)
             throws AccountingUIException {
-        // Retrieve all code group records from the database
         ObjectFactory fact = new ObjectFactory();
         AccountingTransactionRequest req = fact.createAccountingTransactionRequest();
 
         HeaderType head = HeaderTypeBuilder.Builder.create()
                 .withApplication(ApiHeaderNames.APP_NAME_ACCOUNTING)
-                .withModule(ApiTransactionCodes.MODULE_ACCOUNTING_SUBSIDIARY)
+                .withModule(ApiTransactionCodes.MODULE_ACCOUNTING_XACT)
                 .withTransaction(data.getSalesOrderId() > 0 ? ApiTransactionCodes.ACCOUNTING_SALESORDER_UPDATE
-                                : ApiTransactionCodes.ACCOUNTING_SALESORDER_CREATE)
+                        : ApiTransactionCodes.ACCOUNTING_SALESORDER_CREATE)
                 .withMessageMode(ApiHeaderNames.MESSAGE_MODE_REQUEST)
                 .withDeliveryDate(new Date())
                 .withRouting(ApiTransactionCodes.ROUTE_ACCOUNTING)
@@ -138,13 +147,13 @@ public class CustomerSalesOrderSoapRequests extends SubsidiarySoapRequests {
                 .withSessionId(sessionId)
                 .build();
 
-
-                
         TransactionDetailGroup profileGroup = fact.createTransactionDetailGroup();
-        profileGroup.setCustomers(fact.createCustomerListType());
-        // profileGroup.getCustomers().getCustomer().add(custType);
-        req.setHeader(head);
+        SalesOrderListType silt = fact.createSalesOrderListType();
+        SalesOrderType so = CustomerSalesOrderSoapRequests.setupSalesOrder(data);
+        silt.getSalesOrder().add(so);
+        profileGroup.setSalesOrders(silt);
         req.setProfile(profileGroup);
+        req.setHeader(head);
 
         AccountingTransactionResponse response = null;
         try {
@@ -204,5 +213,56 @@ public class CustomerSalesOrderSoapRequests extends SubsidiarySoapRequests {
         } catch (Exception e) {
             throw new AuthenticationException(CustomerSalesOrderSoapRequests.MSG, e);
         }
+    }
+    
+    
+    private static final SalesOrderType setupSalesOrder(VwSalesOrderInvoice data) {
+        if (data == null) {
+            return null;
+        }
+        ObjectFactory fact = new ObjectFactory();
+        List<SalesOrderItemType> lineItems = CustomerSalesOrderSoapRequests.setupSalesOrderLineItems(data.getLineItems());
+
+        SalesOrderType sot = SalesOrderTypeBuilder.Builder.create()
+                .withSalesOrderId(data.getSalesOrderId())
+                .withCustomerId(data.getCustomerId())
+                .withCustomerName(data.getDescription())
+                .withCustomerAcctNo(data.getAccountNo())
+                .withInvoiced(data.getInvoiced() == 1)
+                .withOrderTotal(data.getOrderTotal())
+                .withEffectiveDate(data.getSalesOrderDate())
+                .withSalesOrderItems(lineItems)
+                .build();
+        return sot;
+    }
+    
+    private static final List<SalesOrderItemType> setupSalesOrderLineItems(List<SalesOrderItems> data) {
+        ObjectFactory fact = new ObjectFactory();
+        List <SalesOrderItemType> soItems = new ArrayList<>();
+        
+        for (SalesOrderItems item : data) {
+            InventoryItemType iit = InventoryItemTypeBuilder.Builder.create()
+                    .withItemId(item.getItemId())
+                    .withActive(true)
+                    .withItemName(item.getItemName())
+                    .withMarkup(item.getInitMarkup())
+                    .withUnitCost(item.getInitUnitCost())
+                    .withQtyOnHand(item.getQtyOnHand())
+                    .build();
+            
+            SalesOrderItemType soit = SalesOrderItemTypeBuilder.Builder.create()
+                    .withSalesOrderItemId(item.getSoItemId())
+                    .withSalesOrderId(item.getSoId())
+                    .withInventoryItem(iit)
+                    .withUnitCost(item.getInitUnitCost())
+                    .withMarkup(item.getInitMarkup())
+                    .withOrderQty(Double.valueOf(item.getOrderQty()).intValue())
+                    .build();
+            
+            soItems.add(soit);
+        }
+        
+        return soItems;
+        
     }
 }

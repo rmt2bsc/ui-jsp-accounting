@@ -2,6 +2,7 @@ package com.action.xact.sales;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -404,10 +405,10 @@ public class CustomerSalesConsoleAction extends CustomerSalesSearchAction {
     }
 
     protected void getCustomerSalesOrderForEdit() throws ActionCommandException {
-        this.receiveClientData();
+        boolean oldSalesOrder = this.salesOrderId > 0;
 
         // Setup Sales order profile
-        if (this.salesOrderId > 0) {
+        if (oldSalesOrder) {
             // Call SOAP web service to get existing sales order and items.
             List<VwSalesOrderInvoice> results = this.getCustomerSalesOrderFull();
             if (results != null && results.size() == 1) {
@@ -423,14 +424,14 @@ public class CustomerSalesConsoleAction extends CustomerSalesSearchAction {
             this.salesOrder.setDescription(this.cust.getLongname());
             this.salesOrder.setInvoiced(0);
         }
-
+        
         // Call SOAP web service to get the details of the list of selected
         // Inventory Item Master records based on selection criteria
         Integer items[] = this.getSelectedItems();
         ItemMasterCriteria criteria = ItemMasterCriteria.getInstance();
         criteria.setQry_ItemIdList(items);
 
-        List<VwItemMaster> newItems = null;
+        Map<Integer, VwItemMaster> newItems = null;
         try {
             InventoryResponse response = ItemMasterSoapRequests.callGet(criteria, this.loginId, this.session.getId());
             ReplyStatusType rst = response.getReplyStatus();
@@ -439,27 +440,46 @@ public class CustomerSalesConsoleAction extends CustomerSalesSearchAction {
                 this.throwActionError(rst.getMessage(), rst.getExtMessage());
             }
             if (response.getProfile() != null && response.getProfile().getInvItem() != null) {
-                newItems = VwItemMasterFactory.create(response.getProfile().getInvItem());
+                // Create Map of inventory item master records keyed by item id
+                newItems = VwItemMasterFactory.createMap(response.getProfile().getInvItem());
             }
         } catch (Exception e) {
             logger.log(Level.ERROR, e.getMessage());
             throw new ActionCommandException(e.getMessage());
         }
 
-        // Added new items to sales order profile
-        List<com.entity.SalesOrderItems> newItemList = new ArrayList<>();
-        for (VwItemMaster item : newItems) {
-            com.entity.SalesOrderItems soi = SalesOrderItemsFactory.create();
-            soi.setItemId(item.getId());
-            soi.setItemName(item.getDescription());
-            soi.setInitMarkup(item.getMarkup());
-            soi.setOrderQty(0);
-            soi.setQtyOnHand(item.getQtyOnHand());
-            soi.setInitUnitCost(item.getRetailPrice() > 0 && item.getOverrideRetail() == 1 ? item.getRetailPrice() : item
-                    .getUnitCost());
-            newItemList.add(soi);
+
+        // Set item type id and quantity on hand for items belonging to an
+        // existing sales order using item master object
+        if (oldSalesOrder) {
+            List<com.entity.SalesOrderItems> soItems = this.salesOrder.getLineItems();
+            for (com.entity.SalesOrderItems item : soItems) {
+                VwItemMaster im = newItems.get(item.getItemId());
+                if (im != null) {
+                    item.setItemTypeId(im.getItemTypeId());
+                    item.setQtyOnHand(im.getQtyOnHand());
+                }
+            }
         }
-        this.salesOrder.setLineItems(newItemList);
+        else {
+            // For new sales orders, create sales order items from base
+            // inventory master item data
+            List<com.entity.SalesOrderItems> newItemList = new ArrayList<>();
+            for (Integer key : newItems.keySet()) {
+                VwItemMaster item = newItems.get(key);
+                com.entity.SalesOrderItems soi = SalesOrderItemsFactory.create();
+                soi.setItemId(item.getId());
+                soi.setItemTypeId(item.getItemTypeId());
+                soi.setItemName(item.getDescription());
+                soi.setInitMarkup(item.getMarkup());
+                soi.setOrderQty(0);
+                soi.setQtyOnHand(item.getQtyOnHand());
+                soi.setInitUnitCost(item.getUnitCost());
+                soi.setRetailPrice(item.getRetailPrice());
+                newItemList.add(soi);
+            }
+            this.salesOrder.setLineItems(newItemList);
+        }
     }
 
     /**
