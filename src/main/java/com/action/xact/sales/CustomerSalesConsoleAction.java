@@ -126,7 +126,7 @@ public class CustomerSalesConsoleAction extends CustomerSalesSearchAction {
             this.doSalesOrderHistory();
         }
         if (command.equalsIgnoreCase(CustomerSalesConsoleAction.COMMAND_NEWORDER)) {
-            this.doNewSalesOrder(0);
+            this.doSalesOrderItemSelections(0);
         }
         if (command.equalsIgnoreCase(CustomerSalesConsoleAction.COMMAND_PAYMENT)) {
             this.acceptPaymentOnAccount();
@@ -236,7 +236,7 @@ public class CustomerSalesConsoleAction extends CustomerSalesSearchAction {
      * @throws ActionCommandException
      *             System or Database errors.
      */
-    public void doNewSalesOrder(int salesOrderId) throws ActionCommandException {
+    public void doSalesOrderItemSelections(int salesOrderId) throws ActionCommandException {
         this.receiveClientData();
         try {
             ItemMasterCriteria criteria = ItemMasterCriteria.getInstance();
