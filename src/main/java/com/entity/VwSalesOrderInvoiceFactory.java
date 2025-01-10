@@ -44,8 +44,19 @@ public class VwSalesOrderInvoiceFactory {
                 o.setOrderStatusId(item.getStatus().getStatusId() != null ? item.getStatus().getStatusId().intValue() : 0);
                 o.setOrderStatusDescr(item.getStatus().getDescription());
             }
+
+            // Logic to capture sales order date created, date updated and sales
+            // order effective date
             if (item.getEffectiveDate() != null) {
                 o.setSalesOrderDate(item.getEffectiveDate().toGregorianCalendar().getTime());
+            }
+            if (item.getTracking() != null) {
+                if (item.getTracking().getDateCreated() != null) {
+                    o.setDateCreated(item.getTracking().getDateCreated().toGregorianCalendar().getTime());
+                }
+                if (item.getTracking().getDateUpdated() != null) {
+                    o.setDateUpdated(item.getTracking().getDateUpdated().toGregorianCalendar().getTime());
+                }
             }
             o.setOrderTotal(item.getOrderTotal() != null ? item.getOrderTotal().doubleValue() : 0);
             o.setAccountNo(item.getCustomerAccountNo());

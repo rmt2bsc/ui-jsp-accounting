@@ -53,6 +53,7 @@
 							 <th class="clsTableListHeader">&nbsp;</th>
 							 <th class="clsTableListHeader" >Order No.</th>
 							 <th class="clsTableListHeader">Date Entered</th>
+							 <th class="clsTableListHeader">Effective Date</th>
 							 <th class="clsTableListHeader" >Invoice Id</th>
 							 <th class="clsTableListHeader" >Trans. Id</th>
 							 <th class="clsTableListHeader">Trans. Date</th>
@@ -74,7 +75,12 @@
 									  <beanlib:InputControl value="#beanObj.SalesOrderId"/>
 									</font>
 								 </td>
-									 <td width="10%" align="left">
+								 <td width="10%" align="left">
+									<font size="2"> 
+									  <beanlib:InputControl value="#beanObj.DateCreated" format="MM-dd-yyyy"/>
+									</font>
+								 </td>
+								 <td width="10%" align="left">
 									<font size="2"> 
 									  <beanlib:InputControl value="#beanObj.SalesOrderDate" format="MM-dd-yyyy"/>
 									</font>
@@ -99,12 +105,12 @@
 									   <beanlib:InputControl value="#beanObj.OrderTotal" format="$#,##0.00;($#,##0.00)"/>
 									</font>
 								 </td>
-								 <td width="20%" align="center">
+								 <td width="15%" align="center">
 									<font size="2">
 									   <beanlib:InputControl dataSource="beanObj" value="#beanObj.OrderStatusDescr" />
 									</font>
 								</td>
-								 <td width="15%" align="left" >
+								 <td width="10%" align="left" >
 									<font size="2">
 									   <beanlib:InputControl dataSource="beanObj" value="#beanObj.InvoiceNo"/>
 									</font>
